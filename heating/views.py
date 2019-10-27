@@ -10,8 +10,8 @@ def api_index(request):
 def api_sensors(request):
     if request.method == 'POST':
         # if POST add new sensor
-        s = Sensor(name=request.POST['name'], type=)
-        pass
+        s = Sensor(name=request.POST['name'], type=request.POST['type'], address=request.POST['address'], description=request.POST['description'])
+        s.save()
     else:
         # if GET return list of sensors
         sensors = Sensor.objects.all()
@@ -34,8 +34,13 @@ def api_sensor(request, sensor_name):
 def api_sensor_data(request, sensor_name):
     if request.method == 'POST':
         # if POST add data for sensor
-        pass
+        value_real = request.POST.get('value-real')
+        value_bool = request.POST.get('value-bool')
+        s = Sensor.objects.get(name=sensor_name)
+        sd = SensorData(sensor=s, value_real=value_real, value_bool=value_bool)
+        sd.save()
     else:
         # if GET get data for sensor
-        pass
+        s = Sensor.objects.get(name=sensor_name)
+        data = s.sensordata_set.all()
     return HttpResponse("sensor_data")
