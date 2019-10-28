@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 
 # Create your models here.
 class Sensor(models.Model):
@@ -12,8 +14,8 @@ class Sensor(models.Model):
         verbose_name_plural = "Sensors"
 
 class SensorData(models.Model):
-    name = models.ForeignKey('Sensor', on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    sensor = models.ForeignKey('Sensor', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
     value_real = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     value_bool = models.BooleanField(null=True)
 

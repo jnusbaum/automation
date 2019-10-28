@@ -1,4 +1,6 @@
 from django.http import HttpResponse
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from heating.models import Sensor, SensorData
 
 # Create your views here.
@@ -30,14 +32,36 @@ def api_sensor(request, sensor_name):
         pass
     return HttpResponse("sensor")
 
+bool_values = {
+    'on': True,
+    'true': True,
+    '1': True,
+    'True': True,
+    'off': False,
+    'false': False,
+    '0': False,
+    'False': False
+}
+
 
 def api_sensor_data(request, sensor_name):
     if request.method == 'POST':
+        print("in api_sensor_data")
         # if POST add data for sensor
+        timestamp = request.POST.get('timestamp', timezone.now())
+        print(timestamp)
         value_real = request.POST.get('value-real')
+        print(value_real)
+        if value_real:
+            value_real = float(value_real)
+            print(value_real)
         value_bool = request.POST.get('value-bool')
+        print(value_bool)
+        if value_bool:
+            value_bool = bool_values[value_bool]
+            print(value_bool)
         s = Sensor.objects.get(name=sensor_name)
-        sd = SensorData(sensor=s, value_real=value_real, value_bool=value_bool)
+        sd = SensorData(sensor=s, timestamp=timestamp, value_real=value_real, value_bool=value_bool)
         sd.save()
     else:
         # if GET get data for sensor
