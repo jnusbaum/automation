@@ -1,12 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 from heating.models import Sensor, SensorData
 
 # Create your views here.
 def api_index(request):
     # return doc page
-    return HttpResponse("index")
+    return HttpResponse("Welcome to the home automation API")
 
 
 def api_sensors(request):
@@ -14,10 +14,12 @@ def api_sensors(request):
         # if POST add new sensor
         s = Sensor(name=request.POST['name'], type=request.POST['type'], address=request.POST['address'], description=request.POST['description'])
         s.save()
+        return HttpResponse(status=201)
     else:
         # if GET return list of sensors
         sensors = Sensor.objects.all()
-    return HttpResponse("sensors")
+        data = serializers.serialize('json', sensors)
+        return JsonResponse(data, safe=False)
 
 
 def api_sensor(request, sensor_name):
@@ -25,7 +27,7 @@ def api_sensor(request, sensor_name):
         # if PATCH add data for sensor
         pass
     elif request.method == 'DELETE':
-        # if DELETE get data for sensor
+        # if DELETE delete sensor
         pass
     else:
         # if GET get sensor meta data
