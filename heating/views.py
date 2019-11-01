@@ -65,8 +65,10 @@ def api_sensor_data(request, sensor_name):
         s = Sensor.objects.get(name=sensor_name)
         sd = SensorData(sensor=s, timestamp=timestamp, value_real=value_real, value_bool=value_bool)
         sd.save()
+        return HttpResponse(status=201)
     else:
         # if GET get data for sensor
         s = Sensor.objects.get(name=sensor_name)
-        data = s.sensordata_set.all()
-    return HttpResponse("sensor_data")
+        sensordata = s.sensordata_set.all()
+        data = serializers.serialize('json', sensordata)
+        return JsonResponse(data, safe=False)
