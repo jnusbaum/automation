@@ -13,7 +13,16 @@ def api_index(request):
 def api_sensors(request):
     if request.method == 'POST':
         # if POST add new sensor
-        s = Sensor(name=request.POST['name'], type=request.POST['type'], address=request.POST['address'], description=request.POST['description'])
+        pk = None
+        try:
+            pk = request.POST['name']
+        except KeyError:
+            return HttpResponse()
+
+        s = Sensor(name=pk,
+                   type=request.POST.get('type', 'TEMP'),
+                   address=request.POST.get('address', ''),
+                   description=request.POST.get('description', 'temperature sensor'))
         s.save()
         return HttpResponse(status=201)
     else:
@@ -50,8 +59,8 @@ def api_sensor(request, sensor_name):
     else:
         # if GET get sensor meta data
         sensor = get_object_or_404(Sensor, pk=sensor_name)
-        data = serializers.serialize('json', sensor)
-        return JsonResponse(data)
+        data = serializers.serialize('json', (sensor, ))
+        return JsonResponse(data, safe=False)
 
 
 bool_values = {
