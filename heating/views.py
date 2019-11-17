@@ -87,7 +87,7 @@ def api_sensor_data(request, sensor_name):
         value_bool = request.POST.get('value-bool')
         if value_bool:
             value_bool = bool_values[value_bool]
-        s = Sensor.objects.get(name=sensor_name)
+        s = get_object_or_404(Sensor, pk=sensor_name)
         sd = SensorData(sensor=s, timestamp=timestamp, value_real=value_real, value_bool=value_bool)
         sd.save()
         return HttpResponse(status=201)

@@ -24,7 +24,13 @@ class TestAPI(unittest.TestCase):
         pprint.pprint(data)
         tcount += 1
 
-        sensor_name = 'MBR-IN'
+        sensor_name = 'TEST'
+        print(f'test {tcount} - add sensor')
+        data = {'name': sensor_name, 'type': 'TEMP', 'description': 'test sensor'}
+        r = requests.post(f'{host}/api/heating/sensors', data=data)
+        self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
+        tcount += 1
+
         print(f'test {tcount} - get sensor')
         r = requests.get(f'{host}/api/heating/sensors/{sensor_name}')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
@@ -32,14 +38,22 @@ class TestAPI(unittest.TestCase):
         pprint.pprint(data)
         tcount += 1
 
-        # print(f'test {tcount} - add sensor')
-        # data = {'name': 'TEST', 'type': 'TEMP', 'address':, 'description': }
-        # r = requests.post(f'{host}/api/heating/sensors', data=data)
-        # self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
-        # tcount += 1
-
         print('test %d - add data' % tcount)
         data = {'value-real': '138.2'}
         r = requests.post(f'{host}/api/heating/sensors/{sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
+
+        print(f'test {tcount} - change sensor')
+        data = {'address': '0x423e4a'}
+        r = requests.patch(f'{host}/api/heating/sensors/{sensor_name}', data=data)
+        self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
+        tcount += 1
+
+        print(f'test {tcount} - delete sensor')
+        data = {'name': 'TEST', 'type': 'TEMP', 'address': '', 'description': 'test sensor'}
+        r = requests.delete(f'{host}/api/heating/sensors/{sensor_name}')
+        self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
+        tcount += 1
+
+
