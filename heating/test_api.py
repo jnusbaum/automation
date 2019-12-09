@@ -1,8 +1,9 @@
 import requests
 import unittest
 import pprint
+from datetime import datetime
 
-host = 'http://192.168.0.134:8000'
+host = 'http://192.168.0.134:5000'
 
 class TestAPI(unittest.TestCase):
 
@@ -18,7 +19,7 @@ class TestAPI(unittest.TestCase):
         tcount = 1
 
         print('test %d - get sensors' % tcount)
-        r = requests.get(f'{host}/api/heating/sensors')
+        r = requests.get(f'{host}/sensors')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
@@ -26,32 +27,34 @@ class TestAPI(unittest.TestCase):
 
         sensor_name = 'TEST'
         print(f'test {tcount} - add sensor')
-        data = {'name': sensor_name, 'type': 'TEMP', 'description': 'test sensor'}
-        r = requests.post(f'{host}/api/heating/sensors', data=data)
+        data = {'name': sensor_name, 'type': 'TEMP', 'address': '', 'description': 'test sensor'}
+        r = requests.post(f'{host}/sensors', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - get sensor')
-        r = requests.get(f'{host}/api/heating/sensors/{sensor_name}')
+        r = requests.get(f'{host}/sensors/{sensor_name}')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
         tcount += 1
 
         print('test %d - add data' % tcount)
-        data = {'value-real': '138.2'}
-        r = requests.post(f'{host}/api/heating/sensors/{sensor_name}/data', data=data)
+        tdt = datetime.today()
+        tstr = tdt.strftime("%Y-%m-%d-%H-%M-%S")
+        data = {'value-real': '138.2', 'timestamp': tstr }
+        r = requests.post(f'{host}/sensors/{sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - change sensor')
         data = {'address': '0x423e4a'}
-        r = requests.patch(f'{host}/api/heating/sensors/{sensor_name}', data=data)
+        r = requests.patch(f'{host}/sensors/{sensor_name}', data=data)
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - delete sensor')
-        r = requests.delete(f'{host}/api/heating/sensors/{sensor_name}')
+        r = requests.delete(f'{host}/sensors/{sensor_name}')
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
