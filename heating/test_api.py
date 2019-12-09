@@ -51,7 +51,6 @@ class TestAPI(unittest.TestCase):
         tcount += 1
 
         print(f'test {tcount} - delete sensor')
-        data = {'name': 'TEST', 'type': 'TEMP', 'address': '', 'description': 'test sensor'}
         r = requests.delete(f'{host}/api/heating/sensors/{sensor_name}')
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
