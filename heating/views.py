@@ -40,7 +40,7 @@ def index(request):
             elif dval < 130:
                 dclass = 'warm'
             elif dval < 150:
-                dclass = 'verywarm'
+                dclass = 'very-warm'
             else:
                 dclass = 'hot'
             samples.append({'name': sensor['id'], 'timestamp': sample['attributes']['timestamp'], 'value': sample['attributes']['value_real'], 'dclass': dclass})

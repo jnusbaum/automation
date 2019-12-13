@@ -11,27 +11,27 @@
     <style>
         .hot {
             {# above 150 #}
-            background-color: hsla(0, 100%, 50%, 0.5);
+            background-color: red;
         }
         .very-warm {
             {# 130-150 #}
-            background-color: hsla(36, 100%, 50%, 0.5);
+            background-color: orange;
         }
         .warm {
             {# 110-130 #}
-            background-color: hsla(60, 100%, 50%, 0.5);
+            background-color: yellow;
         }
         .luke-warm {
             {# 90-110 #}
-            background-color: hsla(180, 100%, 90%, 0.5);
+            background-color: aliceblue;
         }
         .cool {
             {# 70-90 #}
-            background-color: hsla(192, 100%, 50%, 0.5);
+            background-color: skyblue;
         }
         .cold {
             {# below 70 #}
-            background-color: hsla(240, 100%, 40%, 0.5);
+            background-color: deepskyblue;
         }
     </style>
 
@@ -44,26 +44,32 @@
 
 <div class="container">
   <div class="row">
+    <div class="col-sm-2">
+      <h3>Status</h3>
+    </div>
     <div class="col-sm-4">
       <h3>Name</h3>
     </div>
     <div class="col-sm-4">
       <h3>Timestamp</h3>
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-2">
       <h3>Temperature</h3>
     </div>
   </div>
     {% for sample in samples %}
     <div class="row">
+        <div class="col-sm-2">
+          <button type="button" class="{{ sample.dclass }} btn-lg"></button>
+        </div>
         <div class="col-sm-4">
           <p>{{ sample.name }}</p>
         </div>
         <div class="col-sm-4">
           <p>{{ sample.timestamp }}</p>
         </div>
-        <div class="col-sm-4">
-          <p class="{{ sample.dclass }}">{{ sample.value }}</p>
+        <div class="col-sm-2">
+          <p>{{ sample.value }}</p>
         </div>
     </div>
     {% endfor %}
