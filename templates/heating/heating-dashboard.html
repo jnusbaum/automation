@@ -8,6 +8,33 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .hot {
+            {# above 150 #}
+            background-color: hsla(0, 100%, 50%, 0.5);
+        }
+        .very-warm {
+            {# 130-150 #}
+            background-color: hsla(36, 100%, 50%, 0.5);
+        }
+        .warm {
+            {# 110-130 #}
+            background-color: hsla(60, 100%, 50%, 0.5);
+        }
+        .luke-warm {
+            {# 90-110 #}
+            background-color: hsla(180, 100%, 90%, 0.5);
+        }
+        .cool {
+            {# 70-90 #}
+            background-color: hsla(192, 100%, 50%, 0.5);
+        }
+        .cold {
+            {# below 70 #}
+            background-color: hsla(240, 100%, 40%, 0.5);
+        }
+    </style>
+
 </head>
 <body>
 
@@ -36,7 +63,7 @@
           <p>{{ sample.timestamp }}</p>
         </div>
         <div class="col-sm-4">
-          <p>{{ sample.value }}</p>
+          <p class="{{ sample.dclass }}">{{ sample.value }}</p>
         </div>
     </div>
     {% endfor %}
