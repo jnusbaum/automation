@@ -11,27 +11,35 @@
     <style>
         .hot {
             {# above 150 #}
-            background-color: red;
+            fill: red;
         }
         .very-warm {
             {# 130-150 #}
-            background-color: orange;
+            fill: orange;
         }
         .warm {
             {# 110-130 #}
-            background-color: yellow;
+            fill: yellow;
         }
         .luke-warm {
             {# 90-110 #}
-            background-color: aliceblue;
+            fill: aliceblue;
         }
         .cool {
             {# 70-90 #}
-            background-color: skyblue;
+            fill: skyblue;
         }
         .cold {
             {# below 70 #}
-            background-color: deepskyblue;
+            fill: deepskyblue;
+        }
+
+        .vertical-center {
+              margin: 0;
+              position: absolute;
+              top: 50%;
+              -ms-transform: translateY(-50%);
+              transform: translateY(-50%);
         }
     </style>
 
@@ -43,35 +51,39 @@
 </div>
 
 <div class="container">
-  <div class="row">
-    <div class="col-sm-2">
-      <h3>Status</h3>
-    </div>
-    <div class="col-sm-4">
-      <h3>Name</h3>
-    </div>
-    <div class="col-sm-4">
-      <h3>Timestamp</h3>
-    </div>
-    <div class="col-sm-2">
-      <h3>Temperature</h3>
-    </div>
-  </div>
-    {% for sample in samples %}
     <div class="row">
         <div class="col-sm-2">
-          <button type="button" class="{{ sample.dclass }} btn-lg"></button>
+            <h3>Status</h3>
         </div>
         <div class="col-sm-4">
-          <p>{{ sample.name }}</p>
+            <h3>Name</h3>
         </div>
         <div class="col-sm-4">
-          <p>{{ sample.timestamp }}</p>
+            <h3>Timestamp</h3>
         </div>
         <div class="col-sm-2">
-          <p>{{ sample.value }}</p>
+            <h3>Temperature</h3>
         </div>
     </div>
+    {% for sample in samples %}
+        <div class="row">
+            <div class="col-sm-2">
+                <svg height="50" width="50">
+                    <circle class="{{ sample.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+                {#          <button type="button" class="{{ sample.dclass }} btn-lg"></button>#}
+            </div>
+            <div class="col-sm-4">
+                <p class="vertical-center">{{ sample.name }}</p>
+            </div>
+            <div class="col-sm-4">
+                <p class="vertical-center">{{ sample.timestamp }}</p>
+            </div>
+            <div class="col-sm-2">
+                <p class="vertical-center">{{ sample.value }}</p>
+            </div>
+        </div>
     {% endfor %}
 </div>
 
