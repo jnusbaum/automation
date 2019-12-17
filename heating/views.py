@@ -22,6 +22,7 @@ def index(request):
         return HttpResponse(status_code=r.status_code)
     data = r.json()
     sensors = data['data']
+    sensors.sort(key=lambda x: x['id'])
     samples = []
     for sensor in sensors:
         r = requests.get(f"{host}/sensors/{sensor['id']}/data")
