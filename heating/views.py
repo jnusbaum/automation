@@ -23,7 +23,7 @@ def index(request):
     data = r.json()
     sensors = data['data']
     sensors.sort(key=lambda x: x['id'])
-    samples = []
+    samples = {}
     for sensor in sensors:
         r = requests.get(f"{host}/sensors/{sensor['id']}/data")
         if requests.codes.ok != r.status_code:
@@ -44,5 +44,5 @@ def index(request):
                 dclass = 'very-warm'
             else:
                 dclass = 'hot'
-            samples.append({'name': sensor['id'], 'timestamp': sample['attributes']['timestamp'], 'value': sample['attributes']['value_real'], 'dclass': dclass})
+            samples[sensor['id'].replace('-', '_')] = {'name': sensor['id'], 'timestamp': sample['attributes']['timestamp'], 'value': sample['attributes']['value_real'], 'dclass': dclass}
     return render(request, 'heating/heating-dashboard.html', {'samples': samples})

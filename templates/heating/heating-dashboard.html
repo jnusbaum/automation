@@ -41,6 +41,11 @@
               -ms-transform: translateY(-50%);
               transform: translateY(-50%);
         }
+
+        .center {
+            text-align: center;
+            border: aliceblue;
+        }
     </style>
 
 </head>
@@ -52,39 +57,85 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-sm-2">
-            <h3>Status</h3>
+        <div class="col-sm-4 col-lg-2 border">
+            <h3  style="text-align: center">MBR</h3>
         </div>
-        <div class="col-sm-4">
-            <h3>Name</h3>
+        <div class="col-sm-4 col-lg-2 border">
+            <h3 style="text-align: center">MBATH</h3>
         </div>
-        <div class="col-sm-4">
-            <h3>Timestamp</h3>
-        </div>
-        <div class="col-sm-2">
-            <h3>Temperature</h3>
+        <div class="col-sm-4 col-lg-2 border">
+            <h3 style="text-align: center">LIBRARY</h3>
         </div>
     </div>
-    {% for sample in samples %}
-        <div class="row">
-            <div class="col-sm-2">
-                <svg height="50" width="50">
-                    <circle class="{{ sample.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                    Sorry, your browser does not support inline SVG.
-                </svg>
-                {#          <button type="button" class="{{ sample.dclass }} btn-lg"></button>#}
-            </div>
-            <div class="col-sm-4">
-                <p class="vertical-center">{{ sample.name }}</p>
-            </div>
-            <div class="col-sm-4">
-                <p class="vertical-center">{{ sample.timestamp }}</p>
-            </div>
-            <div class="col-sm-2">
-                <p class="vertical-center">{{ sample.value }}</p>
-            </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">IN</h3>
         </div>
-    {% endfor %}
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">OUT</h3>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">IN</h3>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">OUT</h3>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">IN</h3>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h3 style="text-align: center">OUT</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.MBR_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.MBR_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.MBATH_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.MBATH_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.LIBRARY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.LIBRARY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-lg-2 center border">
+            {{ samples.MBR_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center border">
+            {{ samples.MBATH_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center border">
+            {{ samples.LIBRARY_IN.timestamp }}
+        </div>
+    </div>
 </div>
 
 </body>
