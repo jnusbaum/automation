@@ -44,6 +44,7 @@
 
         .center {
             text-align: center;
+            vertical-align: center;
             border: aliceblue;
         }
     </style>
@@ -56,35 +57,36 @@
 </div>
 
 <div class="container">
-    <div class="row">
-        <div class="col-sm-4 col-lg-2 border">
-            <h3  style="text-align: center">MBR</h3>
+    {#    #}
+    <div class="row mt-3">
+        <div class="col-sm-4 col-lg-2">
+            <a href="MBR"><h5 class="center">MBR</h5></a>
         </div>
-        <div class="col-sm-4 col-lg-2 border">
-            <h3 style="text-align: center">MBATH</h3>
+        <div class="col-sm-4 col-lg-2">
+            <a href="MBATH"><h5 class="center">MBATH</h5></a>
         </div>
-        <div class="col-sm-4 col-lg-2 border">
-            <h3 style="text-align: center">LIBRARY</h3>
+        <div class="col-sm-4 col-lg-2">
+            <a href="LIBRARY"><h5 class="center">LIBRARY</h5></a>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">IN</h3>
+            <h5 style="text-align: center">IN</h5>
         </div>
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">OUT</h3>
+            <h5 style="text-align: center">OUT</h5>
         </div>
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">IN</h3>
+            <h5 style="text-align: center">IN</h5>
         </div>
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">OUT</h3>
+            <h5 style="text-align: center">OUT</h5>
         </div>
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">IN</h3>
+            <h5 style="text-align: center">IN</h5>
         </div>
         <div class="col-sm-2 col-lg-1 border">
-            <h3 style="text-align: center">OUT</h3>
+            <h5 style="text-align: center">OUT</h5>
         </div>
     </div>
     <div class="row">
@@ -125,17 +127,268 @@
             </svg>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-4 col-lg-2 center border">
+    <div class="row mt-1">
+        <div class="col-sm-4 col-lg-2 center">
             {{ samples.MBR_IN.timestamp }}
         </div>
-        <div class="col-sm-4 col-lg-2 center border">
+        <div class="col-sm-4 col-lg-2 center">
             {{ samples.MBATH_IN.timestamp }}
         </div>
-        <div class="col-sm-4 col-lg-2 center border">
+        <div class="col-sm-4 col-lg-2 center">
             {{ samples.LIBRARY_IN.timestamp }}
         </div>
     </div>
+
+
+    {#    #}
+    <div class="row mt-3">
+        <div class="col-sm-4 col-lg-2">
+            <a href="KITCHEN"><h5 style="text-align: center">KITCHEN</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="LAUNDRY"><h5 style="text-align: center">LAUNDRY</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="GARAGE"><h5 style="text-align: center">GARAGE</h5></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.KITCHEN_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.KITCHEN_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.LAUNDRY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.LAUNDRY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.GARAGE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.GARAGE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.KITCHEN_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.LAUNDRY_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.GARAGE_IN.timestamp }}
+        </div>
+    </div>
+
+
+    {#    #}
+    <div class="row mt-3">
+        <div class="col-sm-4 col-lg-2">
+            <a href="FAMILY"><h5 style="text-align: center">FAMILY ROOM</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="OFFICE"><h5 style="text-align: center">OFFICE</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="EXERCISE"><h5 style="text-align: center">EXERCISE</h5></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.FAMILY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.FAMILY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.OFFICE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.OFFICE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.EXERCISE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.EXERCISE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.FAMILY_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.OFFICE_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.EXERCISE_IN.timestamp }}
+        </div>
+    </div>
+
+
+    {#    #}
+    <div class="row mt-3">
+        <div class="col-sm-4 col-lg-2">
+            <a href="GUEST"><h5 style="text-align: center">GUEST BR</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="VALVE"><h5 style="text-align: center">VALVE</h5></a>
+        </div>
+        <div class="col-sm-4 col-lg-2">
+            <a href="BOILER"><h5 style="text-align: center">BOILER</h5></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">IN</h5>
+        </div>
+        <div class="col-sm-2 col-lg-1 border">
+            <h5 style="text-align: center">OUT</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.GUEST_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.GUEST_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.VALVE_INSYS.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.VALVE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.BOILER_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+        <div class="col-sm-2 col-lg-1 center border">
+            <svg height="50" width="50">
+                <circle class="{{ samples.BOILER_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                Sorry, your browser does not support inline SVG.
+            </svg>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.GUEST_IN.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.VALVE_INSYS.timestamp }}
+        </div>
+        <div class="col-sm-4 col-lg-2 center">
+            {{ samples.BOILER_IN.timestamp }}
+        </div>
+    </div>
+
+
 </div>
 
 </body>

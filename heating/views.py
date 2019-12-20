@@ -46,3 +46,27 @@ def index(request):
                 dclass = 'hot'
             samples[sensor['id'].replace('-', '_')] = {'name': sensor['id'], 'timestamp': sample['attributes']['timestamp'], 'value': sample['attributes']['value_real'], 'dclass': dclass}
     return render(request, 'heating/heating-dashboard.html', {'samples': samples})
+
+
+def zone(request, zone_name):
+    # get data for zone
+    # input, will return latest value
+    if zone_name == 'VALVE':
+        r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data')
+    else:
+        r = requests.get(f'{host}/sensors/{zone_name}-IN/data')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status_code=r.status_code)
+    data = r.json()
+    inval = data['data'][0]['attributes']['value_real']
+    # output
+    r = requests.get(f'{host}/sensors/{zone_name}-OUT/data')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status_code=r.status_code)
+    data = r.json()
+    outval = data['data'][0]['attributes']['value_real']
+    samples = {'inval': inval, 'outval': outval }
+
+    return render(request, 'heating/heating-zone.html', {'samples': samples})
