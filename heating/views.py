@@ -51,22 +51,23 @@ def index(request):
 def zone(request, zone_name):
     # get data for zone
     # input, will return latest value
+    params = {'datapts': 9000}
     if zone_name == 'VALVE':
-        r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data')
+        r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data', params=params)
     else:
-        r = requests.get(f'{host}/sensors/{zone_name}-IN/data')
+        r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
     if requests.codes.ok != r.status_code:
         # error
         return HttpResponse(status_code=r.status_code)
     data = r.json()
-    inval = data['data'][0]['attributes']['value_real']
+    invals = data
     # output
-    r = requests.get(f'{host}/sensors/{zone_name}-OUT/data')
+    r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
     if requests.codes.ok != r.status_code:
         # error
         return HttpResponse(status_code=r.status_code)
     data = r.json()
-    outval = data['data'][0]['attributes']['value_real']
-    samples = {'inval': inval, 'outval': outval }
+    outvals = data
+    samples = {'invals': invals, 'outvals': outvals, 'zone': zone_name }
 
     return render(request, 'heating/heating-zone.html', {'samples': samples})
