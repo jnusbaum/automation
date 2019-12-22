@@ -2,8 +2,16 @@ from django.http import HttpResponse
 from django.shortcuts import render
 import requests
 from decimal import *
+from datetime import datetime
 
 host = 'http://192.168.0.134'
+
+def str_to_datetime(ans):
+    if ans:
+        d = datetime.strptime(ans, "%Y-%m-%d-%H-%M-%S")
+        # no tz info, assumed to be in UTC
+        return d
+    return None
 
 
 def index(request):
@@ -48,6 +56,33 @@ def index(request):
     return render(request, 'heating/heating-dashboard.html', {'samples': samples})
 
 
+def clean_data(sdata):
+    outdata = []
+    # if x more than 25% diif from x-1
+    # then x = x-1
+    prev_in = sdata[0][1]
+    prev_out = sdata[0][2]
+    badin = 0
+    badout = 0
+    for item in sdata:
+        timestamp = item[0]
+        if abs(item[1] - prev_in) / prev_in < .25:
+            inval = item[1]
+        else:
+            inval = prev_in
+            badin += 1
+        prev_in = inval
+        if abs(item[2] - prev_out) / prev_out < .25:
+            outval = item[2]
+        else:
+            outval = prev_out
+            badout += 1
+        prev_out = outval
+        outdata.append((timestamp, inval, outval))
+    return outdata, badin, badout
+
+
+
 def zone(request, zone_name):
     # get data for zone
     # input, will return latest value
@@ -68,6 +103,11 @@ def zone(request, zone_name):
         return HttpResponse(status_code=r.status_code)
     data = r.json()
     outvals = data
-    samples = {'invals': invals, 'outvals': outvals, 'zone': zone_name }
+    # join data
+    sdata = [(str_to_datetime(invals['data'][i]['attributes']['timestamp']),
+              Decimal(invals['data'][i]['attributes']['value_real']),
+              Decimal(outvals['data'][i]['attributes']['value_real'])) for i in range(0, invals['count'])]
+    sdata, badin, badout = clean_data(sdata)
+    samples = {'data': sdata, 'badin': badin, 'badout': badout, 'zone': zone_name }
 
     return render(request, 'heating/heating-zone.html', {'samples': samples})

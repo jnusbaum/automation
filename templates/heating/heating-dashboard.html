@@ -52,21 +52,21 @@
 </head>
 <body>
 
-<div class="jumbotron text-center">
+<div class="jumbotron">
   <h1>Heating Dashboard</h1>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     {#    #}
     <div class="row mt-3">
         <div class="col-sm-4 col-lg-2">
-            <a href="MBR"><h5 class="center">MBR</h5></a>
+            <a href="{% url 'zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="MBATH"><h5 class="center">MBATH</h5></a>
+            <a href="{% url 'zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="LIBRARY"><h5 class="center">LIBRARY</h5></a>
+            <a href="{% url 'zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
         </div>
     </div>
     <div class="row">
@@ -143,13 +143,13 @@
     {#    #}
     <div class="row mt-3">
         <div class="col-sm-4 col-lg-2">
-            <a href="KITCHEN"><h5 style="text-align: center">KITCHEN</h5></a>
+            <a href="{% url 'zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="LAUNDRY"><h5 style="text-align: center">LAUNDRY</h5></a>
+            <a href="{% url 'zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="GARAGE"><h5 style="text-align: center">GARAGE</h5></a>
+            <a href="{% url 'zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
         </div>
     </div>
     <div class="row">
@@ -226,13 +226,13 @@
     {#    #}
     <div class="row mt-3">
         <div class="col-sm-4 col-lg-2">
-            <a href="FAMILY"><h5 style="text-align: center">FAMILY ROOM</h5></a>
+            <a href="{% url 'zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="OFFICE"><h5 style="text-align: center">OFFICE</h5></a>
+            <a href="{% url 'zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="EXERCISE"><h5 style="text-align: center">EXERCISE</h5></a>
+            <a href="{% url 'zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
         </div>
     </div>
     <div class="row">
@@ -309,13 +309,13 @@
     {#    #}
     <div class="row mt-3">
         <div class="col-sm-4 col-lg-2">
-            <a href="GUEST"><h5 style="text-align: center">GUEST BR</h5></a>
+            <a href="{% url 'zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="VALVE"><h5 style="text-align: center">VALVE</h5></a>
+            <a href="{% url 'zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
         </div>
         <div class="col-sm-4 col-lg-2">
-            <a href="BOILER"><h5 style="text-align: center">BOILER</h5></a>
+            <a href="{% url 'zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
         </div>
     </div>
     <div class="row">
