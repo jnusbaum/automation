@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Heating Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="//cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/radial/gauge.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          ['IN', {{ samples.data.0.1 }}],
+          ['OUT', {{ samples.data.0.2 }}]
+        ]);
+
+        var options = {
+            width: 600, height: 300,
+            greenFrom: 90, greenTo: 120,
+            greenColor: "yellow",
+            yellowFrom:120, yellowTo: 150,
+            yellowColor: "orange",
+            redFrom: 150, redTo: 200,
+            minorTicks: 5,
+            max: 200
+        };
+
+        var gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
+        gauges.draw(data, options);
+
+        data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Time');
+        data.addColumn('number', 'IN');
+        data.addColumn('number', 'OUT');
+
+        {% for item in samples.data %}
+        data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
+                                {{ item.1 }},
+                                {{ item.2 }}]);
+        {%  endfor %}
+
+        options = {
+          title: 'Last 24 Hours',
+          legend: { position: 'bottom' },
+          hAxis: {
+              title: 'Time'
+          },
+          vAxis: {
+              title: 'Temperature'
+              maxValue: 200,
+              minValue: 30
+          },
+          colors: ['skyblue', 'orange']
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+    </script>
+    <style>
+        .hot {
+            {# above 150 #}
+            fill: red;
+        }
+        .very-warm {
+            {# 130-150 #}
+            fill: orange;
+        }
+        .warm {
+            {# 110-130 #}
+            fill: yellow;
+        }
+        .luke-warm {
+            {# 90-110 #}
+            fill: aliceblue;
+        }
+        .cool {
+            {# 70-90 #}
+            fill: skyblue;
+        }
+        .cold {
+            {# below 70 #}
+            fill: deepskyblue;
+        }
+
+        .vertical-center {
+              margin: 0;
+              position: absolute;
+              top: 50%;
+              -ms-transform: translateY(-50%);
+              transform: translateY(-50%);
+        }
+
+        .center {
+            text-align: center;
+            vertical-align: center;
+            border: aliceblue;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-4">
+                <h4>{{ samples.zone }}</h4>
+            </div>
+            <div class="col-4">
+                <h6>{{ samples.badin }}</h6>
+            </div>
+            <div class="col-4">
+                <h6>{{ samples.badout }}</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-1">
+                <a href="{% url 'index' %}">dashboard</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="gauge_div" style="width: 100%;"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="chart_div" style="width: 100%; height: 500px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
