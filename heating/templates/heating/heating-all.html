@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Heating Comparison</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart', 'line']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        {% for zone, data in samples.items %}
+            var {{ zone }}data = new google.visualization.DataTable();
+            {{ zone }}data.addColumn('datetime', 'Time');
+            {{ zone }}data.addColumn('number', 'IN');
+            {{ zone }}data.addColumn('number', 'OUT');
+
+            {% for item in data %}
+                {{ zone }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
+                                        {{ item.1 }},
+                                        {{ item.2 }}]);
+            {%  endfor %}
+
+            var {{ zone }}options = {
+              chartArea: {width: '90%', height: '80%'},
+              legend: {position: 'in'},
+              vAxis: {
+                  maxValue: 200,
+                  minValue: 30
+              },
+              colors: ['orange', 'skyblue']
+            };
+            var {{ zone }}chart = new google.visualization.LineChart(document.getElementById('{{ zone }}_div'));
+            {{ zone }}chart.draw({{ zone }}data, {{ zone }}options);
+        {% endfor %}
+      }
+    </script>
+
+</head>
+<body>
+
+    <div class="container-fluid mt-3">
+        {% for zone in samples.keys %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ zone }}</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="{{ zone }}_div" style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
