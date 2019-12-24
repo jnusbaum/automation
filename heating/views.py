@@ -3,6 +3,7 @@ from django.shortcuts import render
 import requests
 from decimal import *
 from datetime import datetime
+from statistics import mean
 
 host = 'http://192.168.0.134/dataserver'
 
@@ -61,38 +62,101 @@ def index(request):
 
 
 def clean_data(sdata):
+    # first pass remove all less than 0 and 77 (seems to be a special "error" value)
+
+    # now remove outliers
+    badin = 0
+    badout = 0
+    outdata = []
     # 3 point window, x, y, z
     # avgxz = average of x and z
     # diffy = abs(y - avgxz)
     # if diffy > 35% replace y with avgxz
-    x = sdata[0][1]
-    y = sdata[1][1]
-    z = sdata[2][1]
-    avgxz = a
-    # replace with previous if less than 0
-    outdata = []
-    badin = 0
-    badout = 0
-    prev_in = sdata[0][1]
-    prev_out = sdata[0][2]
+    # also look for less than 0 and
+    xi = sdata[0][1]
+    yi = sdata[1][1]
+    zi = sdata[2][1]
+    xo = sdata[0][2]
+    yo = sdata[1][2]
+    zo = sdata[2][2]
+    outdata.append((sdata[0][0], sdata[0][1], sdata[0][2]))
+    ty = sdata[1][0]
+    for i in range(3, len(sdata)):
+        inval = 0
+        outval = 0
 
-    for item in sdata:
-        timestamp = item[0]
-        if item[1] > 0 and abs(item[1] - prev_in) / prev_in < .50:
-            inval = item[1]
+        avgxz = mean((xi, zi))
+        if yi > 0:
+            diffy = abs(yi - avgxz)/avgxz
+            if diffy > .35:
+                inval = avgxz  # set current item to avg
+                badin += 1
+            else:
+                inval = yi
         else:
-            inval = prev_in
+            inval = avgxz
             badin += 1
-        prev_in = inval
-        if item[2] > 0 and abs(item[2] - prev_out) / prev_out < .50:
-            outval = item[2]
-        else:
-            outval = prev_out
-            badout += 1
-        prev_out = outval
-        outdata.append((timestamp, inval, outval))
-    return outdata, badin, badout
 
+        xi = inval
+        yi = zi
+        zi = sdata[i][1]
+
+        avgxz = mean((xo, zo))
+        if yo > 0:
+            diffy = abs(yo - avgxz)/avgxz
+            if diffy > .35:
+                outval = avgxz  # set current item to avg
+                badout += 1
+            else:
+                outval = yo
+        else:
+            outval = avgxz
+            badout += 1
+
+        xo = outval
+        yo = zo
+        zo = sdata[i][2]
+        outdata.append((ty, inval, outval))
+        ty = sdata[i-1][0]
+
+    inval = 0
+    outval = 0
+
+    avgxz = mean((xi, zi))
+    if yi > 0:
+        diffy = abs(yi - avgxz)/avgxz
+        if diffy > .35:
+            inval = avgxz  # set current item to avg
+            badin += 1
+        else:
+            inval = yi
+    else:
+        inval = avgxz
+        badin += 1
+
+    xi = inval
+    yi = zi
+
+    avgxz = mean((xo, zo))
+    if yo > 0:
+        diffy = abs(yo - avgxz)/avgxz
+        if diffy > .35:
+            outval = avgxz  # set current item to avg
+            badout += 1
+        else:
+            outval = yo
+    else:
+        outval = avgxz
+        badout += 1
+
+    xo = outval
+    yo = zo
+
+    outdata.append((ty, inval, outval))
+    ty = sdata[i][0]
+    outdata.append((ty, yi, yo))
+
+    return outdata, badin, badout
 
 
 def zone(request, zone_name):
