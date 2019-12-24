@@ -1,0 +1,9 @@
+[Unit]
+Description=dashboard gunicorn socket
+
+[Socket]
+ListenStream=/run/dashboard-gunicorn/socket
+User=www-data
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,24 @@
+[Unit]
+Description=dashboard gunicorn daemon
+Requires=dashboard-gunicorn.socket dataserver-gunicorn.service
+After=network.target multi-user.target dataserver-gunicorn.service
+
+[Service]
+User=rjn
+Group=www-data
+RuntimeDirectory=dashboard-gunicorn
+RuntimeDirectoryMode=0775
+WorkingDirectory=/home/rjn/Projects/automation
+ExecStart=/home/rjn/Projects/automation/venv/bin/gunicorn \
+          --timeout 90 \
+	  --access-logfile /home/rjn/Projects/automation/log/gunicorn.access.log \
+          --error-logfile /home/rjn/Projects/automation/log/gunicorn.error.log \
+          --pid /run/dashboard-gunicorn/pid   \
+          --bind unix:/run/dashboard-gunicorn/socket automation.wsgi
+PIDFile=/run/dashboard-gunicorn/pid
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
