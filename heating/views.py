@@ -61,6 +61,14 @@ def index(request):
 
 
 def clean_data(sdata):
+    # 3 point window, x, y, z
+    # avgxz = average of x and z
+    # diffy = abs(y - avgxz)
+    # if diffy > 35% replace y with avgxz
+    x = sdata[0][1]
+    y = sdata[1][1]
+    z = sdata[2][1]
+    avgxz = a
     # replace with previous if less than 0
     outdata = []
     badin = 0
