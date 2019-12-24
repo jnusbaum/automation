@@ -11,7 +11,13 @@ zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'GARAGE', 'FAMILY', 'OFFICE', 'EX
 def str_to_datetime(ans):
     if ans:
         d = datetime.strptime(ans, "%Y-%m-%d-%H-%M-%S")
-        # no tz info, assumed to be in UTC
+        return d
+    return None
+
+
+def datetime_to_str(ans):
+    if ans:
+        d = ans.strftime("%Y-%m-%d-%H-%M-%S")
         return d
     return None
 
@@ -112,9 +118,11 @@ def zone(request, zone_name):
 
 
 def view_all(request):
-    # get data for zone
+    # get data for all zones
+    datapts = request.GET.get('datapts', '100')
+    targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
     # input, will return latest value
-    params = {'datapts': 9000}
+    params = {'datapts': datapts, 'targettime': targettime}
     samples = {}
     for zone_name in zones:
         if zone_name == 'VALVE':
