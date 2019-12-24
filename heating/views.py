@@ -29,7 +29,7 @@ def index(request):
     r = requests.get(f'{host}/sensors')
     if requests.codes.ok != r.status_code:
         # error
-        return HttpResponse(status_code=r.status_code)
+        return HttpResponse(status=r.status_code)
     data = r.json()
     sensors = data['data']
     sensors.sort(key=lambda x: x['id'])
@@ -38,7 +38,7 @@ def index(request):
         r = requests.get(f"{host}/sensors/{sensor['id']}/data")
         if requests.codes.ok != r.status_code:
             # error
-            return HttpResponse(status_code=r.status_code)
+            return HttpResponse(status=r.status_code)
         data = r.json()
         for sample in data['data']:
             dval = Decimal(sample['attributes']['value_real'])
@@ -62,26 +62,33 @@ def index(request):
 
 
 def clean_data(sdata):
-    # first pass remove all less than 0 and 77 (seems to be a special "error" value)
-
-    # now remove outliers
+    outdata1 = []
     badin = 0
     badout = 0
-    outdata = []
+    # first pass remove all less than 0 and 77 (seems to be a special "error" value)
+    for data in sdata:
+        if data[1] < 0 or data[1] == 77:
+            badin += 1
+        elif data[2] < 0 or data[2] == 77:
+            badout += 1
+        else:
+            outdata1.append(data)
+
+    outdata2 = []
     # 3 point window, x, y, z
     # avgxz = average of x and z
     # diffy = abs(y - avgxz)
     # if diffy > 35% replace y with avgxz
     # also look for less than 0 and
-    xi = sdata[0][1]
-    yi = sdata[1][1]
-    zi = sdata[2][1]
-    xo = sdata[0][2]
-    yo = sdata[1][2]
-    zo = sdata[2][2]
-    outdata.append((sdata[0][0], sdata[0][1], sdata[0][2]))
-    ty = sdata[1][0]
-    for i in range(3, len(sdata)):
+    xi = outdata1[0][1]
+    yi = outdata1[1][1]
+    zi = outdata1[2][1]
+    xo = outdata1[0][2]
+    yo = outdata1[1][2]
+    zo = outdata1[2][2]
+    outdata2.append((outdata1[0][0], outdata1[0][1], outdata1[0][2]))
+    ty = outdata1[1][0]
+    for i in range(3, len(outdata1)):
         inval = 0
         outval = 0
 
@@ -99,7 +106,7 @@ def clean_data(sdata):
 
         xi = inval
         yi = zi
-        zi = sdata[i][1]
+        zi = outdata1[i][1]
 
         avgxz = mean((xo, zo))
         if yo > 0:
@@ -115,9 +122,9 @@ def clean_data(sdata):
 
         xo = outval
         yo = zo
-        zo = sdata[i][2]
-        outdata.append((ty, inval, outval))
-        ty = sdata[i-1][0]
+        zo = outdata1[i][2]
+        outdata2.append((ty, inval, outval))
+        ty = outdata1[i-1][0]
 
     inval = 0
     outval = 0
@@ -134,7 +141,6 @@ def clean_data(sdata):
         inval = avgxz
         badin += 1
 
-    xi = inval
     yi = zi
 
     avgxz = mean((xo, zo))
@@ -149,14 +155,13 @@ def clean_data(sdata):
         outval = avgxz
         badout += 1
 
-    xo = outval
     yo = zo
 
-    outdata.append((ty, inval, outval))
-    ty = sdata[i][0]
-    outdata.append((ty, yi, yo))
+    outdata2.append((ty, inval, outval))
+    ty = outdata1[i][0]
+    outdata2.append((ty, yi, yo))
 
-    return outdata, badin, badout
+    return outdata2, badin, badout
 
 
 def zone(request, zone_name):
@@ -169,14 +174,14 @@ def zone(request, zone_name):
         r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
     if requests.codes.ok != r.status_code:
         # error
-        return HttpResponse(status_code=r.status_code)
+        return HttpResponse(status=r.status_code)
     data = r.json()
     invals = data
     # output
     r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
     if requests.codes.ok != r.status_code:
         # error
-        return HttpResponse(status_code=r.status_code)
+        return HttpResponse(status=r.status_code)
     data = r.json()
     outvals = data
     # join data
@@ -203,14 +208,14 @@ def view_all(request):
             r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
         if requests.codes.ok != r.status_code:
             # error
-            return HttpResponse(status_code=r.status_code)
+            return HttpResponse(status=r.status_code)
         data = r.json()
         invals = data
         # output
         r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
         if requests.codes.ok != r.status_code:
             # error
-            return HttpResponse(status_code=r.status_code)
+            return HttpResponse(status=r.status_code)
         data = r.json()
         outvals = data
         # join data
