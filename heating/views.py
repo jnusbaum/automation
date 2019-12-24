@@ -4,7 +4,7 @@ import requests
 from decimal import *
 from datetime import datetime
 
-host = 'http://192.168.0.134'
+host = 'http://192.168.0.134/dataserver'
 
 zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
 
@@ -55,22 +55,22 @@ def index(request):
 
 
 def clean_data(sdata):
+    # replace with previous if less than 0
     outdata = []
-    # if x more than 25% diif from x-1
-    # then x = x-1
-    prev_in = sdata[0][1]
-    prev_out = sdata[0][2]
     badin = 0
     badout = 0
+    prev_in = sdata[0][1]
+    prev_out = sdata[0][2]
+
     for item in sdata:
         timestamp = item[0]
-        if abs(item[1] - prev_in) / prev_in < .25:
+        if item[1] > 0 and abs(item[1] - prev_in) / prev_in < .50:
             inval = item[1]
         else:
             inval = prev_in
             badin += 1
         prev_in = inval
-        if abs(item[2] - prev_out) / prev_out < .25:
+        if item[2] > 0 and abs(item[2] - prev_out) / prev_out < .50:
             outval = item[2]
         else:
             outval = prev_out
@@ -78,6 +78,7 @@ def clean_data(sdata):
         prev_out = outval
         outdata.append((timestamp, inval, outval))
     return outdata, badin, badout
+
 
 
 def zone(request, zone_name):
