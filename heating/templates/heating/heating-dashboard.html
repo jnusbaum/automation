@@ -35,14 +35,6 @@
             fill: deepskyblue;
         }
 
-        .vertical-center {
-              margin: 0;
-              position: absolute;
-              top: 50%;
-              -ms-transform: translateY(-50%);
-              transform: translateY(-50%);
-        }
-
         .center {
             text-align: center;
             vertical-align: center;
@@ -53,342 +45,421 @@
 </head>
 <body>
 
-<div class="jumbotron">
-  <h1>Heating Dashboard</h1>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container-fluid">
+        <h1>Heating Dashboard</h1>
+    </div>
 </div>
 
 <div class="container-fluid">
-    {#    #}
-    <div class="row mt-3">
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
+    <form role="form" action="/automation/dashboard/heating/all" method="get">
+        <div class="row mt-5">
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="MBR">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="MBATH">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="LIBRARY">
+                </div>
+            </div>
         </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
         </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.MBR_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.MBR_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.MBATH_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.MBATH_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.LIBRARY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.LIBRARY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
+        <div class="row mt-1">
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.MBR_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.MBATH_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.LIBRARY_IN.timestamp }}
+            </div>
         </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.MBR_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.MBR_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.MBATH_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.MBATH_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.LIBRARY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.LIBRARY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-    </div>
-    <div class="row mt-1">
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.MBR_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.MBATH_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.LIBRARY_IN.timestamp }}
-        </div>
-    </div>
 
+        <div class="row mt-5">
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="KITCHEN">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="LAUNDRY">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="GARAGE">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.KITCHEN_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.KITCHEN_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.LAUNDRY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.LAUNDRY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.GARAGE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.GARAGE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.KITCHEN_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.LAUNDRY_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.GARAGE_IN.timestamp }}
+            </div>
+        </div>
 
-    {#    #}
-    <div class="row mt-3">
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
+        <div class="row mt-5">
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="FAMILY">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="OFFICE">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="EXERCISE">
+                </div>
+            </div>
         </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
         </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.FAMILY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.FAMILY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.OFFICE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.OFFICE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.EXERCISE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.EXERCISE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
+        <div class="row">
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.FAMILY_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.OFFICE_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.EXERCISE_IN.timestamp }}
+            </div>
         </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.KITCHEN_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.KITCHEN_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.LAUNDRY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.LAUNDRY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.GARAGE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.GARAGE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.KITCHEN_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.LAUNDRY_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.GARAGE_IN.timestamp }}
-        </div>
-    </div>
 
+        <div class="row mt-5">
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="GUEST">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="VALVE">
+                </div>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <a href="{% url 'zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
+            </div>
+            <div class="col-sm-2 col-lg-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="BOILER">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">IN</h5>
+            </div>
+            <div class="col-sm-2 col-lg-1 border">
+                <h5 style="text-align: center">OUT</h5>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.GUEST_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.GUEST_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.VALVE_INSYS.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.VALVE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.BOILER_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-sm-2 col-lg-1 center border">
+                <svg height="50" width="50">
+                    <circle class="{{ samples.BOILER_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.GUEST_IN.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.VALVE_INSYS.timestamp }}
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                {{ samples.BOILER_IN.timestamp }}
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-sm-4 col-lg-2 center">
+                <div class="checkbox">
+                    <label><input type="checkbox" name="ALL"> ALL</label>
+                </div>
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                <div class="form-group">
+                    <label for="tsel">History:</label>
+                    <select class="form-control" name="datapts" id="tsel">
+                        <option value="360">1 hr</option>
+                        <option value="1080">3 hr</option>
+                        <option value="2160">6 hr</option>
+                        <option value="4320">12 hr</option>
+                        <option value="8640">24 hr</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-4 col-lg-2 center">
+                <button type="submit" class="btn btn-default border">Compare</button>
+            </div>
+        </div>
 
-    {#    #}
-    <div class="row mt-3">
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
-        </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
-        </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.FAMILY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.FAMILY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.OFFICE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.OFFICE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.EXERCISE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.EXERCISE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.FAMILY_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.OFFICE_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.EXERCISE_IN.timestamp }}
-        </div>
-    </div>
-
-
-    {#    #}
-    <div class="row mt-3">
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
-        </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
-        </div>
-        <div class="col-sm-4 col-lg-2">
-            <a href="{% url 'zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">IN</h5>
-        </div>
-        <div class="col-sm-2 col-lg-1 border">
-            <h5 style="text-align: center">OUT</h5>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.GUEST_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.GUEST_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.VALVE_INSYS.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.VALVE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.BOILER_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-        <div class="col-sm-2 col-lg-1 center border">
-            <svg height="50" width="50">
-                <circle class="{{ samples.BOILER_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
-                Sorry, your browser does not support inline SVG.
-            </svg>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.GUEST_IN.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.VALVE_INSYS.timestamp }}
-        </div>
-        <div class="col-sm-4 col-lg-2 center">
-            {{ samples.BOILER_IN.timestamp }}
-        </div>
-    </div>
-
+    </form>
 
 </div>
 

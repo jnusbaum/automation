@@ -7,7 +7,7 @@ from statistics import mean
 
 host = 'http://192.168.0.134/dataserver'
 
-zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
+zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'LAUNDRY', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
 
 def str_to_datetime(ans):
     if ans:
@@ -198,10 +198,19 @@ def view_all(request):
     # get data for all zones
     datapts = request.GET.get('datapts', '100')
     targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
+    # look for zone names
+    dzones = []
+    if 'ALL' in request.GET:
+        dzones = zones
+    else:
+        for zone in zones:
+            if zone in request.GET:
+                dzones.append(zone)
+
     # input, will return latest value
     params = {'datapts': datapts, 'targettime': targettime}
     samples = {}
-    for zone_name in zones:
+    for zone_name in dzones:
         if zone_name == 'VALVE':
             r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data', params=params)
         else:
@@ -225,5 +234,5 @@ def view_all(request):
         sdata, badin, badout = clean_data(sdata)
         samples[zone_name] = sdata
 
-    return render(request, 'heating/heating-all.html', {'samples': samples})
+    return render(request, 'heating/heating-all.html', {'datapts': datapts, 'samples': samples})
 
