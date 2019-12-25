@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Heating Zone</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+      google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      var gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
+
+      var options = {
+            width: 600, height: 300,
+            greenFrom: 90, greenTo: 120,
+            greenColor: "yellow",
+            yellowFrom:120, yellowTo: 150,
+            yellowColor: "orange",
+            redFrom: 150, redTo: 200,
+            minorTicks: 5,
+            max: 200
+      };
+
+      function drawChart() {
+        var inval = 0;
+        var outval = 0;
+        $.ajax({
+            url: 'http://192.168.0.134/dataserver/sensors/MBR-IN/data',
+            dataType: 'json',
+            success: function(data) {
+                inval = data.data[0].attributes.value_real;
+            }
+        });
+        $.ajax({
+            url: 'http://192.168.0.134/dataserver/sensors/MBR-OUT/data',
+            dataType: 'json',
+            success: function(data) {
+                outval = data.data[0].attributes.value_real;
+                var dt = google.visualization.arrayToDataTable([
+                    ['Label', 'Value'],
+                    ['IN', inval],
+                    ['OUT', outval]
+                ]);
+                gauges.draw(data, options);
+            },
+            complete: function() {
+                // schedule the next request *only* when the current one is complete:
+                setTimeout(drawChart, 1000);
+            }
+        });
+      }
+
+    </script>
+    <style>
+        .hot {
+            {# above 150 #}
+            fill: red;
+        }
+        .very-warm {
+            {# 130-150 #}
+            fill: orange;
+        }
+        .warm {
+            {# 110-130 #}
+            fill: yellow;
+        }
+        .luke-warm {
+            {# 90-110 #}
+            fill: aliceblue;
+        }
+        .cool {
+            {# 70-90 #}
+            fill: skyblue;
+        }
+        .cold {
+            {# below 70 #}
+            fill: deepskyblue;
+        }
+
+        .center {
+            text-align: center;
+            vertical-align: center;
+            border: aliceblue;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row mt-3">
+            <div class="col">
+                <div id="gauge_div" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
