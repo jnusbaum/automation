@@ -236,3 +236,45 @@ def view_all(request):
 
     return render(request, 'heating/heating-all.html', {'datapts': datapts, 'samples': samples})
 
+
+def test(request):
+    # get data for all zones
+    datapts = request.GET.get('datapts', '100')
+    targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
+    # look for zone names
+    dzones = []
+    if 'ALL' in request.GET:
+        dzones = zones
+    else:
+        for zone in zones:
+            if zone in request.GET:
+                dzones.append(zone)
+
+    # input, will return latest value
+    params = {'datapts': datapts, 'targettime': targettime}
+    samples = {}
+    for zone_name in dzones:
+        if zone_name == 'VALVE':
+            r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data', params=params)
+        else:
+            r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
+        if requests.codes.ok != r.status_code:
+            # error
+            return HttpResponse(status=r.status_code)
+        data = r.json()
+        invals = data
+        # output
+        r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
+        if requests.codes.ok != r.status_code:
+            # error
+            return HttpResponse(status=r.status_code)
+        data = r.json()
+        outvals = data
+        # join data
+        sdata = [(str_to_datetime(invals['data'][i]['attributes']['timestamp']),
+                  Decimal(invals['data'][i]['attributes']['value_real']),
+                  Decimal(outvals['data'][i]['attributes']['value_real'])) for i in range(0, invals['count'])]
+        sdata, badin, badout = clean_data(sdata)
+        samples[zone_name] = sdata
+
+    return render(request, 'heating/heating-all.html', {'datapts': datapts, 'samples': samples})
