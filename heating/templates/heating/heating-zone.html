@@ -11,10 +11,8 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
-      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(setupChart);
 
-      var inval = 0;
-      var outval = 0;
       var goptions = {
         width: 600, height: 300,
         greenFrom: 90, greenTo: 120,
@@ -25,64 +23,9 @@
         minorTicks: 5,
         max: 200
       };
-
-      function updateIn(data) {
-          inval = Number(data.data[0].attributes.value_real);
-          var gdata = google.visualization.arrayToDataTable([
-                                                          ['Label', 'Value'],
-                                                          ['IN', inval],
-                                                          ['OUT', outval]
-          ]);
-          gauges.draw(gdata, goptions);
-          setTimeout(function () {
-                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
-                                    updateIn);},
-                        15000);
-      }
-
-      function updateOut(data) {
-          outval = Number(data.data[0].attributes.value_real);
-          var gdata = google.visualization.arrayToDataTable([
-                                                          ['Label', 'Value'],
-                                                          ['IN', inval],
-                                                          ['OUT', outval]
-          ]);
-          gauges.draw(gdata, goptions);
-          setTimeout(function () {
-                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
-                                    updateOut);},
-                        15000);
-      }
-
-
-      function curDateStr() {
-      var d = new Date();
-      var datestring = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
-                        ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-                        ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
-
-
-      function drawChart() {
-        gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
-        var ts = Date();
-        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
-                    { 'datapts': 9000, 'targettime':
-              updateIn);
-        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
-              updateOut);
-
-        data = new google.visualization.DataTable();
-        data.addColumn('datetime', 'Time');
-        data.addColumn('number', 'IN');
-        data.addColumn('number', 'OUT');
-
-        {% for item in samples.data %}
-        data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
-                                {{ item.1 }},
-                                {{ item.2 }}]);
-        {%  endfor %}
-
-        options = {
+      var gdata;
+      var gauges;
+      var coptions = {
           chartArea: {width: '90%', height: '80%'},
           title: 'Last 24 Hours',
           legend: {position: 'in'},
@@ -95,10 +38,84 @@
               minValue: 30
           },
           colors: ['orange', 'skyblue']
-        };
+      };
+      var cdata;
+      var chart;
+      var ts;
 
-        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
+
+      function strToDate(ts) {
+          var year = Number(ts.substr(0, 4));
+          var month = Number(ts.substr(5, 2));
+          var day = Number(ts.substr(8, 2));
+          var hour = Number(ts.substr(11, 2));
+          var minute = Number(ts.substr(14, 2));
+          var second = Number(ts.substr(17, 2));
+
+          return new Date(year, month, day, hour, minute, second);
+      }
+
+
+      function drawCharts() {
+          gauges.draw(gdata, goptions);
+          chart.draw(cdata, coptions);
+      }
+
+
+      function updateOut(data) {
+          gdata.setValue(1, 1, Number(data.data[0].attributes.value_real));
+          for (let i=0; i < 9000; i++) {
+              cdata.setValue(i, 2, Number(data.data[i].attributes.value_real));
+          }
+          drawCharts();
+
+          ts = curDateStr();
+          setTimeout(updateData, 15000);
+      }
+
+
+      function updateIn(data) {
+          gdata.setValue(0, 1, Number(data.data[0].attributes.value_real));
+          for (let i=0; i < 9000; i++) {
+              cdata.setValue(i, 0, strToDate(data.data[i].attributes.timestamp));
+              cdata.setValue(i, 1, Number(data.data[i].attributes.value_real));
+          }
+          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
+                    { 'datapts': 9000, 'targettime': ts },
+                    updateOut);
+      }
+
+
+      function updateData() {
+        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
+                    { 'datapts': 9000, 'targettime': ts },
+                    updateIn);
+      }
+
+
+      function curDateStr() {
+          var d = new Date();
+          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+      }
+
+
+      function setupChart() {
+        gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
+        gdata = google.visualization.arrayToDataTable([['Label', 'Value'],
+                                                        ['IN', 0],
+                                                        ['OUT', 0]]);
+        chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        cdata = new google.visualization.DataTable();
+        cdata.addColumn('datetime', 'Time');
+        cdata.addColumn('number', 'IN');
+        cdata.addColumn('number', 'OUT');
+        cdata.addRows(9000);
+
+        ts = curDateStr();
+
+        updateData(ts);
       }
     </script>
     <style>

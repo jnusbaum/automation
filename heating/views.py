@@ -165,32 +165,7 @@ def clean_data(sdata):
 
 
 def zone(request, zone_name):
-    # get data for zone
-    # input, will return latest value
-    params = {'datapts': 9000}
-    if zone_name == 'VALVE':
-        r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data', params=params)
-    else:
-        r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
-    if requests.codes.ok != r.status_code:
-        # error
-        return HttpResponse(status=r.status_code)
-    data = r.json()
-    invals = data
-    # output
-    r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
-    if requests.codes.ok != r.status_code:
-        # error
-        return HttpResponse(status=r.status_code)
-    data = r.json()
-    outvals = data
-    # join data
-    sdata = [(str_to_datetime(invals['data'][i]['attributes']['timestamp']),
-              Decimal(invals['data'][i]['attributes']['value_real']),
-              Decimal(outvals['data'][i]['attributes']['value_real'])) for i in range(0, invals['count'])]
-    sdata, badin, badout = clean_data(sdata)
-    samples = {'data': sdata, 'badin': badin, 'badout': badout, 'zone': zone_name }
-
+    samples = {'zone': zone_name }
     return render(request, 'heating/heating-zone.html', {'samples': samples})
 
 
