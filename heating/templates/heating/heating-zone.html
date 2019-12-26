@@ -87,7 +87,11 @@
 
 
       function updateData() {
-        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
+          var ext = 'IN';
+          if ('{{ samples.zone }}' == 'VALVE') {
+              ext = 'INSYS';
+          }
+        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-' + ext +'/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateIn);
       }
