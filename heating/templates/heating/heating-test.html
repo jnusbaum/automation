@@ -12,27 +12,55 @@
       google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Label', 'Value'],
-          ['IN', 100],
-          ['OUT', 180]
-        ]);
+      var inval = 0;
+      var outval = 0;
+      var options = {
+        width: 600, height: 300,
+        greenFrom: 90, greenTo: 120,
+        greenColor: "yellow",
+        yellowFrom:120, yellowTo: 150,
+        yellowColor: "orange",
+        redFrom: 150, redTo: 200,
+        minorTicks: 5,
+        max: 200
+      };
 
-        var options = {
-            width: 600, height: 300,
-            greenFrom: 90, greenTo: 120,
-            greenColor: "yellow",
-            yellowFrom:120, yellowTo: 150,
-            yellowColor: "orange",
-            redFrom: 150, redTo: 200,
-            minorTicks: 5,
-            max: 200
-        };
-
-        var gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
-        gauges.draw(data, options);
+      function updateIn(data) {
+          inval = Number(data.data[0].attributes.value_real);
+          var gdata = google.visualization.arrayToDataTable([
+                                                          ['Label', 'Value'],
+                                                          ['IN', inval],
+                                                          ['OUT', outval]
+          ]);
+          gauges.draw(gdata, options);
+          setTimeout(function () {
+                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-IN/data',
+                                    updateIn);},
+                        15000);
       }
+
+      function updateOut(data) {
+          outval = Number(data.data[0].attributes.value_real);
+          var gdata = google.visualization.arrayToDataTable([
+                                                          ['Label', 'Value'],
+                                                          ['IN', inval],
+                                                          ['OUT', outval]
+          ]);
+          gauges.draw(gdata, options);
+          setTimeout(function () {
+                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-OUT/data',
+                                    updateOut);},
+                        15000);
+      }
+
+      function drawChart() {
+          gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
+          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-IN/data',
+              updateIn);
+          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-OUT/data',
+              updateOut);
+      }
+
     </script>
 </head>
 <body>
