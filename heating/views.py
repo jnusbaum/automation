@@ -210,7 +210,3 @@ def view_all(request):
         samples[zone_name] = sdata
 
     return render(request, 'heating/heating-all.html', {'datapts': datapts, 'samples': samples})
-
-
-def test(request, zone_name):
-    return render(request, 'heating/heating-test.html', {'zone': zone_name})
