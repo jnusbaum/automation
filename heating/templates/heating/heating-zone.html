@@ -4,7 +4,6 @@
     <title>Heating Zone</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="30">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -14,26 +13,63 @@
       google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
       google.charts.setOnLoadCallback(drawChart);
 
+      var inval = 0;
+      var outval = 0;
+      var goptions = {
+        width: 600, height: 300,
+        greenFrom: 90, greenTo: 120,
+        greenColor: "yellow",
+        yellowFrom:120, yellowTo: 150,
+        yellowColor: "orange",
+        redFrom: 150, redTo: 200,
+        minorTicks: 5,
+        max: 200
+      };
+
+      function updateIn(data) {
+          inval = Number(data.data[0].attributes.value_real);
+          var gdata = google.visualization.arrayToDataTable([
+                                                          ['Label', 'Value'],
+                                                          ['IN', inval],
+                                                          ['OUT', outval]
+          ]);
+          gauges.draw(gdata, goptions);
+          setTimeout(function () {
+                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
+                                    updateIn);},
+                        15000);
+      }
+
+      function updateOut(data) {
+          outval = Number(data.data[0].attributes.value_real);
+          var gdata = google.visualization.arrayToDataTable([
+                                                          ['Label', 'Value'],
+                                                          ['IN', inval],
+                                                          ['OUT', outval]
+          ]);
+          gauges.draw(gdata, goptions);
+          setTimeout(function () {
+                        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
+                                    updateOut);},
+                        15000);
+      }
+
+
+      function curDateStr() {
+      var d = new Date();
+      var datestring = d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+                        ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+                        ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+
+
       function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Label', 'Value'],
-          ['IN', {{ samples.data.0.1 }}],
-          ['OUT', {{ samples.data.0.2 }}]
-        ]);
-
-        var options = {
-            width: 600, height: 300,
-            greenFrom: 90, greenTo: 120,
-            greenColor: "yellow",
-            yellowFrom:120, yellowTo: 150,
-            yellowColor: "orange",
-            redFrom: 150, redTo: 200,
-            minorTicks: 5,
-            max: 200
-        };
-
-        var gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
-        gauges.draw(data, options);
+        gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
+        var ts = Date();
+        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-IN/data',
+                    { 'datapts': 9000, 'targettime':
+              updateIn);
+        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
+              updateOut);
 
         data = new google.visualization.DataTable();
         data.addColumn('datetime', 'Time');
@@ -46,7 +82,7 @@
                                 {{ item.2 }}]);
         {%  endfor %}
 
-      options = {
+        options = {
           chartArea: {width: '90%', height: '80%'},
           title: 'Last 24 Hours',
           legend: {position: 'in'},
@@ -62,7 +98,6 @@
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
         chart.draw(data, options);
       }
     </script>
