@@ -80,7 +80,7 @@
               cdata.setValue(i, 0, strToDate(data.data[i].attributes.timestamp));
               cdata.setValue(i, 1, Number(data.data[i].attributes.value_real));
           }
-          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-OUT/data',
+          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-OUT/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateOut);
       }
@@ -88,10 +88,10 @@
 
       function updateData() {
           var ext = 'IN';
-          if ('{{ samples.zone }}' == 'VALVE') {
+          if ('{{ zone }}' == 'VALVE') {
               ext = 'INSYS';
           }
-        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ samples.zone }}-' + ext +'/data',
+        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-' + ext +'/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateIn);
       }
@@ -148,14 +148,6 @@
             fill: deepskyblue;
         }
 
-        .vertical-center {
-              margin: 0;
-              position: absolute;
-              top: 50%;
-              -ms-transform: translateY(-50%);
-              transform: translateY(-50%);
-        }
-
         .center {
             text-align: center;
             vertical-align: center;
@@ -165,24 +157,32 @@
 
 </head>
 <body>
-    <div class="jumbotron jumbotron-fluid">
-        <div class="container-fluid">
-            <h1>{{ samples.zone }} Zone Info</h1>
-        </div>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Zone {{ zone }}</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'index' %}">Dashboard <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Zones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for zone in zones %}
+                  <a class="dropdown-item" href="{% url 'zone' zone %}">{{ zone }}</a>
+                {% endfor %}
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
     <div class="container-fluid mt-3">
-        <div class="row">
-            <div class="col-4">
-                <a href="{% url 'index' %}">dashboard</a>
-            </div>
-            <div class="col-4">
-                <h6>{{ samples.badin }}</h6>
-            </div>
-            <div class="col-4">
-                <h6>{{ samples.badout }}</h6>
-            </div>
-        </div>
         <div class="row mt-3">
             <div class="col">
                 <div id="gauge_div" style="width: 100%;"></div>

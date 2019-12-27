@@ -58,7 +58,7 @@ def index(request):
                                                        'timestamp': sample['attributes']['timestamp'],
                                                        'value': sample['attributes']['value_real'],
                                                        'dclass': dclass}
-    return render(request, 'heating/heating-dashboard.html', {'samples': samples})
+    return render(request, 'heating/heating-dashboard.html', {'zones': zones, 'samples': samples})
 
 
 def clean_data(sdata):
@@ -165,8 +165,7 @@ def clean_data(sdata):
 
 
 def zone(request, zone_name):
-    samples = {'zone': zone_name }
-    return render(request, 'heating/heating-zone.html', {'samples': samples})
+    return render(request, 'heating/heating-zone.html', {'zone': zone_name, 'zones': zones})
 
 
 def view_all(request):
@@ -209,4 +208,4 @@ def view_all(request):
         sdata, badin, badout = clean_data(sdata)
         samples[zone_name] = sdata
 
-    return render(request, 'heating/heating-all.html', {'datapts': datapts, 'samples': samples})
+    return render(request, 'heating/heating-all.html', {'datapts': datapts, 'zones': zones, 'samples': samples})
