@@ -62,10 +62,10 @@
       }
 
 
-      function updateOut(data) {
-          gdata.setValue(1, 1, Number(data.data[0].attributes.value_real));
+      function updateOut(adata) {
+          gdata.setValue(1, 1, Number(adata.data[0].attributes.value_real));
           for (let i=0; i < 9000; i++) {
-              cdata.setValue(i, 2, Number(data.data[i].attributes.value_real));
+              cdata.setValue(i, 2, Number(adata.data[i].attributes.value_real));
           }
           drawCharts();
 
@@ -74,24 +74,20 @@
       }
 
 
-      function updateIn(data) {
-          gdata.setValue(0, 1, Number(data.data[0].attributes.value_real));
+      function updateIn(adata) {
+          gdata.setValue(0, 1, Number(adata.data[0].attributes.value_real));
           for (let i=0; i < 9000; i++) {
-              cdata.setValue(i, 0, strToDate(data.data[i].attributes.timestamp));
-              cdata.setValue(i, 1, Number(data.data[i].attributes.value_real));
+              cdata.setValue(i, 0, strToDate(adata.data[i].attributes.timestamp));
+              cdata.setValue(i, 1, Number(adata.data[i].attributes.value_real));
           }
-          $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-OUT/data',
+          $.getJSON('{{ host }}/sensors/{{ zone }}-OUT/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateOut);
       }
 
 
       function updateData() {
-          var ext = 'IN';
-          if ('{{ zone }}' == 'VALVE') {
-              ext = 'INSYS';
-          }
-        $.getJSON('http://192.168.0.134/dataserver/sensors/{{ zone }}-' + ext +'/data',
+        $.getJSON('{{ host }}/zones/{{ zone }}/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateIn);
       }

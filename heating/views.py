@@ -5,7 +5,7 @@ from decimal import *
 from datetime import datetime
 from statistics import mean
 
-host = 'http://192.168.0.134/dataserver'
+host = 'http://localhost:5000/dataserver'
 
 zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'LAUNDRY', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
 
@@ -62,7 +62,7 @@ def index(request):
 
 
 def zone(request, zone_name):
-    return render(request, 'heating/heating-zone.html', {'zone': zone_name, 'zones': zones})
+    return render(request, 'heating/heating-zone.html', {'host': host, 'zone': zone_name, 'zones': zones})
 
 
 def view_all(request):
