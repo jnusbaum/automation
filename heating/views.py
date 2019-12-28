@@ -70,38 +70,49 @@ def view_all(request):
     datapts = request.GET.get('datapts', '100')
     targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
     # look for zone names
+    r = requests.get(f'{host}/zones')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status=r.status_code)
+    data = r.json()
+    zones = data['data']
+    zones.sort(key=lambda x: x['id'])
     dzones = []
     if 'ALL' in request.GET:
         dzones = zones
     else:
         for zone in zones:
-            if zone in request.GET:
+            if zone.name in request.GET:
                 dzones.append(zone)
 
     # input, will return latest value
     params = {'datapts': datapts, 'targettime': targettime}
     samples = {}
-    for zone_name in dzones:
-        if zone_name == 'VALVE':
-            r = requests.get(f'{host}/sensors/{zone_name}-INSYS/data', params=params)
-        else:
-            r = requests.get(f'{host}/sensors/{zone_name}-IN/data', params=params)
+    for zone in dzones:
+        zone_name = zone['id']
+        r = requests.get(f'{host}/zones/{zone_name}/data', params=params)
         if requests.codes.ok != r.status_code:
             # error
             return HttpResponse(status=r.status_code)
         data = r.json()
-        invals = data
-        # output
-        r = requests.get(f'{host}/sensors/{zone_name}-OUT/data', params=params)
-        if requests.codes.ok != r.status_code:
-            # error
-            return HttpResponse(status=r.status_code)
-        data = r.json()
-        outvals = data
-        # join data
-        sdata = [(str_to_datetime(invals['data'][i]['attributes']['timestamp']),
-                  Decimal(invals['data'][i]['attributes']['value_real']),
-                  Decimal(outvals['data'][i]['attributes']['value_real'])) for i in range(0, invals['count'])]
+        data = data['data']
+        count = None
+        for sensor_name, sdata in data.items():
+            if count:
+                if sdata['count'] != count:
+                    # unequal length time series
+                    return HttpResponse(status=500)
+            else:
+                count = sdata['count']
+            if sensor_name.endswith('-IN') or sensor_name.endswith('-INSYS'):
+                invals = sdata['data']
+            elif sensor_name.endswith('-OUT'):
+                outvals = sdata['data']
+        sdata = [(str_to_datetime(invals[i]['attributes']['timestamp']),
+                  Decimal(invals[i]['attributes']['value_real']),
+                  Decimal(outvals[i]['attributes']['value_real'])) for i in range(0, len(invals))]
         samples[zone_name] = sdata
 
-    return render(request, 'heating/heating-all.html', {'datapts': datapts, 'zones': zones, 'samples': samples})
+    return render(request, 'heating/heating-all.html', {'datapts': datapts,
+                                                        'zones': [zone['id'] for zone in zones],
+                                                        'samples': samples})
