@@ -3,9 +3,8 @@ from django.shortcuts import render
 import requests
 from decimal import *
 from datetime import datetime
-from statistics import mean
 
-host = 'http://localhost:5000/dataserver'
+from django.conf import settings
 
 zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'LAUNDRY', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
 
@@ -25,8 +24,15 @@ def datetime_to_str(ans):
 
 def index(request):
     # get samples from data server
+    r = requests.get(f'{settings.DATASERVER_HOST}/zones')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status=r.status_code)
+    data = r.json()
+    zones = data['data']
+    zones.sort(key=lambda x: x['id'])
     # first get sensors
-    r = requests.get(f'{host}/sensors')
+    r = requests.get(f'{settings.DATASERVER_HOST}/sensors')
     if requests.codes.ok != r.status_code:
         # error
         return HttpResponse(status=r.status_code)
@@ -35,7 +41,7 @@ def index(request):
     sensors.sort(key=lambda x: x['id'])
     samples = {}
     for sensor in sensors:
-        r = requests.get(f"{host}/sensors/{sensor['id']}/data")
+        r = requests.get(f"{settings.DATASERVER_HOST}/sensors/{sensor['id']}/data")
         if requests.codes.ok != r.status_code:
             # error
             return HttpResponse(status=r.status_code)
@@ -62,7 +68,14 @@ def index(request):
 
 
 def zone(request, zone_name):
-    return render(request, 'heating/heating-zone.html', {'host': host, 'zone': zone_name, 'zones': zones})
+    r = requests.get(f'{settings.DATASERVER_HOST}/zones')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status=r.status_code)
+    data = r.json()
+    zones = data['data']
+    zones.sort(key=lambda x: x['id'])
+    return render(request, 'heating/heating-zone.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
 
 
 def view_all(request):
@@ -70,7 +83,7 @@ def view_all(request):
     datapts = request.GET.get('datapts', '100')
     targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
     # look for zone names
-    r = requests.get(f'{host}/zones')
+    r = requests.get(f'{settings.DATASERVER_HOST}/zones')
     if requests.codes.ok != r.status_code:
         # error
         return HttpResponse(status=r.status_code)
@@ -82,7 +95,7 @@ def view_all(request):
         dzones = zones
     else:
         for zone in zones:
-            if zone.name in request.GET:
+            if zone['id'] in request.GET:
                 dzones.append(zone)
 
     # input, will return latest value
@@ -90,7 +103,7 @@ def view_all(request):
     samples = {}
     for zone in dzones:
         zone_name = zone['id']
-        r = requests.get(f'{host}/zones/{zone_name}/data', params=params)
+        r = requests.get(f'{settings.DATASERVER_HOST}/zones/{zone_name}/data', params=params)
         if requests.codes.ok != r.status_code:
             # error
             return HttpResponse(status=r.status_code)

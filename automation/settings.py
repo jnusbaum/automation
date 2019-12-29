@@ -125,3 +125,5 @@ USE_TZ = True
 STATIC_URL = '/automation/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# dataserver host
+DATASERVER_HOST = 'http://192.168.0.134/dataserver'
