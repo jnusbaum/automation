@@ -46,7 +46,7 @@
 
       function strToDate(its) {
           var year = Number(its.substr(0, 4));
-          var month = Number(its.substr(5, 2));
+          var month = Number(its.substr(5, 2))-1;
           var day = Number(its.substr(8, 2));
           var hour = Number(its.substr(11, 2));
           var minute = Number(its.substr(14, 2));

@@ -21,7 +21,7 @@
             {{ zone }}data.addColumn('number', 'OUT');
 
             {% for item in data %}
-                {{ zone }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
+                {{ zone }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month-1 }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
                                         {{ item.1 }},
                                         {{ item.2 }}]);
             {%  endfor %}
