@@ -44,15 +44,23 @@
       var ts;
 
 
-      function strToDate(ts) {
-          var year = Number(ts.substr(0, 4));
-          var month = Number(ts.substr(5, 2));
-          var day = Number(ts.substr(8, 2));
-          var hour = Number(ts.substr(11, 2));
-          var minute = Number(ts.substr(14, 2));
-          var second = Number(ts.substr(17, 2));
+      function strToDate(its) {
+          var year = Number(its.substr(0, 4));
+          var month = Number(its.substr(5, 2));
+          var day = Number(its.substr(8, 2));
+          var hour = Number(its.substr(11, 2));
+          var minute = Number(its.substr(14, 2));
+          var second = Number(its.substr(17, 2));
 
           return new Date(year, month, day, hour, minute, second);
+      }
+
+
+      function curDateStr() {
+          var d = new Date();
+          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
       }
 
 
@@ -62,42 +70,34 @@
       }
 
 
-      function updateOut(adata) {
-          gdata.setValue(1, 1, Number(adata.data[0].attributes.value_real));
-          for (let i=0; i < 9000; i++) {
-              cdata.setValue(i, 2, Number(adata.data[i].attributes.value_real));
+      function updateData(adata) {
+          for (let sensor in adata['data']) {
+              let slist = adata['data'][sensor]['data'];
+              if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                  gdata.setValue(0, 1, Number(slist[0]['attributes']['value_real']));
+                  for (let i=0; i < 9000; i++) {
+                      cdata.setValue(i, 0, strToDate(slist[i]['attributes']['timestamp']));
+                      cdata.setValue(i, 1, Number(slist[i]['attributes']['value_real']));
+                  }
+              }
+              else if (sensor.endsWith('-OUT')) {
+                  gdata.setValue(1, 1, Number(slist[0]['attributes']['value_real']));
+                  for (let i=0; i < 9000; i++) {
+                        cdata.setValue(i, 2, Number(slist[i]['attributes']['value_real']));
+                  }
+              }
           }
           drawCharts();
 
           ts = curDateStr();
-          setTimeout(updateData, 15000);
+          setTimeout(startUpdate, 15000);
       }
 
 
-      function updateIn(adata) {
-          gdata.setValue(0, 1, Number(adata.data[0].attributes.value_real));
-          for (let i=0; i < 9000; i++) {
-              cdata.setValue(i, 0, strToDate(adata.data[i].attributes.timestamp));
-              cdata.setValue(i, 1, Number(adata.data[i].attributes.value_real));
-          }
-          $.getJSON('{{ host }}/sensors/{{ zone }}-OUT/data',
-                    { 'datapts': 9000, 'targettime': ts },
-                    updateOut);
-      }
-
-
-      function updateData() {
+      function startUpdate() {
         $.getJSON('{{ host }}/zones/{{ zone }}/data',
                     { 'datapts': 9000, 'targettime': ts },
-                    updateIn);
-      }
-
-
-      function curDateStr() {
-          var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+                    updateData);
       }
 
 
@@ -115,7 +115,7 @@
 
         ts = curDateStr();
 
-        updateData(ts);
+        startUpdate();
       }
     </script>
     <style>

@@ -82,7 +82,7 @@ def view_all(request):
         dzones = zones
     else:
         for zone in zones:
-            if zone.name in request.GET:
+            if zone['id'] in request.GET:
                 dzones.append(zone)
 
     # input, will return latest value
