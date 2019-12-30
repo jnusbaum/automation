@@ -40,55 +40,24 @@
       }
 
 
-      function curDateStr() {
-          var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
-      }
-
-
-      function selectColor(temp) {
-          let dclass = 'cold';
-          if (temp < 70) {
-              dclass = 'cold';
-          } else if (temp < 90) {
-              dclass = 'cool';
-          } else if (temp < 110) {
-              dclass = 'luke-warm';
-          } else if (temp < 130) {
-              dclass = 'warm';
-          } else if (temp < 150) {
-              dclass = 'very-warm';
-          } else {
-              dclass = 'hot';
-          }
-          return dclass;
-      }
-
-
       function updateData() {
           // for each zone fire off an update
           {% for zone in zones %}
             $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
+                    {'datapts': {{ datapts }}},
                     function (adata) {
                         // process data
                         for (let sensor in adata['data']) {
                             let slist = adata['data'][sensor]['data'];
                             if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                let inval = Number(slist[0]['attributes']['value_real']);
-                                let timestamp = slist[0]['attributes']['timestamp'];
-                                // update data in DOM
-                                let newcls = selectColor(inval);
-                                let oldcls = $('#' + sensor + '-LED').attr('class');
-                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
-                                $('#{{ zone.id }}-TS').text(timestamp)
+                                for (let i=0; i < {{ datapts }}; i++) {
+                                    {{ zone.id }}data.setValue(i, 0, strToDate(slist[i]['attributes']['timestamp']));
+                                    {{ zone.id }}data.setValue(i, 1, Number(slist[i]['attributes']['value_real']));
+                                }
                             } else if (sensor.endsWith('-OUT')) {
-                                let outval = Number(slist[0]['attributes']['value_real']);
-                                // update data in DOM
-                                let newcls = selectColor(outval);
-                                let oldcls = $('#' + sensor + '-LED').attr('class');
-                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                for (let i=0; i < {{ datapts }}; i++) {
+                                    {{ zone.id }}data.setValue(i, 2, Number(slist[i]['attributes']['value_real']));
+                                }
                             }
                         }
                         {{ zone.id }}chart.draw({{ zone.id }}data, options);
@@ -96,7 +65,7 @@
             );
           {%  endfor %}
           //schedule next update
-          setTimeout(updateData, 15000);
+          setTimeout(updateData, 30000);
       }
 
 
@@ -107,10 +76,9 @@
             {{ zone.id }}data.addColumn('number', 'IN');
             {{ zone.id }}data.addColumn('number', 'OUT');
             {{ zone.id }}data.addRows(9000);
-            var {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
+            {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
         {% endfor %}
-
-
+        updateData();
       }
     </script>
 
@@ -142,15 +110,15 @@
     </nav>
 
     <div class="container-fluid mt-3">
-        {% for zone_name in samples.keys %}
+        {% for zone in zones %}
         <div class="row">
             <div class="col">
-                <h6>{{ zone_name }}</h6>
+                <h6>{{ zone.id }}</h6>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <div id="{{ zone_name }}_div" style="width: 100%; height: 400px;"></div>
+                <div id="{{ zone.id }}_div" style="width: 100%; height: 400px;"></div>
             </div>
         </div>
         {% endfor %}
