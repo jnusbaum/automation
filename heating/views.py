@@ -29,40 +29,8 @@ def index(request):
     data = r.json()
     zones = data['data']
     zones.sort(key=lambda x: x['id'])
-    # first get sensors
-    r = requests.get(f'{settings.DATASERVER_HOST}/sensors')
-    if requests.codes.ok != r.status_code:
-        # error
-        return HttpResponse(status=r.status_code)
-    data = r.json()
-    sensors = data['data']
-    sensors.sort(key=lambda x: x['id'])
-    samples = {}
-    for sensor in sensors:
-        r = requests.get(f"{settings.DATASERVER_HOST}/sensors/{sensor['id']}/data")
-        if requests.codes.ok != r.status_code:
-            # error
-            return HttpResponse(status=r.status_code)
-        data = r.json()
-        for sample in data['data']:
-            dval = Decimal(sample['attributes']['value_real'])
-            if dval < 70:
-                dclass = 'cold'
-            elif dval < 90:
-                dclass = 'cool'
-            elif dval < 110:
-                dclass = 'luke-warm'
-            elif dval < 130:
-                dclass = 'warm'
-            elif dval < 150:
-                dclass = 'very-warm'
-            else:
-                dclass = 'hot'
-            samples[sensor['id'].replace('-', '_')] = {'name': sensor['id'],
-                                                       'timestamp': sample['attributes']['timestamp'],
-                                                       'value': sample['attributes']['value_real'],
-                                                       'dclass': dclass}
-    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST, 'zones': zones, 'samples': samples})
+
+    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST, 'zones': zones})
 
 
 def zone(request, zone_name):
