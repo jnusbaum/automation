@@ -170,7 +170,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in zones %}
-                  <a class="dropdown-item" href="{% url 'zone' zone %}">{{ zone }}</a>
+                  <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
                 {% endfor %}
             </div>
           </li>

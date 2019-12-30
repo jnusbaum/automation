@@ -14,19 +14,19 @@
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        {% for zone, data in samples.items %}
-            var {{ zone }}data = new google.visualization.DataTable();
-            {{ zone }}data.addColumn('datetime', 'Time');
-            {{ zone }}data.addColumn('number', 'IN');
-            {{ zone }}data.addColumn('number', 'OUT');
+        {% for zone_name, data in samples.items %}
+            var {{ zone_name }}data = new google.visualization.DataTable();
+            {{ zone_name }}data.addColumn('datetime', 'Time');
+            {{ zone_name }}data.addColumn('number', 'IN');
+            {{ zone_name }}data.addColumn('number', 'OUT');
 
             {% for item in data %}
-                {{ zone }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month-1 }}, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
+                {{ zone_name }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}-1, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
                                         {{ item.1 }},
                                         {{ item.2 }}]);
             {%  endfor %}
 
-            var {{ zone }}options = {
+            var {{ zone_name }}options = {
               chartArea: {width: '90%', height: '80%'},
               legend: {position: 'in'},
               vAxis: {
@@ -35,8 +35,8 @@
               },
               colors: ['orange', 'skyblue']
             };
-            var {{ zone }}chart = new google.visualization.LineChart(document.getElementById('{{ zone }}_div'));
-            {{ zone }}chart.draw({{ zone }}data, {{ zone }}options);
+            var {{ zone_name }}chart = new google.visualization.LineChart(document.getElementById('{{ zone_name }}_div'));
+            {{ zone_name }}chart.draw({{ zone_name }}data, {{ zone_name }}options);
         {% endfor %}
       }
     </script>
@@ -60,7 +60,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in zones %}
-                  <a class="dropdown-item" href="{% url 'zone' zone %}">{{ zone }}</a>
+                  <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
                 {% endfor %}
             </div>
           </li>
@@ -69,15 +69,15 @@
     </nav>
 
     <div class="container-fluid mt-3">
-        {% for zone in samples.keys %}
+        {% for zone_name in samples.keys %}
         <div class="row">
             <div class="col">
-                <h6>{{ zone }}</h6>
+                <h6>{{ zone_name }}</h6>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <div id="{{ zone }}_div" style="width: 100%; height: 400px;"></div>
+                <div id="{{ zone_name }}_div" style="width: 100%; height: 400px;"></div>
             </div>
         </div>
         {% endfor %}

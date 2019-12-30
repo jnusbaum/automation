@@ -4,11 +4,84 @@
   <title>Heating Dashboard</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="30">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(updateData);
+
+      function strToDate(ts) {
+          var year = Number(ts.substr(0, 4));
+          var month = Number(ts.substr(5, 2));
+          var day = Number(ts.substr(8, 2));
+          var hour = Number(ts.substr(11, 2));
+          var minute = Number(ts.substr(14, 2));
+          var second = Number(ts.substr(17, 2));
+
+          return new Date(year, month, day, hour, minute, second);
+      }
+
+
+      function curDateStr() {
+          var d = new Date();
+          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+      }
+
+
+      function selectColor(temp) {
+          let dclass = 'cold';
+          if (temp < 70) {
+              dclass = 'cold';
+          } else if (temp < 90) {
+              dclass = 'cool';
+          } else if (temp < 110) {
+              dclass = 'luke-warm';
+          } else if (temp < 130) {
+              dclass = 'warm';
+          } else if (temp < 150) {
+              dclass = 'very-warm';
+          } else {
+              dclass = 'hot';
+          }
+          return dclass;
+      }
+
+
+      function updateData() {
+          // for each zone fire off an update
+          {% for zone in zones %}
+            $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
+                    function (adata) {
+                        // process data
+                        for (let sensor in adata['data']) {
+                            let slist = adata['data'][sensor]['data'];
+                            if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                let inval = Number(slist[0]['attributes']['value_real']);
+                                let timestamp = slist[0]['attributes']['timestamp'];
+                                // update data in DOM
+                                let newcls = selectColor(inval);
+                                let oldcls = $('#' + sensor + '-LED').attr('class');
+                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                $('#{{ zone.id }}-TS').text(timestamp)
+                            } else if (sensor.endsWith('-OUT')) {
+                                let outval = Number(slist[0]['attributes']['value_real']);
+                                // update data in DOM
+                                let newcls = selectColor(outval);
+                                let oldcls = $('#' + sensor + '-LED').attr('class');
+                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                            }
+                        }
+                    }
+            );
+          {%  endfor %}
+          //schedule next update
+          setTimeout(updateData, 15000);
+      }
+
+    </script>
     <style>
         .hot {
             {# above 150 #}
@@ -62,13 +135,14 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for zone in zones %}
-              <a class="dropdown-item" href="{% url 'zone' zone %}">{{ zone }}</a>
+              <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
             {% endfor %}
         </div>
       </li>
     </ul>
   </div>
 </nav>
+
 
 <div class="container-fluid">
     <form role="form" action="/automation/dashboard/heating/all" method="get">
@@ -121,50 +195,50 @@
         <div class="row">
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.MBR_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="MBR-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.MBR_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="MBR-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.MBATH_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="MBATH-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.MBATH_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="MBATH-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.LIBRARY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="LIBRARY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.LIBRARY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="LIBRARY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
         </div>
         <div class="row mt-1">
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.MBR_IN.timestamp }}
+            <div id="MBR-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.MBATH_IN.timestamp }}
+            <div id="MBATH-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.LIBRARY_IN.timestamp }}
+            <div id="LIBRARY-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
         </div>
 
@@ -217,50 +291,50 @@
         <div class="row">
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.KITCHEN_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="KITCHEN-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.KITCHEN_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="KITCHEN-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.LAUNDRY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="LAUNDRY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.LAUNDRY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="LAUNDRY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.GARAGE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="GARAGE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.GARAGE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="GARAGE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.KITCHEN_IN.timestamp }}
+            <div id="KITCHEN-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.LAUNDRY_IN.timestamp }}
+            <div id="LAUNDRY-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.GARAGE_IN.timestamp }}
+            <div id="GARAGE-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
         </div>
 
@@ -313,50 +387,50 @@
         <div class="row">
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.FAMILY_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="FAMILY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.FAMILY_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="FAMILY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.OFFICE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="OFFICE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.OFFICE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="OFFICE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.EXERCISE_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="EXERCISE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.EXERCISE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="EXERCISE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.FAMILY_IN.timestamp }}
+            <div id="FAMILY-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.OFFICE_IN.timestamp }}
+            <div id="OFFICE-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.EXERCISE_IN.timestamp }}
+            <div id="EXERCISE-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
         </div>
 
@@ -409,50 +483,50 @@
         <div class="row">
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.GUEST_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="GUEST-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.GUEST_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="GUEST-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.VALVE_INSYS.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="VALVE-INSYS-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.VALVE_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="VALVE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.BOILER_IN.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="BOILER-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
             <div class="col-sm-2 col-lg-1 center border">
                 <svg height="50" width="50">
-                    <circle class="{{ samples.BOILER_OUT.dclass }}" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="BOILER-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.GUEST_IN.timestamp }}
+            <div id="GUEST-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.VALVE_INSYS.timestamp }}
+            <div id="VALVE-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                {{ samples.BOILER_IN.timestamp }}
+            <div id="BOILER-TS" class="col-sm-4 col-lg-2 center">
+                0000-00-00-00-00-00
             </div>
         </div>
         <div class="row mt-5">
