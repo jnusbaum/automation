@@ -5,7 +5,7 @@ from decimal import *
 from datetime import datetime
 from statistics import mean
 
-host = 'http://localhost:5000/dataserver'
+host = 'http://192.168.0.134/dataserver'
 
 zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'LAUNDRY', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
 
