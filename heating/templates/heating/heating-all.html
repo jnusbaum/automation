@@ -100,7 +100,7 @@
               Zones
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for zone in zones %}
+                {% for zone in allzones %}
                   <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
                 {% endfor %}
             </div>
