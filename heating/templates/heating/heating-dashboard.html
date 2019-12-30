@@ -64,14 +64,18 @@
                                 // update data in DOM
                                 let newcls = selectColor(inval);
                                 let oldcls = $('#' + sensor + '-LED').attr('class');
-                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                if (oldcls != newcls) {
+                                    $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                }
                                 $('#{{ zone.id }}-TS').text(timestamp)
                             } else if (sensor.endsWith('-OUT')) {
                                 let outval = Number(slist[0]['attributes']['value_real']);
                                 // update data in DOM
                                 let newcls = selectColor(outval);
                                 let oldcls = $('#' + sensor + '-LED').attr('class');
-                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                if (oldcls != newcls) {
+                                    $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                }
                             }
                         }
                     }

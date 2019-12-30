@@ -11,22 +11,9 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart', 'line']});
-      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(setupCharts);
 
-      function drawChart() {
-        {% for zone_name, data in samples.items %}
-            var {{ zone_name }}data = new google.visualization.DataTable();
-            {{ zone_name }}data.addColumn('datetime', 'Time');
-            {{ zone_name }}data.addColumn('number', 'IN');
-            {{ zone_name }}data.addColumn('number', 'OUT');
-
-            {% for item in data %}
-                {{ zone_name }}data.addRow([new Date({{ item.0.year }}, {{ item.0.month }}-1, {{ item.0.day }}, {{ item.0.hour }}, {{ item.0.minute }}, {{ item.0.second }}),
-                                        {{ item.1 }},
-                                        {{ item.2 }}]);
-            {%  endfor %}
-
-            var {{ zone_name }}options = {
+        var options = {
               chartArea: {width: '90%', height: '80%'},
               legend: {position: 'in'},
               vAxis: {
@@ -34,10 +21,96 @@
                   minValue: 30
               },
               colors: ['orange', 'skyblue']
-            };
-            var {{ zone_name }}chart = new google.visualization.LineChart(document.getElementById('{{ zone_name }}_div'));
-            {{ zone_name }}chart.draw({{ zone_name }}data, {{ zone_name }}options);
+        };
+
+        {% for zone in zones %}
+            var {{ zone.id }}data;
+            var {{ zone.id }}chart;
         {% endfor %}
+
+      function strToDate(ts) {
+          var year = Number(ts.substr(0, 4));
+          var month = Number(ts.substr(5, 2));
+          var day = Number(ts.substr(8, 2));
+          var hour = Number(ts.substr(11, 2));
+          var minute = Number(ts.substr(14, 2));
+          var second = Number(ts.substr(17, 2));
+
+          return new Date(year, month, day, hour, minute, second);
+      }
+
+
+      function curDateStr() {
+          var d = new Date();
+          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+      }
+
+
+      function selectColor(temp) {
+          let dclass = 'cold';
+          if (temp < 70) {
+              dclass = 'cold';
+          } else if (temp < 90) {
+              dclass = 'cool';
+          } else if (temp < 110) {
+              dclass = 'luke-warm';
+          } else if (temp < 130) {
+              dclass = 'warm';
+          } else if (temp < 150) {
+              dclass = 'very-warm';
+          } else {
+              dclass = 'hot';
+          }
+          return dclass;
+      }
+
+
+      function updateData() {
+          // for each zone fire off an update
+          {% for zone in zones %}
+            $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
+                    function (adata) {
+                        // process data
+                        for (let sensor in adata['data']) {
+                            let slist = adata['data'][sensor]['data'];
+                            if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                let inval = Number(slist[0]['attributes']['value_real']);
+                                let timestamp = slist[0]['attributes']['timestamp'];
+                                // update data in DOM
+                                let newcls = selectColor(inval);
+                                let oldcls = $('#' + sensor + '-LED').attr('class');
+                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                $('#{{ zone.id }}-TS').text(timestamp)
+                            } else if (sensor.endsWith('-OUT')) {
+                                let outval = Number(slist[0]['attributes']['value_real']);
+                                // update data in DOM
+                                let newcls = selectColor(outval);
+                                let oldcls = $('#' + sensor + '-LED').attr('class');
+                                $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                            }
+                        }
+                        {{ zone.id }}chart.draw({{ zone.id }}data, options);
+                    }
+            );
+          {%  endfor %}
+          //schedule next update
+          setTimeout(updateData, 15000);
+      }
+
+
+      function setupCharts() {
+        {% for zone in zones %}
+            {{ zone.id }}data = new google.visualization.DataTable();
+            {{ zone.id }}data.addColumn('datetime', 'Time');
+            {{ zone.id }}data.addColumn('number', 'IN');
+            {{ zone.id }}data.addColumn('number', 'OUT');
+            {{ zone.id }}data.addRows(9000);
+            var {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
+        {% endfor %}
+
+
       }
     </script>
 
