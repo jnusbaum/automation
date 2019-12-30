@@ -6,8 +6,6 @@ from datetime import datetime
 
 from django.conf import settings
 
-zones = ('MBR', 'MBATH', 'LIBRARY', 'KITCHEN', 'LAUNDRY', 'GARAGE', 'FAMILY', 'OFFICE', 'EXERCISE', 'GUEST', 'VALVE', 'BOILER')
-
 def str_to_datetime(ans):
     if ans:
         d = datetime.strptime(ans, "%Y-%m-%d-%H-%M-%S")
@@ -64,7 +62,7 @@ def index(request):
                                                        'timestamp': sample['attributes']['timestamp'],
                                                        'value': sample['attributes']['value_real'],
                                                        'dclass': dclass}
-    return render(request, 'heating/heating-dashboard.html', {'zones': zones, 'samples': samples})
+    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST, 'zones': zones, 'samples': samples})
 
 
 def zone(request, zone_name):
@@ -110,6 +108,8 @@ def view_all(request):
         data = r.json()
         data = data['data']
         count = None
+        invals = []
+        outvals = []
         for sensor_name, sdata in data.items():
             if count:
                 if sdata['count'] != count:
@@ -126,6 +126,7 @@ def view_all(request):
                   Decimal(outvals[i]['attributes']['value_real'])) for i in range(0, len(invals))]
         samples[zone_name] = sdata
 
-    return render(request, 'heating/heating-all.html', {'datapts': datapts,
-                                                        'zones': [zone['id'] for zone in zones],
+    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
+                                                        'datapts': datapts,
+                                                        'zones': zones,
                                                         'samples': samples})
