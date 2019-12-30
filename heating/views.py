@@ -64,37 +64,7 @@ def view_all(request):
             if zone['id'] in request.GET:
                 dzones.append(zone)
 
-    # input, will return latest value
-    params = {'datapts': datapts, 'targettime': targettime}
-    samples = {}
-    for zone in dzones:
-        zone_name = zone['id']
-        r = requests.get(f'{settings.DATASERVER_HOST}/zones/{zone_name}/data', params=params)
-        if requests.codes.ok != r.status_code:
-            # error
-            return HttpResponse(status=r.status_code)
-        data = r.json()
-        data = data['data']
-        count = None
-        invals = []
-        outvals = []
-        for sensor_name, sdata in data.items():
-            if count:
-                if sdata['count'] != count:
-                    # unequal length time series
-                    return HttpResponse(status=500)
-            else:
-                count = sdata['count']
-            if sensor_name.endswith('-IN') or sensor_name.endswith('-INSYS'):
-                invals = sdata['data']
-            elif sensor_name.endswith('-OUT'):
-                outvals = sdata['data']
-        sdata = [(str_to_datetime(invals[i]['attributes']['timestamp']),
-                  Decimal(invals[i]['attributes']['value_real']),
-                  Decimal(outvals[i]['attributes']['value_real'])) for i in range(0, len(invals))]
-        samples[zone_name] = sdata
-
     return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
                                                         'datapts': datapts,
-                                                        'zones': zones,
-                                                        'samples': samples})
+                                                        'allzones': zones,
+                                                        'zones': dzones})
