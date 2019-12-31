@@ -75,7 +75,7 @@
             {{ zone.id }}data.addColumn('datetime', 'Time');
             {{ zone.id }}data.addColumn('number', 'IN');
             {{ zone.id }}data.addColumn('number', 'OUT');
-            {{ zone.id }}data.addRows(9000);
+            {{ zone.id }}data.addRows(datapts);
             {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
         {% endfor %}
         updateData();
