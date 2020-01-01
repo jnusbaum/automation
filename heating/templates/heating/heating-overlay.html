@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Heating Comparison</title>
+    <title>Heating Overlay</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -54,6 +54,7 @@
       function updateData() {
           // for each zone fire off an update
           let ts = curDateStr();
+          let cols = 0;
           {% for zone in zones %}
             $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
                     {'datapts': {{ datapts }}, 'targettime': ts },
@@ -86,15 +87,14 @@
 
 
       function setupCharts() {
-        {% for zone in zones %}
-            {{ zone.id }}data = new google.visualization.DataTable();
-            {{ zone.id }}data.addColumn('datetime', 'Time');
-            {{ zone.id }}data.addColumn('number', 'IN');
-            {{ zone.id }}data.addColumn('number', 'OUT');
-            {{ zone.id }}data.addRows({{ datapts }});
-            $('#{{ zone.id }}_div').css('width', String({{ datapts }}/3) + 'px')
-            {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
-        {% endfor %}
+          data = new google.visualization.DataTable();
+          data.addColumn('datetime', 'Time');
+        {% for sensor in sensors %}
+            data.addColumn('number', sensor.id);
+        {%  endfor %}
+          data.addRows({{ datapts }});
+          $('#chart_div').css('width', String({{ datapts }}/3) + 'px')
+          chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
         updateData();
       }
@@ -128,7 +128,6 @@
     </nav>
 
     <div class="container-fluid mt-3">
-        {% for zone in zones %}
         <div class="row">
             <div class="col">
                 <h6>{{ zone.id }}</h6>
@@ -137,10 +136,9 @@
         <div class="row">
             <div class="col">
                 {#  calculate width based on number of data points #}
-                <div id="{{ zone.id }}_div" style="width: 1900px; height: 400px;"></div>
+                <div id="chart_div" style="width: 1900px; height: 400px;"></div>
             </div>
         </div>
-        {% endfor %}
     </div>
 
 </body>
