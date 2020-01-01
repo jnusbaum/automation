@@ -127,3 +127,4 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # dataserver host
 DATASERVER_HOST = 'http://192.168.0.134/dataserver'
+# DATASERVER_HOST = 'http://localhost:5000/dataserver'

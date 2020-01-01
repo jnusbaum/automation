@@ -75,26 +75,30 @@
               let slist = adata['data'][sensor]['data'];
               if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
                   gdata.setValue(0, 1, Number(slist[0]['attributes']['value_real']));
+                  // reverse load
+                  let j = 9000;
                   for (let i=0; i < 9000; i++) {
-                      cdata.setValue(i, 0, strToDate(slist[i]['attributes']['timestamp']));
-                      cdata.setValue(i, 1, Number(slist[i]['attributes']['value_real']));
+                      --j;
+                      cdata.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
+                      cdata.setValue(i, 1, Number(slist[j]['attributes']['value_real']));
                   }
               }
               else if (sensor.endsWith('-OUT')) {
                   gdata.setValue(1, 1, Number(slist[0]['attributes']['value_real']));
+                  let j = 9000;
                   for (let i=0; i < 9000; i++) {
-                        cdata.setValue(i, 2, Number(slist[i]['attributes']['value_real']));
+                      --j;
+                      cdata.setValue(i, 2, Number(slist[j]['attributes']['value_real']));
                   }
               }
           }
           drawCharts();
-
-          ts = curDateStr();
           setTimeout(startUpdate, 15000);
       }
 
 
       function startUpdate() {
+          let ts = curDateStr();
         $.getJSON('{{ host }}/zones/{{ zone }}/data',
                     { 'datapts': 9000, 'targettime': ts },
                     updateData);
@@ -112,8 +116,6 @@
         cdata.addColumn('number', 'IN');
         cdata.addColumn('number', 'OUT');
         cdata.addRows(9000);
-
-        ts = curDateStr();
 
         startUpdate();
       }

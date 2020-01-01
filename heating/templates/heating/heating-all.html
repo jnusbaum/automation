@@ -39,24 +39,37 @@
           return new Date(year, month, day, hour, minute, second);
       }
 
+      function curDateStr() {
+          var d = new Date();
+          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
+              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+      }
+
+
 
       function updateData() {
           // for each zone fire off an update
+          let ts = curDateStr();
           {% for zone in zones %}
             $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
-                    {'datapts': {{ datapts }}},
+                    {'datapts': {{ datapts }}, 'targettime': ts },
                     function (adata) {
                         // process data
                         for (let sensor in adata['data']) {
                             let slist = adata['data'][sensor]['data'];
                             if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                let j = {{ datapts }};
                                 for (let i=0; i < {{ datapts }}; i++) {
-                                    {{ zone.id }}data.setValue(i, 0, strToDate(slist[i]['attributes']['timestamp']));
-                                    {{ zone.id }}data.setValue(i, 1, Number(slist[i]['attributes']['value_real']));
+                                    --j;
+                                    {{ zone.id }}data.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
+                                    {{ zone.id }}data.setValue(i, 1, Number(slist[j]['attributes']['value_real']));
                                 }
                             } else if (sensor.endsWith('-OUT')) {
+                                let j = {{ datapts }};
                                 for (let i=0; i < {{ datapts }}; i++) {
-                                    {{ zone.id }}data.setValue(i, 2, Number(slist[i]['attributes']['value_real']));
+                                    --j;
+                                    {{ zone.id }}data.setValue(i, 2, Number(slist[j]['attributes']['value_real']));
                                 }
                             }
                         }
@@ -78,6 +91,7 @@
             {{ zone.id }}data.addRows({{ datapts }});
             {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
         {% endfor %}
+
         updateData();
       }
     </script>
