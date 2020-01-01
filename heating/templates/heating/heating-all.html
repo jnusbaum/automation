@@ -107,7 +107,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="{% url 'index' %}">Dashboard <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -115,7 +115,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in allzones %}
-                  <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
+                  <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
                 {% endfor %}
             </div>
           </li>

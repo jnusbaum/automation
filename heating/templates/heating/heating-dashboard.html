@@ -135,7 +135,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="{% url 'index' %}">Dashboard <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -143,7 +143,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for zone in zones %}
-              <a class="dropdown-item" href="{% url 'zone' zone.id %}">{{ zone.id }}</a>
+              <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
             {% endfor %}
         </div>
       </li>
@@ -156,7 +156,7 @@
     <form role="form" action="/automation/dashboard/heating/all" method="get">
         <div class="row mt-5">
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
+                <a href="{% url 'view_zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -164,7 +164,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
+                <a href="{% url 'view_zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -172,7 +172,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
+                <a href="{% url 'view_zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -252,7 +252,7 @@
 
         <div class="row mt-5">
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
+                <a href="{% url 'view_zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -260,7 +260,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
+                <a href="{% url 'view_zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -268,7 +268,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
+                <a href="{% url 'view_zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -348,7 +348,7 @@
 
         <div class="row mt-5">
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
+                <a href="{% url 'view_zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -356,7 +356,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
+                <a href="{% url 'view_zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -364,7 +364,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
+                <a href="{% url 'view_zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -444,7 +444,7 @@
 
         <div class="row mt-5">
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
+                <a href="{% url 'view_zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -452,7 +452,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
+                <a href="{% url 'view_zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
@@ -460,7 +460,7 @@
                 </div>
             </div>
             <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
+                <a href="{% url 'view_zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
             </div>
             <div class="col-sm-2 col-lg-1">
                 <div class="checkbox center">
