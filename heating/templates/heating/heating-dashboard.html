@@ -13,7 +13,7 @@
 
       function strToDate(ts) {
           var year = Number(ts.substr(0, 4));
-          var month = Number(ts.substr(5, 2));
+          var month = Number(ts.substr(5, 2))-1;
           var day = Number(ts.substr(8, 2));
           var hour = Number(ts.substr(11, 2));
           var minute = Number(ts.substr(14, 2));
