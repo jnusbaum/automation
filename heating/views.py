@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.conf import settings
 
+
 def str_to_datetime(ans):
     if ans:
         d = datetime.strptime(ans, "%Y-%m-%d-%H-%M-%S")
