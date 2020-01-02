@@ -13,6 +13,10 @@
       google.charts.load('current', {'packages':['corechart', 'line']});
       google.charts.setOnLoadCallback(setupCharts);
 
+        var colidxs = {
+            {% for sensor in sensors %}
+            {{ sensor.id }}: 
+        };
         var options = {
             chartArea: {width: '98%', height: '85%'},
             legend: {
@@ -54,7 +58,6 @@
       function updateData() {
           // for each zone fire off an update
           let ts = curDateStr();
-          let cols = 0;
           {% for zone in zones %}
             $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
                     {'datapts': {{ datapts }}, 'targettime': ts },
