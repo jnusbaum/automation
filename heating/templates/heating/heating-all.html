@@ -92,7 +92,7 @@
             {{ zone.id }}data.addColumn('number', 'IN');
             {{ zone.id }}data.addColumn('number', 'OUT');
             {{ zone.id }}data.addRows({{ datapts }});
-            $('#{{ zone.id }}_div').css('width', String({{ datapts }}/3) + 'px')
+            $('#{{ zone.id }}_div').css('width', String({{ datapts }}/3) + 'px');
             {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
         {% endfor %}
 
