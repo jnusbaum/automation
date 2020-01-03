@@ -13,10 +13,8 @@
       google.charts.load('current', {'packages':['corechart', 'line']});
       google.charts.setOnLoadCallback(setupCharts);
 
-        var colidxs = {
-            {% for sensor in sensors %}
-            {{ sensor.id }}:
-        };
+        var colidxs;
+
         var options = {
             chartArea: {width: '98%', height: '85%'},
             legend: {
@@ -52,7 +50,6 @@
               ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
               ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
       }
-
 
 
       function updateData() {
@@ -93,7 +90,8 @@
           data = new google.visualization.DataTable();
           data.addColumn('datetime', 'Time');
         {% for sensor in sensors %}
-            data.addColumn('number', sensor.id);
+            colidxs[]
+            data.addColumn('number', sensor.id, sensor.id);
         {%  endfor %}
           data.addRows({{ datapts }});
           $('#chart_div').css('width', String({{ datapts }}/3) + 'px')
