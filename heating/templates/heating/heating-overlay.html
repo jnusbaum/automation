@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Heating Comparison</title>
+    <title>Heating Overlay</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -13,23 +13,25 @@
       google.charts.load('current', {'packages':['corechart', 'line']});
       google.charts.setOnLoadCallback(setupCharts);
 
-        var options = {
-            chartArea: {width: '98%', height: '85%'},
-            legend: {
-                position: 'in',
-                textStyle: {fontSize: 14},
-            },
-            vAxis: {
-                maxValue: 200,
-                 minValue: 30
-            },
-            colors: ['orange', 'skyblue']
-        };
-
-        {% for zone in zones %}
-            var {{ zone.id }}data;
-            var {{ zone.id }}chart;
+        var colidxs = {};
+        {% for sensor in sensors %}
+            colidxs['{{ sensor.id }}'] = 0;
         {% endfor %}
+
+      var options = {
+          chartArea: {width: '90%', height: '80%'},
+          legend: {
+              position: 'in',
+              textStyle: {fontSize: 14},
+          },
+          vAxis: {
+              maxValue: 200,
+              minValue: 30
+          },
+      };
+
+      var data;
+      var chart;
 
       function strToDate(ts) {
           var year = Number(ts.substr(0, 4));
@@ -50,35 +52,23 @@
       }
 
 
-
       function updateData() {
           // for each zone fire off an update
           let ts = curDateStr();
-          {% for zone in zones %}
-            $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
-                    {'datapts': {{ datapts }}, 'targettime': ts },
-                    function (adata) {
-                        // process data
-                        for (let sensor in adata['data']) {
-                            let slist = adata['data'][sensor]['data'];
-                            if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                let j = {{ datapts }};
-                                for (let i=0; i < {{ datapts }}; i++) {
-                                    --j;
-                                    {{ zone.id }}data.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
-                                    {{ zone.id }}data.setValue(i, 1, Number(slist[j]['attributes']['value_real']));
-                                }
-                            } else if (sensor.endsWith('-OUT')) {
-                                let j = {{ datapts }};
-                                for (let i=0; i < {{ datapts }}; i++) {
-                                    --j;
-                                    {{ zone.id }}data.setValue(i, 2, Number(slist[j]['attributes']['value_real']));
-                                }
-                            }
-                        }
-                        {{ zone.id }}chart.draw({{ zone.id }}data, options);
-                    }
-            );
+          {% for sensor in sensors %}
+              $.getJSON('{{ host }}/sensors/{{ sensor.id }}/data',
+                  {'datapts': {{ datapts }}, 'targettime': ts },
+                  function (adata) {
+                      // process data
+                      let j = {{ datapts }};
+                      for (let i=0; i < {{ datapts }}; i++) {
+                          --j;
+                          data.setValue(i, 0, strToDate(adata['data'][j]['attributes']['timestamp']));
+                          data.setValue(i, colidxs['{{ sensor.id }}'], Number(adata['data'][j]['attributes']['value_real']));
+                      }
+                      chart.draw(data, options);
+                  }
+              );
           {%  endfor %}
           //schedule next update
           setTimeout(updateData, 30000);
@@ -86,17 +76,17 @@
 
 
       function setupCharts() {
-        {% for zone in zones %}
-            {{ zone.id }}data = new google.visualization.DataTable();
-            {{ zone.id }}data.addColumn('datetime', 'Time');
-            {{ zone.id }}data.addColumn('number', 'IN');
-            {{ zone.id }}data.addColumn('number', 'OUT');
-            {{ zone.id }}data.addRows({{ datapts }});
-            $('#{{ zone.id }}_div').css('width', String({{ datapts }}/3) + 'px');
-            {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
-        {% endfor %}
-
-        updateData();
+          data = new google.visualization.DataTable();
+          data.addColumn('datetime', 'Time');
+          let x = 1;
+          {% for sensor in sensors %}
+              colidxs['{{ sensor.id }}'] = x;
+              ++x;
+              data.addColumn('number', '{{ sensor.id }}', '{{ sensor.id }}');
+          {%  endfor %}
+          data.addRows({{ datapts }});
+          chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          updateData();
       }
     </script>
 
@@ -128,7 +118,6 @@
     </nav>
 
     <div class="container-fluid mt-3">
-        {% for zone in zones %}
         <div class="row">
             <div class="col">
                 <h6>{{ zone.id }}</h6>
@@ -137,10 +126,9 @@
         <div class="row">
             <div class="col">
                 {#  calculate width based on number of data points #}
-                <div id="{{ zone.id }}_div" style="width: 1900px; height: 400px;"></div>
+                <div id="chart_div" style="width: 100%; height: 800px;"></div>
             </div>
         </div>
-        {% endfor %}
     </div>
 
 </body>

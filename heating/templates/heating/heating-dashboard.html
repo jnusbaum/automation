@@ -538,14 +538,16 @@
             </div>
         </div>
         <div class="row mt-5">
-            <div class="col-sm-4 col-lg-2 center">
+            <div class="col-sm-2 col-lg-1 center">
                 <div class="checkbox">
                     <label><input type="checkbox" name="ALL"> ALL</label>
                 </div>
             </div>
-            <div class="col-sm-4 col-lg-2 center">
-                <div class="form-group">
+            <div class="col-sm-2 col-lg-1 center">
                     <label for="tsel">History:</label>
+            </div>
+            <div class="col-sm-2 col-lg-1 center">
+                <div class="form-group">
                     <select class="form-control" name="datapts" id="tsel">
                         <option value="360">1 hr</option>
                         <option value="1080">3 hr</option>
@@ -555,8 +557,11 @@
                     </select>
                 </div>
             </div>
-            <div class="col-sm-4 col-lg-2 center">
+            <div class="col-sm-2 col-lg-1 center">
                 <button type="submit" class="btn btn-default border">Compare</button>
+            </div>
+            <div class="col-sm-2 col-lg-1 center">
+                <button type="submit" formaction="/automation/dashboard/heating/overlay" class="btn btn-default border">Overlay</button>
             </div>
         </div>
 

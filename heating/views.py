@@ -91,7 +91,15 @@ def overlay(request):
             if zone['id'] in request.GET:
                 dzones.append(zone)
 
+    osensors = []
+    for zone in dzones:
+        r = requests.get(f"{settings.DATASERVER_HOST}/sensors/zone/{zone['id']}")
+        data = r.json()
+        sensors = data['data']
+        for sensor in sensors:
+            osensors.append(sensor)
     return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST,
-                                                        'datapts': datapts,
-                                                        'allzones': zones,
-                                                        'zones': dzones})
+                                                            'datapts': datapts,
+                                                            'allzones': zones,
+                                                            'zones': dzones,
+                                                            'sensors': osensors})
