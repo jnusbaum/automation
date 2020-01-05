@@ -36,20 +36,28 @@
 				}]
 			},
 			options: {
+			    maintainAspectRatio: false,
 				title: {
 					text: 'BOILER'
 				},
 				scales: {
 					xAxes: [{
 						type: 'time',
+                        time: {
+						    unit: 'second',
+                            displayFormats: { second: 'MM-DD HH:mm:ss' }
+                        },
 						scaleLabel: {
 							display: true,
 							labelString: 'Time'
 						}
 					}],
 					yAxes: [{
-					    min: 30,
-                        max: 200,
+					    ticks: {
+                            suggestedMin: 30,
+                            suggestedMax: 180,
+                            stepSize: 30
+                        },
 						scaleLabel: {
 							display: true,
 							labelString: 'temp'
@@ -106,7 +114,7 @@
 
 
         function startUpdate() {
-            $.getJSON('http://192.168.0.134/dataserver/zones/BOILER/data',
+            $.getJSON('http://192.168.0.134/dataserver/zones/FAMILY/data',
                 { 'datapts': 9000 },
                 updateData);
         }
@@ -114,7 +122,7 @@
 
         function setupCharts() {
             gaugeIn = new RadialGauge({renderTo: 'gauge_in_div',
-                width: 600, height: 300,
+                width: 300, height: 300,
                 units: 'F', minValue: 30, maxValue: 180,
                 majorTicks: ['30', '50', '70', '90', '110', '130', '150', '180'],
                 minorTicks: 5,
@@ -127,14 +135,14 @@
                 valueBox: true,
                 value: 30});
             gaugeOut = new RadialGauge({renderTo: 'gauge_out_div',
-                width: 600, height: 300,
+                width: 300, height: 300,
                 units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '50', '70', '90', '110', '130', '150', '180'],
-                minorTicks: 5,
-                highlights: [{ from: 30, to: 70, color: 'skyblue' },
-                    { from: 70, to: 100, color: 'aliceblue' },
-                    { from: 100, to: 130, color: 'yellow' },
-                    { from: 130, to: 150, color: 'orange' },
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{ from: 30, to: 60, color: 'skyblue' },
+                    { from: 60, to: 90, color: 'aliceblue' },
+                    { from: 90, to: 120, color: 'yellow' },
+                    { from: 120, to: 150, color: 'orange' },
                     { from: 150, to: 180, color: 'red' }
                 ],
                 valueBox: true,
@@ -148,16 +156,16 @@
 <body>
     <div class="container-fluid mt-3">
         <div class="row mt-3">
-            <div class="col">
+            <div class="col-sm-4 col-m-3 col-lg-2">
                 <canvas id="gauge_in_div" style="width: 100%;"></canvas>
             </div>
-            <div class="col">
+            <div class="col-sm-4 col-m-3 col-lg-2">
                 <canvas id="gauge_out_div" style="width: 100%;"></canvas>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="chart_div" style="width: 100%;"></canvas>
+                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
     </div>
