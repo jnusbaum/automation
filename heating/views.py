@@ -48,7 +48,6 @@ def zone(request, zone_name):
 def all(request):
     # get data for all zones
     datapts = request.GET.get('datapts', '100')
-    targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
     # look for zone names
     r = requests.get(f'{settings.DATASERVER_HOST}/zones')
     if requests.codes.ok != r.status_code:
@@ -74,7 +73,6 @@ def all(request):
 def overlay(request):
     # get data for all zones
     datapts = request.GET.get('datapts', '100')
-    targettime = request.GET.get('targettime', datetime_to_str(datetime.today()))
     # look for zone names
     r = requests.get(f'{settings.DATASERVER_HOST}/zones')
     if requests.codes.ok != r.status_code:
@@ -90,7 +88,6 @@ def overlay(request):
         for zone in zones:
             if zone['id'] in request.GET:
                 dzones.append(zone)
-
     osensors = []
     for zone in dzones:
         r = requests.get(f"{settings.DATASERVER_HOST}/sensors/zone/{zone['id']}")
@@ -103,3 +100,16 @@ def overlay(request):
                                                             'allzones': zones,
                                                             'zones': dzones,
                                                             'sensors': osensors})
+
+
+def test(request, zone_name):
+    r = requests.get(f'{settings.DATASERVER_HOST}/zones')
+    if requests.codes.ok != r.status_code:
+        # error
+        return HttpResponse(status=r.status_code)
+    data = r.json()
+    zones = data['data']
+    zones.sort(key=lambda x: x['id'])
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
+
+
