@@ -2,158 +2,155 @@
 <html lang="en">
 <head>
     <title>Heating Zone</title>
-    <title>Heating Zone</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart', 'line', 'gauge']});
-      google.charts.setOnLoadCallback(setupChart);
-
-      var goptions = {
-        width: 600, height: 300,
-        greenFrom: 90, greenTo: 120,
-        greenColor: "yellow",
-        yellowFrom:120, yellowTo: 150,
-        yellowColor: "orange",
-        redFrom: 150, redTo: 200,
-        minorTicks: 5,
-        max: 200
-      };
-      var gdata;
-      var gauges;
-      var coptions = {
-          chartArea: {width: '90%', height: '80%'},
-          title: 'Last 24 Hours',
-          legend: {position: 'in'},
-          hAxis: {
-              title: 'Time',
-          },
-          vAxis: {
-              title: 'Temperature',
-              maxValue: 200,
-              minValue: 30
-          },
-          colors: ['orange', 'skyblue']
-      };
-      var cdata;
-      var chart;
-      var ts;
+        $( document ).ready(setupCharts);
 
 
-      function strToDate(its) {
-          var year = Number(its.substr(0, 4));
-          var month = Number(its.substr(5, 2))-1;
-          var day = Number(its.substr(8, 2));
-          var hour = Number(its.substr(11, 2));
-          var minute = Number(its.substr(14, 2));
-          var second = Number(its.substr(17, 2));
+        var gaugeIn;
+        var gaugeOut;
+        var lineChart;
+		var chartConfig = {
+			type: 'line',
+			data: {
+				labels: new Array(9000).fill(new Date()),
+				datasets: [{
+					label: 'IN',
+                    borderColor: 'orange',
+					fill: false,
+                    pointRadius: 0,
+					data: new Array(9000).fill(Number(0)),
+				}, {
+					label: 'OUT',
+                    borderColor: 'skyblue',
+					fill: false,
+                    pointRadius: 0,
+					data: new Array(9000).fill(Number(0)),
+				}]
+			},
+			options: {
+			    maintainAspectRatio: false,
+				scales: {
+					xAxes: [{
+						type: 'time',
+                        time: {
+						    unit: 'second',
+                            displayFormats: { second: 'MM-DD HH:mm:ss' }
+                        },
+						scaleLabel: {
+							display: true,
+							labelString: 'Time'
+						}
+					}],
+					yAxes: [{
+					    ticks: {
+                            suggestedMin: 30,
+                            suggestedMax: 180,
+                            stepSize: 30
+                        },
+						scaleLabel: {
+							display: true,
+							labelString: 'temp'
+						}
+					}]
+				},
+			}
+		};
 
-          return new Date(year, month, day, hour, minute, second);
-      }
+		function strToDate(its) {
+            var year = Number(its.substr(0, 4));
+            var month = Number(its.substr(5, 2))-1;
+            var day = Number(its.substr(8, 2));
+            var hour = Number(its.substr(11, 2));
+            var minute = Number(its.substr(14, 2));
+            var second = Number(its.substr(17, 2));
+
+            return new Date(year, month, day, hour, minute, second);
+        }
 
 
-      function curDateStr() {
-          var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
-      }
+        function drawCharts() {
+            gaugeIn.draw();
+            gaugeOut.draw();
+            lineChart.update();
+        }
 
 
-      function drawCharts() {
-          gauges.draw(gdata, goptions);
-          chart.draw(cdata, coptions);
-      }
+        function updateData(adata) {
+            for (let sensor in adata['data']) {
+                let slist = adata['data'][sensor]['data'];
+                if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                    gaugeIn.value = Number(slist[0]['attributes']['value_real'])
+                    // reverse load
+                    let j = 9000;
+                      for (let i=0; i < 9000; i++) {
+                          --j;
+                          chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
+                          chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value_real']);
+                      }
+                }
+                else if (sensor.endsWith('-OUT')) {
+                    gaugeOut.value = Number(slist[0]['attributes']['value_real'])
+                    // reverse load
+                    let j = 9000;
+                      for (let i=0; i < 9000; i++) {
+                          --j;
+                          chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value_real']);
+                      }                }
+            }
+            drawCharts();
+            setTimeout(startUpdate, 5000);
+        }
 
 
-      function updateData(adata) {
-          for (let sensor in adata['data']) {
-              let slist = adata['data'][sensor]['data'];
-              if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                  gdata.setValue(0, 1, Number(slist[0]['attributes']['value_real']));
-                  // reverse load
-                  let j = 9000;
-                  for (let i=0; i < 9000; i++) {
-                      --j;
-                      cdata.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
-                      cdata.setValue(i, 1, Number(slist[j]['attributes']['value_real']));
-                  }
-              }
-              else if (sensor.endsWith('-OUT')) {
-                  gdata.setValue(1, 1, Number(slist[0]['attributes']['value_real']));
-                  let j = 9000;
-                  for (let i=0; i < 9000; i++) {
-                      --j;
-                      cdata.setValue(i, 2, Number(slist[j]['attributes']['value_real']));
-                  }
-              }
-          }
-          drawCharts();
-          setTimeout(startUpdate, 15000);
-      }
+        function startUpdate() {
+            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                { 'datapts': 9000 },
+                updateData);
+        }
 
 
-      function startUpdate() {
-          let ts = curDateStr();
-        $.getJSON('{{ host }}/zones/{{ zone }}/data',
-                    { 'datapts': 9000, 'targettime': ts },
-                    updateData);
-      }
-
-
-      function setupChart() {
-        gauges = new google.visualization.Gauge(document.getElementById('gauge_div'));
-        gdata = google.visualization.arrayToDataTable([['Label', 'Value'],
-                                                        ['IN', 0],
-                                                        ['OUT', 0]]);
-        chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-        cdata = new google.visualization.DataTable();
-        cdata.addColumn('datetime', 'Time');
-        cdata.addColumn('number', 'IN');
-        cdata.addColumn('number', 'OUT');
-        cdata.addRows(9000);
-
-        startUpdate();
-      }
+        function setupCharts() {
+            gaugeIn = new RadialGauge({renderTo: 'gauge_in_div',
+                title: 'IN',
+                width: 250, height: 250,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '50', '70', '90', '110', '130', '150', '180'],
+                minorTicks: 5,
+                highlights: [{ from: 30, to: 70, color: 'skyblue' },
+                    { from: 70, to: 100, color: 'aliceblue' },
+                    { from: 100, to: 130, color: 'yellow' },
+                    { from: 130, to: 150, color: 'orange' },
+                    { from: 150, to: 180, color: 'red' }
+                ],
+                valueBox: true,
+                value: 30});
+            gaugeOut = new RadialGauge({renderTo: 'gauge_out_div',
+                title: 'OUT',
+                width: 250, height: 250,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{ from: 30, to: 60, color: 'skyblue' },
+                    { from: 60, to: 90, color: 'aliceblue' },
+                    { from: 90, to: 120, color: 'yellow' },
+                    { from: 120, to: 150, color: 'orange' },
+                    { from: 150, to: 180, color: 'red' }
+                ],
+                valueBox: true,
+                value: 30});
+            var ctx = document.getElementById('chart_div').getContext('2d');
+            lineChart = new Chart(ctx, chartConfig);
+            startUpdate();
+        }
     </script>
-    <style>
-        .hot {
-            {# above 150 #}
-            fill: red;
-        }
-        .very-warm {
-            {# 130-150 #}
-            fill: orange;
-        }
-        .warm {
-            {# 110-130 #}
-            fill: yellow;
-        }
-        .luke-warm {
-            {# 90-110 #}
-            fill: aliceblue;
-        }
-        .cool {
-            {# 70-90 #}
-            fill: skyblue;
-        }
-        .cold {
-            {# below 70 #}
-            fill: deepskyblue;
-        }
-
-        .center {
-            text-align: center;
-            vertical-align: center;
-            border: aliceblue;
-        }
-    </style>
-
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -180,20 +177,20 @@
         </ul>
       </div>
     </nav>
-
     <div class="container-fluid mt-3">
         <div class="row mt-3">
-            <div class="col">
-                <div id="gauge_div" style="width: 100%;"></div>
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <canvas id="gauge_in_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <canvas id="gauge_out_div" style="width: 100%;"></canvas>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <div class="col">
-                <div id="chart_div" style="width: 100%; height: 750px;"></div>
+                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
-
     </div>
-
 </body>
 </html>
