@@ -103,5 +103,4 @@ def overlay(request):
 
 
 def test(request):
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST}
-
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST})
