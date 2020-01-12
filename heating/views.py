@@ -102,14 +102,5 @@ def overlay(request):
                                                             'sensors': osensors})
 
 
-def test(request, zone_name):
-    r = requests.get(f'{settings.DATASERVER_HOST}/zones')
-    if requests.codes.ok != r.status_code:
-        # error
-        return HttpResponse(status=r.status_code)
-    data = r.json()
-    zones = data['data']
-    zones.sort(key=lambda x: x['id'])
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
-
-
+def test(request):
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST})
