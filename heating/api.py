@@ -18,13 +18,22 @@ class HttpResponseCreated(HttpResponse):
 
 def zones(request):
     if request.method == 'POST':
+        try:
+            zone_name = request.POST['name']
+        except KeyError:
+            return HttpResponseBadRequest(reason="No name parameter supplied.")
         # if POST add new zone
-        z = Zone(name=request.POST['name'], description=request.POST['description'])
-        z.save()
-        return HttpResponseCreated()
+        try:
+            Zone.objects.get(pk=zone_name)
+            return HttpResponseBadRequest(reason="Zone with supplied name already exists.")
+        except Zone.DoesNotExist:
+            description = request.POST.get('description', default=None)
+            z = Zone(name=zone_name, description=description)
+            z.save()
+            return HttpResponseCreated()
     else:
         # if GET return list of zones
-        zones = Zone.objects.order_by('name')
+        zones = Zone.objects.all().order_by('name')
         rzones = {'count': len(zones), 'data': [z.as_json() for z in zones]}
         return JsonResponse(data=rzones)
 
@@ -33,7 +42,7 @@ def zone(request, zone_name):
     try:
         zone = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
-        return HttpResponseNotFound(reaason="No Zone with the specified id was found.")
+        return HttpResponseNotFound(reason="No Zone with the specified id was found.")
     if request.method == 'PATCH':
         # if PATCH add data for zone
         # can't change pk (name)
@@ -47,7 +56,7 @@ def zone(request, zone_name):
     elif request.method == 'DELETE':
         # if DELETE delete sensor
         zone.delete()
-        return HttpResponseNoContent
+        return HttpResponseNoContent()
     else:
         # if GET get zone meta data
         rzone = {'count': 1, 'data': [zone.as_json()]}
@@ -59,7 +68,7 @@ def sensors_for_zone(request, zone_name):
     try:
         zone = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
-        return HttpResponseNotFound(reaason="No Zone with the specified id was found.")
+        return HttpResponseNotFound(reason="No Zone with the specified id was found.")
     # sensors for zone
     rsensors = {'count': len(zone.sensors), 'data': [s.as_json for s in zone.sensors]}
     return JsonResponse(data=rsensors)
@@ -74,14 +83,27 @@ def sensors(request):
             try:
                 zone = Zone.objects.get(pk=zone_name)
             except Zone.DoesNotExist:
-                return HttpResponseNotFound(reaason="No Zone with the specified id was found.")
+                return HttpResponseNotFound(reason="No Zone with the specified id was found.")
         except KeyError:
             pass
-        s = Sensor(name=request.POST['name'], type=request.POST['type'],
-               address=request.POST['address'], description=request.POST['description'],
-               zone=zone)
-        s.save()
-        return HttpResponseCreated()
+        try:
+            sensor_name = request.POST['name']
+        except KeyError:
+            return HttpResponseBadRequest(reason="No name parameter supplied.")
+        try:
+            type = request.POST['type']
+        except KeyError:
+            return HttpResponseBadRequest(reason="No type parameter supplied.")
+        address = request.POST.get('address', default=None)
+        description = request.POST.get('description', default=None)
+
+        try:
+            Sensor.objects.get(pk=sensor_name)
+            return HttpResponseBadRequest(reason="Sensor with supplied name already exists.")
+        except Sensor.DoesNotExist:
+            s = Sensor(name=sensor_name, type=type, address=address, description=description, zone=zone)
+            s.save()
+            return HttpResponseCreated()
     else:
         # if GET return list of sensors
         sensors = Sensor.objects.all().order_by('name')
@@ -93,7 +115,7 @@ def sensor(request, sensor_name):
     try:
         sensor = Sensor.objects.get(pk=sensor_name)
     except Sensor.DoesNotExist:
-        return HttpResponseNotFound(reaason="No Sensor with the specified id was found.")
+        return HttpResponseNotFound(reason="No Sensor with the specified id was found.")
     if request.method == 'PATCH':
         # if PATCH add data for sensor
         # can't change pk (name)
@@ -139,7 +161,7 @@ def zone_data(request, zone_name):
     try:
         zone = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
-        return HttpResponseNotFound(reaason="No Zone with the specified id was found.")
+        return HttpResponseNotFound(reason="No Zone with the specified id was found.")
     try:
         targettime = request.GET['targettime']
         targettime = datetime.fromisoformat(targettime)
@@ -147,10 +169,11 @@ def zone_data(request, zone_name):
         targettime = datetime.today()
     try:
         datapts = request.GET['datapts']
+        datapts = int(datapts)
     except KeyError:
         datapts = 1
     dseries = {}
-    for sensor in zone.sensors:
+    for sensor in zone.sensor_set.all():
         sdata = sensor.sensordata_set.filter(timestamp__lte=targettime).order_by('-timestamp')[:datapts]
         data = []
         bad = 0
@@ -224,6 +247,7 @@ def sensor_data(request, sensor_name):
             targettime = datetime.today()
         try:
             datapts = request.GET['datapts']
+            datapts=int(datapts)
         except KeyError:
             datapts = 1
         try:

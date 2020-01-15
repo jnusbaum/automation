@@ -58,7 +58,7 @@ class SensorData(models.Model):
         verbose_name = "SensorData"
         verbose_name_plural = "SensorData"
 
-    def as_json(self, altvalue):
+    def as_json(self, altvalue=None):
         dself = {'attributes': {'timestamp': self.timestamp,
                                 # this is a decimal so we convert it to a string here
                                 'value': altvalue if altvalue else self.value,
