@@ -10,6 +10,7 @@ MIN_TEMP = 30
 
 
 class JsonResponseNoContent(HttpResponse):
+    # this is actually an HttpResponse since JsonResponse has payload by definition
     def __init__(self):
         super().__init__(status=HTTPStatus.NO_CONTENT)
 
