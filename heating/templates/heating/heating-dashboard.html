@@ -26,8 +26,8 @@
       function curDateStr() {
           var d = new Date();
           return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+              ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+              ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
       }
 
 
@@ -55,14 +55,14 @@
           {% for zone in zones %}
               {
                   let ts = curDateStr()
-                  $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
+                  $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
                       {'timestamp': ts},
                       function (adata) {
                           // process data
                           for (let sensor in adata['data']) {
                               let slist = adata['data'][sensor]['data'];
                               if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                  let inval = Number(slist[0]['attributes']['value_real']);
+                                  let inval = Number(slist[0]['attributes']['value']);
                                   let timestamp = slist[0]['attributes']['timestamp'];
                                   // update data in DOM
                                   let newcls = selectColor(inval);
@@ -72,7 +72,7 @@
                                   }
                                   $('#{{ zone.id }}-TS').text(timestamp)
                               } else if (sensor.endsWith('-OUT')) {
-                                  let outval = Number(slist[0]['attributes']['value_real']);
+                                  let outval = Number(slist[0]['attributes']['value']);
                                   // update data in DOM
                                   let newcls = selectColor(outval);
                                   let oldcls = $('#' + sensor + '-LED').attr('class');
@@ -143,7 +143,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for zone in zones %}
-              <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
+              <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
             {% endfor %}
         </div>
       </li>

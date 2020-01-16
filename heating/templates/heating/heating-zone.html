@@ -87,22 +87,22 @@
             for (let sensor in adata['data']) {
                 let slist = adata['data'][sensor]['data'];
                 if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                    gaugeIn.value = Number(slist[0]['attributes']['value_real'])
+                    gaugeIn.value = Number(slist[0]['attributes']['value'])
                     // reverse load
                     let j = 9000;
                       for (let i=0; i < 9000; i++) {
                           --j;
                           chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
-                          chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value_real']);
+                          chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value']);
                       }
                 }
                 else if (sensor.endsWith('-OUT')) {
-                    gaugeOut.value = Number(slist[0]['attributes']['value_real'])
+                    gaugeOut.value = Number(slist[0]['attributes']['value'])
                     // reverse load
                     let j = 9000;
                       for (let i=0; i < 9000; i++) {
                           --j;
-                          chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value_real']);
+                          chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value']);
                       }                }
             }
             drawCharts();
@@ -170,7 +170,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in zones %}
-                  <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
+                  <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
                 {% endfor %}
             </div>
           </li>
