@@ -171,6 +171,67 @@ def sensor(request, sensor_name):
         return JsonResponse(data=rsensor)
 
 
+def get_sensor_data(request, sensor):
+    sdata = sensor.sensordata_set
+    try:
+        stime = request.GET['starttime']
+        stime = datetime.fromisoformat(stime)
+        sdata = sdata.filter(timestamp_gt=stime)
+    except KeyError:
+        pass
+    try:
+        etime = request.GET['endtime']
+        etime = datetime.fromisoformat(etime)
+    except KeyError:
+        etime = datetime.today()
+    sdata = sdata.filter(timestamp_lte=etime)
+    try:
+        datapts = request.GET['datapts']
+        datapts = int(datapts)
+    except KeyError:
+        datapts = 1
+    sdata = sdata.order_by('-timestamp')[:datapts]
+    data = []
+    bad = 0
+    if len(sdata) >= 4:
+        # initialize algorithm
+        # determine if initial value is bad
+        val = sdata[0].value
+        avgval = mean((val, sdata[1].value, sdata[2].value, sdata[3].value))
+        if val < MIN_TEMP or abs(val - avgval) > MAX_TEMP_MOVE:
+            # bad value
+            bad += 1
+            print(f"{sensor.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
+            v = sdata[0].as_json(avgval)
+        else:
+            v = sdata[0].as_json()
+        data.append(v)
+    else:
+        val = sdata[0].value
+        if val < MIN_TEMP:
+            bad += 1
+            val = Decimal(MIN_TEMP)
+            v = sdata[0].as_json(val)
+        else:
+            v = sdata[0].as_json()
+        data.append(v)
+    for i in range(1, len(sdata)):
+        # null all clearly bad values
+        prev = val
+        val = sdata[i].value
+        if val < MIN_TEMP or abs(val - prev) > MAX_TEMP_MOVE:
+            bad += 1
+            print(f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
+            val = prev
+            v = sdata[i].as_json(val)
+        else:
+            v = sdata[i].as_json()
+        data.append(v)
+    print(f"{sensor.name}: {bad} bad data points out of {len(sdata)}")
+    return {'count': len(data), 'data': data}
+
+
+
 # url options for GET
 # targettime=<datetime: targettime> get data <= <targettime>, default is now
 # datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
@@ -181,42 +242,9 @@ def zone_data(request, zone_name):
         z = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    try:
-        targettime = request.GET['targettime']
-        targettime = datetime.fromisoformat(targettime)
-    except KeyError:
-        targettime = datetime.today()
-    try:
-        datapts = request.GET['datapts']
-        datapts = int(datapts)
-    except KeyError:
-        datapts = 1
     dseries = {}
     for s in z.sensor_set.all():
-        sdata = s.sensordata_set.filter(timestamp__lte=targettime).order_by('-timestamp')[:datapts]
-        data = []
-        bad = 0
-        if len(sdata):
-            val = sdata[0].value
-            if val < MIN_TEMP:
-                bad += 1
-                val = Decimal(MIN_TEMP)
-                v = sdata[0].as_json(val)
-            else:
-                v = sdata[0].as_json()
-            data.append(v)
-            for i in range(1, len(sdata)):
-                # null all clearly bad values
-                prev = val
-                val = sdata[i].value
-                if val < MIN_TEMP or abs(val - prev) > MAX_TEMP_MOVE:
-                    bad += 1
-                    val = prev
-                    v = sdata[i].as_json(val)
-                else:
-                    v = sdata[i].as_json()
-                data.append(v)
-            dseries[s.name] = {'count': len(data), 'data': data}
+        dseries[s.name] = get_sensor_data(request, s)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
@@ -260,48 +288,8 @@ def sensor_data(request, sensor_name):
     else:
         # if GET get data for sensor
         try:
-            targettime = request.GET['targettime']
-            targettime = datetime.fromisoformat(targettime)
-        except KeyError:
-            targettime = datetime.today()
-        try:
-            datapts = request.GET['datapts']
-            datapts = int(datapts)
-        except KeyError:
-            datapts = 1
-        try:
             s = Sensor.objects.get(pk=sensor_name)
         except Sensor.DoesNotExist:
             return JsonResponseNotFound("No Sensor with the specified id was found.")
-        sdata = s.sensordata_set.filter(timestamp__lte=targettime).order_by('-timestamp')[:datapts]
-
-        data = []
-        bad = 0
-        if len(sdata) >= 4:
-            # initialize algorithm
-            # determine if initial value is bad
-            val = sdata[0].value
-            avgval = mean((val, sdata[1].value, sdata[2].value, sdata[3].value))
-            if val < MIN_TEMP or abs(val - avgval) > MAX_TEMP_MOVE:
-                # bad value
-                bad += 1
-                print(f"{s.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
-                v = sdata[0].as_json(val)
-            else:
-                v = sdata[0].as_json()
-            data.append(v)
-            for i in range(1, len(sdata)):
-                # null all clearly bad values
-                prev = val
-                val = sdata[i].value
-                if val < MIN_TEMP or abs(val - prev) > MAX_TEMP_MOVE:
-                    bad += 1
-                    print(f"{s.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
-                    val = prev
-                    v = sdata[i].as_json(val)
-                else:
-                    v = sdata[i].as_json()
-                data.append(v)
-            print(f"{s.name}: {bad} bad data points out of {len(sdata)}")
-        rsensordata = {'count': len(data), 'data': data}
+        rsensordata = get_sensor_data(request, s)
         return JsonResponse(data=rsensordata)

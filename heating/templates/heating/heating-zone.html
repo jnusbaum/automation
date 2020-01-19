@@ -13,7 +13,7 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-
+        var ts;
         var gaugeIn;
         var gaugeOut;
         var lineChart;
@@ -75,6 +75,13 @@
             return new Date(year, month, day, hour, minute, second);
         }
 
+        function curDateStr() {
+            var d = new Date();
+            return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+                ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+                ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+        }
+
 
         function drawCharts() {
             gaugeIn.draw();
@@ -111,8 +118,10 @@
 
 
         function startUpdate() {
+		    let sts = ts;
+            ts = curDateStr();
             $.getJSON('{{ host }}/zones/{{ zone }}/data',
-                { 'datapts': 9000 },
+                { 'starttime': sts, 'endtime': ts, 'datapts': 9000 },
                 updateData);
         }
 
@@ -148,7 +157,10 @@
                 value: 30});
             var ctx = document.getElementById('chart_div').getContext('2d');
             lineChart = new Chart(ctx, chartConfig);
-            startUpdate();
+            ts = curDateStr();
+            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                { 'endtime': ts, 'datapts': 9000 },
+                updateData);
         }
     </script>
 </head>
