@@ -176,7 +176,7 @@ def get_sensor_data(request, sensor):
     try:
         stime = request.GET['starttime']
         stime = datetime.fromisoformat(stime)
-        sdata = sdata.filter(timestamp_gt=stime)
+        sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
@@ -184,7 +184,7 @@ def get_sensor_data(request, sensor):
         etime = datetime.fromisoformat(etime)
     except KeyError:
         etime = datetime.today()
-    sdata = sdata.filter(timestamp_lte=etime)
+    sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
         datapts = int(datapts)
