@@ -56,7 +56,7 @@
           let ts = curDateStr();
           {% for zone in zones %}
             $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
-                    {'datapts': {{ datapts }}, 'targettime': ts },
+                    {'datapts': {{ datapts }}, 'endtime': ts },
                     function (adata) {
                         // process data
                         for (let sensor in adata['data']) {
