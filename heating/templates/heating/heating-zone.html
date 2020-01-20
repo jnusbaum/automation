@@ -94,29 +94,30 @@
             for (let sensor in adata['data']) {
                 let slist = adata['data'][sensor]['data'];
                 let numpts = slist.length;
-                // shift arrays
-                for (let i=0; i < 9000-numpts; i++) {
-                    chartConfig.data.labels[i] = chartConfig.data.labels[i + numpts];
-                    chartConfig.data.datasets[0].data[i] = chartConfig.data.datasets[0].data[i + numpts];
-                    chartConfig.data.datasets[1].data[i] =  chartConfig.data.datasets[1].data[i+numpts];
-                }
-                if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                    gaugeIn.value = Number(slist[0]['attributes']['value'])
-                    // reverse load
-                    let j = numpts;
-                    for (let i=9000-numpts; i < 9000; i++) {
-                        --j;
-                        chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
-                        chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value']);
+                if (numpts > 0) {
+                    // shift arrays
+                    for (let i = 0; i < 9000 - numpts; i++) {
+                        chartConfig.data.labels[i] = chartConfig.data.labels[i + numpts];
+                        chartConfig.data.datasets[0].data[i] = chartConfig.data.datasets[0].data[i + numpts];
+                        chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[1].data[i + numpts];
                     }
-                }
-                else if (sensor.endsWith('-OUT')) {
-                    gaugeOut.value = Number(slist[0]['attributes']['value'])
-                    // reverse load
-                    let j = numpts;
-                    for (let i=9000-numpts; i < 9000; i++) {
-                        --j;
-                        chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value']);
+                    if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                        gaugeIn.value = Number(slist[0]['attributes']['value'])
+                        // reverse load
+                        let j = numpts;
+                        for (let i = 9000 - numpts; i < 9000; i++) {
+                            --j;
+                            chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
+                            chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value']);
+                        }
+                    } else if (sensor.endsWith('-OUT')) {
+                        gaugeOut.value = Number(slist[0]['attributes']['value'])
+                        // reverse load
+                        let j = numpts;
+                        for (let i = 9000 - numpts; i < 9000; i++) {
+                            --j;
+                            chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value']);
+                        }
                     }
                 }
             }
