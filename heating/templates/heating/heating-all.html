@@ -70,7 +70,7 @@
                         // process data
                        for (let sensor in adata['data']) {
                            let slist = adata['data'][sensor]['data'];
-                           let numpts = slist.length;
+                           let numpts = adata['data'][sensor]['count'];
                            if (numpts > 0) {
                                // shift arrays
                                for (let i = 0; i < {{ datapts }} - numpts; i++) {
