@@ -56,28 +56,30 @@
               {
                   let ts = curDateStr()
                   $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
-                      {'endtime': ts},
+                      {'datapts': 1, 'endtime': ts},
                       function (adata) {
                           // process data
                           for (let sensor in adata['data']) {
                               let slist = adata['data'][sensor]['data'];
-                              if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                  let inval = Number(slist[0]['attributes']['value']);
-                                  let timestamp = slist[0]['attributes']['timestamp'];
-                                  // update data in DOM
-                                  let newcls = selectColor(inval);
-                                  let oldcls = $('#' + sensor + '-LED').attr('class');
-                                  if (oldcls != newcls) {
-                                      $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
-                                  }
-                                  $('#{{ zone.id }}-TS').text(timestamp)
-                              } else if (sensor.endsWith('-OUT')) {
-                                  let outval = Number(slist[0]['attributes']['value']);
-                                  // update data in DOM
-                                  let newcls = selectColor(outval);
-                                  let oldcls = $('#' + sensor + '-LED').attr('class');
-                                  if (oldcls != newcls) {
-                                      $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                              if (slist.length) {
+                                  if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                      let inval = Number(slist[0]['attributes']['value']);
+                                      let timestamp = slist[0]['attributes']['timestamp'];
+                                      // update data in DOM
+                                      let newcls = selectColor(inval);
+                                      let oldcls = $('#' + sensor + '-LED').attr('class');
+                                      if (oldcls != newcls) {
+                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                      }
+                                      $('#{{ zone.id }}-TS').text(timestamp)
+                                  } else if (sensor.endsWith('-OUT')) {
+                                      let outval = Number(slist[0]['attributes']['value']);
+                                      // update data in DOM
+                                      let newcls = selectColor(outval);
+                                      let oldcls = $('#' + sensor + '-LED').attr('class');
+                                      if (oldcls != newcls) {
+                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                      }
                                   }
                               }
                           }
