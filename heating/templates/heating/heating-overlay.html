@@ -72,12 +72,12 @@
                         let slist = adata['data'];
                         let numpts = adata['count'];
                         if (numpts > 0) {
-                            for (let i = 0; i < {{ datapts }} -numpts; i++) {
+                            for (let i = 0; i < {{ datapts }} - numpts; i++) {
                                 data.setValue(i, 0, data.getValue(i + numpts, 0));
                                 data.setValue(i, colidxs['{{ sensor.name }}'], data.getValue(i + numpts, colidxs['{{ sensor.name }}']));
                             }
                             let j = numpts;
-                            for (let i = {{ datapts }} -numpts; i < {{ datapts }}; i++) {
+                            for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
                                 --j;
                                 data.setValue(i, 0, strToDate(adata['data'][j]['attributes']['timestamp']));
                                 data.setValue(i, colidxs['{{ sensor.name }}'], Number(adata['data'][j]['attributes']['value']));
