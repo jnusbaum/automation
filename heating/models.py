@@ -16,7 +16,7 @@ class Zone(models.Model):
                  'self': f"/zones/{self.name}",
                  'relationships': {
                      'sensors': f"/sensors/zone/{self.name}"
-                 }
+                    }
                  }
         return dself
 
@@ -25,8 +25,11 @@ class Sensor(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
     zone = models.ForeignKey('Zone', on_delete=models.SET_NULL, blank=True, null=True)
     type = models.CharField(max_length=8, choices=[('TEMP', 'Temperature'), ('POS', 'Position'), ('ONOFF', 'On/Off')])
-    address = models.CharField(max_length=128, blank=True)
+    address = models.CharField(max_length=128, blank=True, null=True)
     description = models.CharField(max_length=512)
+    total_bad = models.IntegerField(null=True)
+    last_scan_bad = models.IntegerField(null=True)
+    last_ts_checked = models.DateTimeField(null=True)
 
     class Meta:
         verbose_name = "Sensor"
@@ -35,7 +38,10 @@ class Sensor(models.Model):
     def as_json(self):
         dself = {'attributes': {'type': self.type,
                                 'address': self.address,
-                                'description': self.description
+                                'description': self.description,
+                                'total_bad': self.total_bad,
+                                'last_scan_bad': self.last_scan_bad,
+                                'last_ts_checked': self.last_ts_checked
                                 },
                  'id': self.name,
                  'type': 'Sensor',
@@ -43,7 +49,7 @@ class Sensor(models.Model):
                  'relationships': {
                      'data': f"/sensors/{self.name}/data",
                      'zone': f"/zones/{self.zone.name}" if self.zone else '',
-                 }
+                    }
                  }
         return dself
 
@@ -58,7 +64,7 @@ class SensorData(models.Model):
         verbose_name = "SensorData"
         verbose_name_plural = "SensorData"
         indexes = [
-            models.Index(fields=['sensor', '-timestamp'], name='heating_sensordata_sensor_id_timestamp'),
+            models.Index(fields=['sensor', '-timestamp'], name='heating_sensordata_sid_ts'),
         ]
 
     def as_json(self, altvalue=None):
@@ -72,6 +78,6 @@ class SensorData(models.Model):
                  'self': f"/sensors/{self.sensor.name}/data/{self.id}",
                  'relationships': {
                      'sensor': f"/sensors/{self.sensor.name}"
-                 }
+                    }
                  }
         return dself
