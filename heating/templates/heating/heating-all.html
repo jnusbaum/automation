@@ -72,13 +72,11 @@
                            let slist = adata['data'][sensor]['data'];
                            let numpts = adata['data'][sensor]['count'];
                            if (numpts > 0) {
-                               // shift arrays
-                               for (let i = 0; i < {{ datapts }} - numpts; i++) {
-                                   {{ zone.name }}data.setValue(i, 0, {{ zone.name }}data.getValue(i+numpts, 0));
-                                   {{ zone.name }}data.setValue(i, 1, {{ zone.name }}data.getValue(i+numpts, 1));
-                                   {{ zone.name }}data.setValue(i, 2, {{ zone.name }}data.getValue(i+numpts, 2));
-                               }
                                if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                   // shift arrays
+                                   for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                       {{ zone.name }}data.setValue(i, 0, {{ zone.name }}data.getValue(i+numpts, 0));
+                                   }
                                    // reverse load
                                    let j = numpts;
                                    for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
@@ -87,6 +85,10 @@
                                        {{ zone.name }}data.setValue(i, 1, Number(slist[j]['attributes']['value']));
                                    }
                                } else if (sensor.endsWith('-OUT')) {
+                                   // shift arrays
+                                   for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                       {{ zone.name }}data.setValue(i, 2, {{ zone.name }}data.getValue(i+numpts, 2));
+                                   }
                                    // reverse load
                                    let j = numpts;
                                    for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
