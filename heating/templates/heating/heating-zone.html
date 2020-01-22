@@ -40,9 +40,12 @@
 				scales: {
 					xAxes: [{
 						type: 'time',
+                        ticks: {
+                            stepSize: 10
+                        },
                         time: {
-						    unit: 'second',
-                            displayFormats: { second: 'MM-DD HH:mm:ss' }
+						    unit: 'minute',
+                            displayFormats: { minute: 'MM-DD HH:mm' }
                         },
 						scaleLabel: {
 							display: true,
