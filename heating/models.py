@@ -57,6 +57,9 @@ class SensorData(models.Model):
     class Meta:
         verbose_name = "SensorData"
         verbose_name_plural = "SensorData"
+        indexes = [
+            models.Index(fields=['sensor', '-timestamp'], name='heating_sensordata_sensor_id_timestamp'),
+        ]
 
     def as_json(self, altvalue=None):
         dself = {'attributes': {'timestamp': self.timestamp,
