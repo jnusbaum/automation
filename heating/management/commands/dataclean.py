@@ -4,7 +4,7 @@ from statistics import mean
 from decimal import *
 
 MAX_TEMP_MOVE = 25
-MIN_TEMP = 30
+MIN_TEMP = 25
 
 class Command(BaseCommand):
     help = 'clean sensor data'
@@ -18,33 +18,35 @@ class Command(BaseCommand):
                 sdata = sensor.sensordata_set.order_by('timestamp')
             bad = 0
             if len(sdata):
+                # first pass - set any values less than MIN_TEMP to MIN_TEMP or prev
+                s = sdata[0]
+                if s.value < MIN_TEMP:
+                        s.value = Decimal(MIN_TEMP)
+                        s.save()
+                for i in range(1, len(sdata)):
+                    s = sdata[i]
+                    if s.value < MIN_TEMP:
+                        s.value = sdata[i-1].value
+                        s.save()
                 if len(sdata) >= 4:
                     # initialize algorithm
                     # determine if initial value is bad
                     val = sdata[0].value
                     avgval = mean((val, sdata[1].value, sdata[2].value, sdata[3].value))
-                    if val < MIN_TEMP or abs(val - avgval) > MAX_TEMP_MOVE:
+                    if abs(val - avgval) > MAX_TEMP_MOVE:
                         # bad value
                         bad += 1
                         self.stdout.write(f"{sensor.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
                         sdata[0].value = avgval
                         sdata[0].save()
-                else:
-                    val = sdata[0].value
-                    if val < MIN_TEMP:
-                        bad += 1
-                        val = Decimal(MIN_TEMP)
-                        sdata[0].value = val
-                        sdata[0].save()
                 for i in range(1, len(sdata)):
                     # null all clearly bad values
-                    prev = val
+                    prev = sdata[i-1].value
                     val = sdata[i].value
-                    if val < MIN_TEMP or abs(val - prev) > MAX_TEMP_MOVE:
+                    if abs(val - prev) > MAX_TEMP_MOVE:
                         bad += 1
                         self.stdout.write(f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
-                        val = prev
-                        sdata[i].value = val
+                        sdata[i].value = prev
                         sdata[i].save()
                 sensor.last_ts_checked = sdata[len(sdata)-1].timestamp
                 sensor.last_scan_bad = bad

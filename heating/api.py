@@ -1,7 +1,6 @@
 from datetime import datetime
 from decimal import *
 from http import HTTPStatus
-from statistics import mean
 
 from django.http import JsonResponse, HttpResponse
 
