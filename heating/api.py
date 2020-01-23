@@ -1,9 +1,11 @@
-from decimal import *
 from datetime import datetime
-from statistics import mean
-from heating.models import *
+from decimal import *
 from http import HTTPStatus
+from statistics import mean
+
 from django.http import JsonResponse, HttpResponse
+
+from heating.models import *
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 30
@@ -191,44 +193,7 @@ def get_sensor_data(request, sensor):
     except KeyError:
         datapts = 1
     sdata = sdata.order_by('-timestamp')[:datapts]
-    data = []
-    bad = 0
-    if len(sdata):
-        if len(sdata) >= 4:
-            # initialize algorithm
-            # determine if initial value is bad
-            val = sdata[0].value
-            avgval = mean((val, sdata[1].value, sdata[2].value, sdata[3].value))
-            if val < MIN_TEMP or abs(val - avgval) > MAX_TEMP_MOVE:
-                # bad value
-                bad += 1
-                print(f"{sensor.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
-                v = sdata[0].as_json(avgval)
-            else:
-                v = sdata[0].as_json()
-            data.append(v)
-        else:
-            val = sdata[0].value
-            if val < MIN_TEMP:
-                bad += 1
-                val = Decimal(MIN_TEMP)
-                v = sdata[0].as_json(val)
-            else:
-                v = sdata[0].as_json()
-            data.append(v)
-        for i in range(1, len(sdata)):
-            # null all clearly bad values
-            prev = val
-            val = sdata[i].value
-            if val < MIN_TEMP or abs(val - prev) > MAX_TEMP_MOVE:
-                bad += 1
-                print(f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
-                val = prev
-                v = sdata[i].as_json(val)
-            else:
-                v = sdata[i].as_json()
-            data.append(v)
-    print(f"{sensor.name}: {bad} bad data points out of {len(sdata)}")
+    data = [s.as_json() for s in sdata]
     return {'count': len(data), 'data': data}
 
 
