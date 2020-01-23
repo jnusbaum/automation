@@ -27,8 +27,8 @@ class Sensor(models.Model):
     type = models.CharField(max_length=8, choices=[('TEMP', 'Temperature'), ('POS', 'Position'), ('ONOFF', 'On/Off')])
     address = models.CharField(max_length=128, blank=True, null=True)
     description = models.CharField(max_length=512)
-    total_bad = models.IntegerField(null=True)
-    last_scan_bad = models.IntegerField(null=True)
+    total_bad = models.IntegerField(default=0)
+    last_scan_bad = models.IntegerField(default=0)
     last_ts_checked = models.DateTimeField(null=True)
 
     class Meta:

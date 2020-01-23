@@ -13,9 +13,9 @@ class Command(BaseCommand):
         sensors = Sensor.objects.all()
         for sensor in sensors:
             if sensor.last_ts_checked:
-                sdata = sensor.sensordata_set.filter(timestamp__gt=sensor.last_ts_checked).order_by('-timestamp')
+                sdata = sensor.sensordata_set.filter(timestamp__gt=sensor.last_ts_checked).order_by('timestamp')
             else:
-                sdata = sensor.sensordata_set.order_by('-timestamp')
+                sdata = sensor.sensordata_set.order_by('timestamp')
             bad = 0
             if len(sdata):
                 if len(sdata) >= 4:
@@ -45,7 +45,8 @@ class Command(BaseCommand):
                         self.stdout.write(f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
                         val = prev
                         sdata[i].value = val
-                sensor.last_ts_checked = sdata[-1].timestamp
+                        sdata[i].save()
+                sensor.last_ts_checked = sdata[len(sdata)-1].timestamp
                 sensor.last_scan_bad = bad
                 sensor.total_bad = sensor.total_bad + bad
                 sensor.save()
