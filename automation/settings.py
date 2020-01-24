@@ -124,3 +124,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # dataserver host
 # DATASERVER_HOST = 'http://192.168.0.134/dataserver'
 DATASERVER_HOST = 'http://localhost:8000/automation/api/heating'
+MQTTHOST = '192.168.0.134'
+TOPIC = 'sorrelhills/temperature/+'

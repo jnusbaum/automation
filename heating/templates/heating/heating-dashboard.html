@@ -33,13 +33,13 @@
 
       function selectColor(temp) {
           let dclass = 'cold';
-          if (temp < 70) {
+          if (temp < 30) {
               dclass = 'cold';
-          } else if (temp < 90) {
+          } else if (temp < 60) {
               dclass = 'cool';
-          } else if (temp < 110) {
+          } else if (temp < 90) {
               dclass = 'luke-warm';
-          } else if (temp < 130) {
+          } else if (temp < 120) {
               dclass = 'warm';
           } else if (temp < 150) {
               dclass = 'very-warm';
@@ -98,23 +98,23 @@
             fill: red;
         }
         .very-warm {
-            {# 130-150 #}
+            {# 120-150 #}
             fill: orange;
         }
         .warm {
-            {# 110-130 #}
+            {# 90-120 #}
             fill: yellow;
         }
         .luke-warm {
-            {# 90-110 #}
+            {# 60-90 #}
             fill: aliceblue;
         }
         .cool {
-            {# 70-90 #}
+            {# 30-60 #}
             fill: skyblue;
         }
         .cold {
-            {# below 70 #}
+            {# below 30 #}
             fill: deepskyblue;
         }
 
