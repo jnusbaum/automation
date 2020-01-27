@@ -76,6 +76,7 @@
                                    // shift arrays
                                    for (let i = 0; i < {{ datapts }} - numpts; i++) {
                                        {{ zone.name }}data.setValue(i, 0, {{ zone.name }}data.getValue(i+numpts, 0));
+                                       {{ zone.name }}data.setValue(i, 1, {{ zone.name }}data.getValue(i+numpts, 1));
                                    }
                                    // reverse load
                                    let j = numpts;
