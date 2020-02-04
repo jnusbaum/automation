@@ -10,12 +10,12 @@ class Command(BaseCommand):
     help = 'clean sensor data'
 
     def handle(self, *args, **options):
-        sensors = Sensor.objects.all()
+        sensors = TempSensor.objects.all()
         for sensor in sensors:
             if sensor.last_ts_checked:
-                sdata = sensor.sensordata_set.filter(timestamp__gt=sensor.last_ts_checked).order_by('timestamp')
+                sdata = sensor.tempsensordata_set.filter(timestamp__gt=sensor.last_ts_checked).order_by('timestamp')
             else:
-                sdata = sensor.sensordata_set.order_by('timestamp')
+                sdata = sensor.tempsensordata_set.order_by('timestamp')
             bad = 0
             if len(sdata):
                 # first pass - set any values less than MIN_TEMP to MIN_TEMP or prev

@@ -1,11 +1,9 @@
-from django.core.management.base import BaseCommand
-from heating.models import *
-import os
-import logging
-from datetime import datetime
 import json
+from datetime import datetime
 import paho.mqtt.client as mqtt
 from django.conf import settings
+from django.core.management.base import BaseCommand
+from heating.models import TempSensorData
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -28,7 +26,7 @@ def on_message(client, userdata, msg):
     fsname = payload['sensor']
     timestamp = datetime.fromisoformat(payload['timestamp'])
     value = payload['value']
-    s = SensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=value)
+    s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=value)
     s.save()
 
 

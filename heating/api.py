@@ -118,24 +118,24 @@ def sensors(request):
         description = request.POST.get('description', default=None)
 
         try:
-            Sensor.objects.get(pk=sensor_name)
-            return JsonResponseBadRequest(reason="Sensor with supplied name already exists.")
-        except Sensor.DoesNotExist:
-            s = Sensor(name=sensor_name, type=t, address=address, description=description, zone=z)
+            TempSensor.objects.get(pk=sensor_name)
+            return JsonResponseBadRequest(reason="TempSensor with supplied name already exists.")
+        except TempSensor.DoesNotExist:
+            s = TempSensor(name=sensor_name, type=t, address=address, description=description, zone=z)
             s.save()
             return JsonResponseCreated()
     else:
         # if GET return list of sensors
-        snsrs = Sensor.objects.all().order_by('name')
+        snsrs = TempSensor.objects.all().order_by('name')
         rsensors = {'count': len(snsrs), 'data': [s.as_json() for s in snsrs]}
         return JsonResponse(data=rsensors)
 
 
 def sensor(request, sensor_name):
     try:
-        s = Sensor.objects.get(pk=sensor_name)
-    except Sensor.DoesNotExist:
-        return JsonResponseNotFound(reason="No Sensor with the specified id was found.")
+        s = TempSensor.objects.get(pk=sensor_name)
+    except TempSensor.DoesNotExist:
+        return JsonResponseNotFound(reason="No TempSensor with the specified id was found.")
     if request.method == 'PATCH':
         # if PATCH add data for sensor
         # can't change pk (name)
@@ -173,7 +173,7 @@ def sensor(request, sensor_name):
 
 
 def get_sensor_data(request, sensor):
-    sdata = sensor.sensordata_set
+    sdata = sensor.tempsensordata_set
     try:
         stime = request.GET['starttime']
         stime = datetime.fromisoformat(stime)
@@ -208,7 +208,7 @@ def zone_data(request, zone_name):
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
     dseries = {}
-    for s in z.sensor_set.all():
+    for s in z.tempsensor_set.all():
         dseries[s.name] = get_sensor_data(request, s)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
@@ -244,17 +244,17 @@ def sensor_data(request, sensor_name):
         except KeyError:
             return JsonResponseBadRequest(reason="Missing value parameter")
         try:
-            s = Sensor.objects.get(pk=sensor_name)
-        except Sensor.DoesNotExist:
+            s = TempSensor.objects.get(pk=sensor_name)
+        except TempSensor.DoesNotExist:
             return JsonResponseNotFound("No Sensor with the specified id was found.")
-        s = SensorData(sensor=s, timestamp=timestamp, value=value, original_value=value)
+        s = TempSensorData(sensor=s, timestamp=timestamp, value=value, original_value=value)
         s.save()
         return JsonResponseCreated()
     else:
         # if GET get data for sensor
         try:
-            s = Sensor.objects.get(pk=sensor_name)
-        except Sensor.DoesNotExist:
-            return JsonResponseNotFound("No Sensor with the specified id was found.")
+            s = TempSensor.objects.get(pk=sensor_name)
+        except TempSensor.DoesNotExist:
+            return JsonResponseNotFound("No TempSensor with the specified id was found.")
         rsensordata = get_sensor_data(request, s)
         return JsonResponse(data=rsensordata)
