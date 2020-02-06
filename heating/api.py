@@ -94,6 +94,86 @@ def sensors_for_zone(zone_name):
     return JsonResponse(data=rsensors)
 
 
+def devices(request):
+    if request.method == 'POST':
+        try:
+            device_name = request.POST['name']
+        except KeyError:
+            return JsonResponseBadRequest(reason="No name parameter supplied.")
+        # if POST add new device
+        try:
+            Device.objects.get(pk=device_name)
+            return JsonResponseBadRequest(reason="Device with supplied name already exists.")
+        except Device.DoesNotExist:
+            description = request.POST.get('description', default=None)
+            z = Device(name=device_name, description=description)
+            z.save()
+            return JsonResponseCreated()
+    else:
+        # if GET return list of devices
+        zns = Device.objects.all().order_by('name')
+        rdevices = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        return JsonResponse(data=rdevices)
+
+
+def device(request, device_name):
+    try:
+        z = Device.objects.get(pk=device_name)
+    except Device.DoesNotExist:
+        return JsonResponseNotFound(reason="No Device with the specified id was found.")
+    if request.method == 'PATCH':
+        # if PATCH add data for device
+        # can't change pk (name)
+        try:
+            z.description = request.POST['description']
+            z.save()
+        except KeyError:
+            pass
+        z.save()
+        return JsonResponseNoContent()
+    elif request.method == 'DELETE':
+        # if DELETE delete sensor
+        z.delete()
+        return JsonResponseNoContent()
+    else:
+        # if GET get device meta data
+        rdevice = {'count': 1, 'data': [z.as_json()]}
+        return JsonResponse(data=rdevice)
+
+
+def sensors_for_device(device_name):
+    # if GET get device meta data
+    try:
+        z = Device.objects.get(pk=device_name)
+    except Device.DoesNotExist:
+        return JsonResponseNotFound(reason="No Device with the specified id was found.")
+    # sensors for device
+    rsensors = {'count': len(z.sensors), 'data': [s.as_json for s in z.sensors]}
+    return JsonResponse(data=rsensors)
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def device_config(request, device_name):
+    # if GET get device meta data
+    try:
+        d = Device.objects.get(pk=device_name)
+    except Device.DoesNotExist:
+        return JsonResponseNotFound(reason="No Device with the specified id was found.")
+    # get config here
+    djson = d.as_json()
+    djson['attributes']['interfaces'] = []
+    for onew in d.onewireinterface_set.all():
+        ojson = onew.as_json()
+        ojson['attributes']['sensors'] = []
+        for s in onew.tempsensor_set.all():
+            ojson['attributes']['sensors'].append(s.as_json())
+        djson['attributes']['interfaces'].append(ojson)
+    return JsonResponse(data={'count': 1, 'data': djson})
+
+
 def sensors(request):
     if request.method == 'POST':
         # if POST add new sensor
@@ -207,6 +287,23 @@ def zone_data(request, zone_name):
         z = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
+    dseries = {}
+    for s in z.tempsensor_set.all():
+        dseries[s.name] = get_sensor_data(request, s)
+    rsensordata = {'count': 1, 'data': dseries}
+    return JsonResponse(data=rsensordata)
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def device_data(request, device_name):
+    # if GET get device meta data
+    try:
+        z = Device.objects.get(pk=device_name)
+    except Device.DoesNotExist:
+        return JsonResponseNotFound(reason="No Device with the specified id was found.")
     dseries = {}
     for s in z.tempsensor_set.all():
         dseries[s.name] = get_sensor_data(request, s)
