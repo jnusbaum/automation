@@ -190,10 +190,6 @@ def sensors(request):
             sensor_name = request.POST['name']
         except KeyError:
             return JsonResponseBadRequest(reason="No name parameter supplied.")
-        try:
-            t = request.POST['type']
-        except KeyError:
-            return JsonResponseBadRequest(reason="No type parameter supplied.")
         address = request.POST.get('address', default=None)
         description = request.POST.get('description', default=None)
 
@@ -201,7 +197,7 @@ def sensors(request):
             TempSensor.objects.get(pk=sensor_name)
             return JsonResponseBadRequest(reason="TempSensor with supplied name already exists.")
         except TempSensor.DoesNotExist:
-            s = TempSensor(name=sensor_name, type=t, address=address, description=description, zone=z)
+            s = TempSensor(name=sensor_name, address=address, description=description, zone=z)
             s.save()
             return JsonResponseCreated()
     else:
@@ -219,10 +215,6 @@ def sensor(request, sensor_name):
     if request.method == 'PATCH':
         # if PATCH add data for sensor
         # can't change pk (name)
-        try:
-            s.type = request.POST['type']
-        except KeyError:
-            pass
         try:
             s.address = request.POST['address']
         except KeyError:
