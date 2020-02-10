@@ -21,6 +21,7 @@ def on_message(client, userdata, msg):
     # publish config data
     msg_pieces = msg.topic.split('/')
     device_name = msg_pieces[-1]
+    print(len(msg.payload))
     payload = json.loads(msg.payload)
     print(device_name)
     pprint.pprint(payload)

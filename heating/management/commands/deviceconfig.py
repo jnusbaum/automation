@@ -12,6 +12,7 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     print("Connected with result code " + str(rc))
     client.subscribe('sorrelhills/device/config-request/+')
+    print(f"subscribed to sorrelhills/device/config-request/+")
 
 
 def handler(obj):
@@ -23,6 +24,7 @@ def handler(obj):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    print(f"request received on {msg.topic}")
     # publish config data
     msg_pieces = msg.topic.split('/')
     device_name = msg_pieces[-1]
@@ -35,8 +37,11 @@ def on_message(client, userdata, msg):
             ojson['sensors'] = []
             for s in onew.tempsensor_set.all():
                 ojson['sensors'].append({'name': s.name, 'address': s.address})
+            ojson['num_sensors'] = len(ojson['sensors'])
             djson['interfaces'].append(ojson)
+            djson['num_interfaces'] = len(djson['interfaces'])
         jload = json.dumps(djson, default=handler)
+        print(f"publishing {jload} to sorrelhills/device/config/{device_name}")
         pres = client.publish(f"sorrelhills/device/config/{device_name}", jload)
         if pres.rc != mqtt.MQTT_ERR_SUCCESS:
             print(f"error = {pres.rc}")

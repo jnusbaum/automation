@@ -26,6 +26,7 @@ def on_message(client, userdata, msg):
     fsname = payload['sensor']
     timestamp = datetime.fromisoformat(payload['timestamp'])
     value = payload['value']
+    print(f"saving {fsname}, {timestamp}, {value}")
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=value)
     s.save()
 
