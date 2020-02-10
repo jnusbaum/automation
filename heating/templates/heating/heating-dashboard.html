@@ -54,7 +54,7 @@
           // for each zone fire off an update
           {% for zone in zones %}
               {
-                  let ts = curDateStr()
+                  let ts = curDateStr();
                   $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
                       {'datapts': 1, 'endtime': ts},
                       function (adata) {
@@ -71,7 +71,7 @@
                                       if (oldcls != newcls) {
                                           $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
                                       }
-                                      $('#{{ zone.id }}-TS').text(timestamp)
+                                      $('#{{ zone.name }}-TS').text(timestamp);
                                   } else if (sensor.endsWith('-OUT')) {
                                       let outval = Number(slist[0]['attributes']['value']);
                                       // update data in DOM
