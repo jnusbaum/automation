@@ -31,13 +31,13 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'heating.apps.HeatingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'heating.apps.HeatingConfig',
 ]
 
 MIDDLEWARE = [
@@ -76,12 +76,8 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'automation',
-        'USER': 'rjn',
-        'PASSWORD': 'zaxxon',
-        'HOST': '192.168.0.134',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'database.sqlite',
     }
 }
 
@@ -110,13 +106,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Denver'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -126,5 +122,7 @@ STATIC_URL = '/automation/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # dataserver host
-DATASERVER_HOST = 'http://192.168.0.134/dataserver'
-# DATASERVER_HOST = 'http://localhost:5000/dataserver'
+# DATASERVER_HOST = 'http://192.168.0.134/dataserver'
+DATASERVER_HOST = 'http://localhost:8000/automation/api/heating'
+MQTTHOST = '192.168.0.134'
+TOPIC = 'sorrelhills/temperature/+'

@@ -26,20 +26,20 @@
       function curDateStr() {
           var d = new Date();
           return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+              ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+              ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
       }
 
 
       function selectColor(temp) {
           let dclass = 'cold';
-          if (temp < 70) {
+          if (temp < 30) {
               dclass = 'cold';
-          } else if (temp < 90) {
+          } else if (temp < 60) {
               dclass = 'cool';
-          } else if (temp < 110) {
+          } else if (temp < 90) {
               dclass = 'luke-warm';
-          } else if (temp < 130) {
+          } else if (temp < 120) {
               dclass = 'warm';
           } else if (temp < 150) {
               dclass = 'very-warm';
@@ -54,30 +54,32 @@
           // for each zone fire off an update
           {% for zone in zones %}
               {
-                  let ts = curDateStr()
-                  $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
-                      {'timestamp': ts},
+                  let ts = curDateStr();
+                  $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
+                      {'datapts': 1, 'endtime': ts},
                       function (adata) {
                           // process data
                           for (let sensor in adata['data']) {
                               let slist = adata['data'][sensor]['data'];
-                              if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                  let inval = Number(slist[0]['attributes']['value_real']);
-                                  let timestamp = slist[0]['attributes']['timestamp'];
-                                  // update data in DOM
-                                  let newcls = selectColor(inval);
-                                  let oldcls = $('#' + sensor + '-LED').attr('class');
-                                  if (oldcls != newcls) {
-                                      $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
-                                  }
-                                  $('#{{ zone.id }}-TS').text(timestamp)
-                              } else if (sensor.endsWith('-OUT')) {
-                                  let outval = Number(slist[0]['attributes']['value_real']);
-                                  // update data in DOM
-                                  let newcls = selectColor(outval);
-                                  let oldcls = $('#' + sensor + '-LED').attr('class');
-                                  if (oldcls != newcls) {
-                                      $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                              if (slist.length) {
+                                  if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                      let inval = Number(slist[0]['attributes']['value']);
+                                      let timestamp = slist[0]['attributes']['timestamp'];
+                                      // update data in DOM
+                                      let newcls = selectColor(inval);
+                                      let oldcls = $('#' + sensor + '-LED').attr('class');
+                                      if (oldcls != newcls) {
+                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                      }
+                                      $('#{{ zone.name }}-TS').text(timestamp);
+                                  } else if (sensor.endsWith('-OUT')) {
+                                      let outval = Number(slist[0]['attributes']['value']);
+                                      // update data in DOM
+                                      let newcls = selectColor(outval);
+                                      let oldcls = $('#' + sensor + '-LED').attr('class');
+                                      if (oldcls != newcls) {
+                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
+                                      }
                                   }
                               }
                           }
@@ -96,23 +98,23 @@
             fill: red;
         }
         .very-warm {
-            {# 130-150 #}
+            {# 120-150 #}
             fill: orange;
         }
         .warm {
-            {# 110-130 #}
+            {# 90-120 #}
             fill: yellow;
         }
         .luke-warm {
-            {# 90-110 #}
+            {# 60-90 #}
             fill: aliceblue;
         }
         .cool {
-            {# 70-90 #}
+            {# 30-60 #}
             fill: skyblue;
         }
         .cold {
-            {# below 70 #}
+            {# below 30 #}
             fill: deepskyblue;
         }
 
@@ -143,7 +145,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for zone in zones %}
-              <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
+              <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
             {% endfor %}
         </div>
       </li>

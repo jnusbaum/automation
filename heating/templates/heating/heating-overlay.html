@@ -10,84 +10,101 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart', 'line']});
-      google.charts.setOnLoadCallback(setupCharts);
+        google.charts.load('current', {'packages':['corechart', 'line']});
+        google.charts.setOnLoadCallback(setupCharts);
 
         var colidxs = {};
         {% for sensor in sensors %}
-            colidxs['{{ sensor.id }}'] = 0;
+            colidxs['{{ sensor.name }}'] = 0;
         {% endfor %}
 
-      var options = {
-          chartArea: {width: '90%', height: '80%'},
-          legend: {
-              position: 'in',
-              textStyle: {fontSize: 14},
-          },
-          vAxis: {
-              maxValue: 200,
-              minValue: 30
-          },
-      };
+        var options = {
+            chartArea: {width: '90%', height: '80%'},
+            legend: {
+                position: 'in',
+                textStyle: {fontSize: 14},
+            },
+            vAxis: {
+                maxValue: 200,
+                minValue: 30
+            },
+        };
 
-      var data;
-      var chart;
+        var data;
+        var chart;
+        var ts = false;
 
-      function strToDate(ts) {
-          var year = Number(ts.substr(0, 4));
-          var month = Number(ts.substr(5, 2))-1;
-          var day = Number(ts.substr(8, 2));
-          var hour = Number(ts.substr(11, 2));
-          var minute = Number(ts.substr(14, 2));
-          var second = Number(ts.substr(17, 2));
+        function strToDate(ts) {
+            var year = Number(ts.substr(0, 4));
+            var month = Number(ts.substr(5, 2))-1;
+            var day = Number(ts.substr(8, 2));
+            var hour = Number(ts.substr(11, 2));
+            var minute = Number(ts.substr(14, 2));
+            var second = Number(ts.substr(17, 2));
 
-          return new Date(year, month, day, hour, minute, second);
-      }
+            return new Date(year, month, day, hour, minute, second);
+        }
 
-      function curDateStr() {
-          var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
-      }
-
-
-      function updateData() {
-          // for each zone fire off an update
-          let ts = curDateStr();
-          {% for sensor in sensors %}
-              $.getJSON('{{ host }}/sensors/{{ sensor.id }}/data',
-                  {'datapts': {{ datapts }}, 'targettime': ts },
-                  function (adata) {
-                      // process data
-                      let j = {{ datapts }};
-                      for (let i=0; i < {{ datapts }}; i++) {
-                          --j;
-                          data.setValue(i, 0, strToDate(adata['data'][j]['attributes']['timestamp']));
-                          data.setValue(i, colidxs['{{ sensor.id }}'], Number(adata['data'][j]['attributes']['value_real']));
-                      }
-                      chart.draw(data, options);
-                  }
-              );
-          {%  endfor %}
-          //schedule next update
-          setTimeout(updateData, 30000);
-      }
+        function curDateStr() {
+            var d = new Date();
+            return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+                ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+                ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+        }
 
 
-      function setupCharts() {
-          data = new google.visualization.DataTable();
-          data.addColumn('datetime', 'Time');
-          let x = 1;
-          {% for sensor in sensors %}
-              colidxs['{{ sensor.id }}'] = x;
-              ++x;
-              data.addColumn('number', '{{ sensor.id }}', '{{ sensor.id }}');
-          {%  endfor %}
-          data.addRows({{ datapts }});
-          chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-          updateData();
-      }
+        function updateData() {
+            let args;
+            if (ts) {
+                let sts = ts;
+                ts = curDateStr();
+                args = {'datapts': {{ datapts }}, 'starttime': sts, 'endtime': ts }
+            }
+            else {
+                ts = curDateStr();
+                args = {'datapts': {{ datapts }}, 'endtime': ts }
+            }
+            {% for sensor in sensors %}
+                $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data',
+                    args,
+                    function (adata) {
+                        // process data
+                        let slist = adata['data'];
+                        let numpts = adata['count'];
+                        if (numpts > 0) {
+                            for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                data.setValue(i, 0, data.getValue(i + numpts, 0));
+                                data.setValue(i, colidxs['{{ sensor.name }}'], data.getValue(i + numpts, colidxs['{{ sensor.name }}']));
+                            }
+                            let j = numpts;
+                            for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
+                                --j;
+                                data.setValue(i, 0, strToDate(adata['data'][j]['attributes']['timestamp']));
+                                data.setValue(i, colidxs['{{ sensor.name }}'], Number(adata['data'][j]['attributes']['value']));
+                            }
+                            chart.draw(data, options);
+                        }
+                    }
+                );
+            {%  endfor %}
+            //schedule next update
+            setTimeout(updateData, 30000);
+        }
+
+
+        function setupCharts() {
+            data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'Time');
+            let x = 1;
+            {% for sensor in sensors %}
+                colidxs['{{ sensor.name }}'] = x;
+                ++x;
+                data.addColumn('number', '{{ sensor.name }}', '{{ sensor.name }}');
+            {%  endfor %}
+            data.addRows({{ datapts }});
+            chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+            updateData();
+        }
     </script>
 
 </head>
@@ -109,7 +126,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in allzones %}
-                  <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
+                  <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
                 {% endfor %}
             </div>
           </li>
@@ -120,7 +137,7 @@
     <div class="container-fluid mt-3">
         <div class="row">
             <div class="col">
-                <h6>{{ zone.id }}</h6>
+                <h6>{{ zone.name }}</h6>
             </div>
         </div>
         <div class="row">

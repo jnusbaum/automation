@@ -13,6 +13,7 @@
       google.charts.load('current', {'packages':['corechart', 'line']});
       google.charts.setOnLoadCallback(setupCharts);
 
+        var ts = false;
         var options = {
             chartArea: {width: '90%', height: '80%'},
             legend: {
@@ -27,8 +28,8 @@
         };
 
         {% for zone in zones %}
-            var {{ zone.id }}data;
-            var {{ zone.id }}chart;
+            var {{ zone.name }}data;
+            var {{ zone.name }}chart;
         {% endfor %}
 
       function strToDate(ts) {
@@ -45,38 +46,60 @@
       function curDateStr() {
           var d = new Date();
           return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "-" + ("0" + d.getHours()).slice(-2) + "-" +
-              ("0" + d.getMinutes()).slice(-2) + "-" + ("0" + d.getSeconds()).slice(-2);
+              ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+              ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
       }
-
 
 
       function updateData() {
           // for each zone fire off an update
-          let ts = curDateStr();
+          let args;
+          if (ts) {
+              let sts = ts;
+              ts = curDateStr();
+              args = {'datapts': {{ datapts }}, 'starttime': sts, 'endtime': ts }
+          }
+          else {
+              ts = curDateStr();
+              args = {'datapts': {{ datapts }}, 'endtime': ts }
+          }
           {% for zone in zones %}
-            $.getJSON('{{ host }}/zones/{{ zone.id }}/data',
-                    {'datapts': {{ datapts }}, 'targettime': ts },
+            $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
+                    args,
                     function (adata) {
                         // process data
-                        for (let sensor in adata['data']) {
-                            let slist = adata['data'][sensor]['data'];
-                            if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                let j = {{ datapts }};
-                                for (let i=0; i < {{ datapts }}; i++) {
-                                    --j;
-                                    {{ zone.id }}data.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
-                                    {{ zone.id }}data.setValue(i, 1, Number(slist[j]['attributes']['value_real']));
-                                }
-                            } else if (sensor.endsWith('-OUT')) {
-                                let j = {{ datapts }};
-                                for (let i=0; i < {{ datapts }}; i++) {
-                                    --j;
-                                    {{ zone.id }}data.setValue(i, 2, Number(slist[j]['attributes']['value_real']));
-                                }
-                            }
-                        }
-                        {{ zone.id }}chart.draw({{ zone.id }}data, options);
+                       for (let sensor in adata['data']) {
+                           let slist = adata['data'][sensor]['data'];
+                           let numpts = adata['data'][sensor]['count'];
+                           if (numpts > 0) {
+                               if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
+                                   // shift arrays
+                                   for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                       {{ zone.name }}data.setValue(i, 0, {{ zone.name }}data.getValue(i+numpts, 0));
+                                       {{ zone.name }}data.setValue(i, 1, {{ zone.name }}data.getValue(i+numpts, 1));
+                                   }
+                                   // reverse load
+                                   let j = numpts;
+                                   for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
+                                       --j;
+                                       {{ zone.name }}data.setValue(i, 0, strToDate(slist[j]['attributes']['timestamp']));
+                                       {{ zone.name }}data.setValue(i, 1, Number(slist[j]['attributes']['value']));
+                                   }
+                               } else if (sensor.endsWith('-OUT')) {
+                                   // shift arrays
+                                   for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                       {{ zone.name }}data.setValue(i, 2, {{ zone.name }}data.getValue(i+numpts, 2));
+                                   }
+                                   // reverse load
+                                   let j = numpts;
+                                   for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
+                                       --j;
+                                       {{ zone.name }}data.setValue(i, 2, Number(slist[j]['attributes']['value']));
+                                   }
+                               }
+                           }
+                       }
+                        {{ zone.name }}chart.draw({{ zone.name }}data, options);
                     }
             );
           {%  endfor %}
@@ -87,12 +110,12 @@
 
       function setupCharts() {
         {% for zone in zones %}
-            {{ zone.id }}data = new google.visualization.DataTable();
-            {{ zone.id }}data.addColumn('datetime', 'Time');
-            {{ zone.id }}data.addColumn('number', 'IN');
-            {{ zone.id }}data.addColumn('number', 'OUT');
-            {{ zone.id }}data.addRows({{ datapts }});
-            {{ zone.id }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.id }}_div'));
+            {{ zone.name }}data = new google.visualization.DataTable();
+            {{ zone.name }}data.addColumn('datetime', 'Time');
+            {{ zone.name }}data.addColumn('number', 'IN');
+            {{ zone.name }}data.addColumn('number', 'OUT');
+            {{ zone.name }}data.addRows({{ datapts }});
+            {{ zone.name }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.name }}_div'));
         {% endfor %}
 
         updateData();
@@ -118,7 +141,7 @@
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for zone in allzones %}
-                  <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
+                  <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
                 {% endfor %}
             </div>
           </li>
@@ -130,13 +153,13 @@
         {% for zone in zones %}
         <div class="row">
             <div class="col">
-                <h6>{{ zone.id }}</h6>
+                <h6>{{ zone.name }}</h6>
             </div>
         </div>
         <div class="row">
             <div class="col">
                 {#  calculate width based on number of data points #}
-                <div id="{{ zone.id }}_div" style="width: 100%; height: 400px;"></div>
+                <div id="{{ zone.name }}_div" style="width: 100%; height: 400px;"></div>
             </div>
         </div>
         {% endfor %}
