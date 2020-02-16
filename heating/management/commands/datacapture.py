@@ -32,7 +32,7 @@ def on_message(client, userdata, msg):
     # need to do some kind of basic data cleaning here
     if value < MIN_TEMP:
         value = MIN_TEMP
-    
+
     userdata[fsname] = value
     # save previous value, if new value "significantly" different from previous, then wait for next value to confirm?
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
