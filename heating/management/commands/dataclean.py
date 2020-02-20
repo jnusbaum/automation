@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from heating.models import *
 from statistics import mean
 from decimal import *
+from datetime import timedelta
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
@@ -13,8 +14,11 @@ class Command(BaseCommand):
         sensors = TempSensor.objects.all()
         for sensor in sensors:
             if sensor.last_ts_checked:
-                sdata = sensor.tempsensordata_set.filter(timestamp__gt=sensor.last_ts_checked).order_by('timestamp')
+                stime = sensor.last_ts_checked - timedelta(minutes=5)
+                self.stdout.write(f"checking data for {sensor.name}: starting at {stime}")
+                sdata = sensor.tempsensordata_set.filter(timestamp__gt=stime).order_by('timestamp')
             else:
+                self.stdout.write(f"checking data for {sensor.name}: starting at beginning of data")
                 sdata = sensor.tempsensordata_set.order_by('timestamp')
             bad = 0
             if len(sdata):
