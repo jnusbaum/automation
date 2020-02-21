@@ -24,7 +24,8 @@ def handler(obj):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(f"request received on {msg.topic}")
+    cmd = userdata
+    cmd.stdout.write(f"request received on {msg.topic}")
     # publish config data
     msg_pieces = msg.topic.split('/')
     device_name = msg_pieces[-1]
@@ -41,24 +42,22 @@ def on_message(client, userdata, msg):
             djson['interfaces'].append(ojson)
             djson['num_interfaces'] = len(djson['interfaces'])
         jload = json.dumps(djson, default=handler)
-        print(f"publishing {jload} to sorrelhills/device/config/{device_name}")
+        cmd.stdout.write(f"publishing {jload} to sorrelhills/device/config/{device_name}")
         pres = client.publish(f"sorrelhills/device/config/{device_name}", jload)
         if pres.rc != mqtt.MQTT_ERR_SUCCESS:
-            print(f"error = {pres.rc}")
+            cmd.stdout.write(f"error = {pres.rc}")
     except Device.DoesNotExist:
         # error
-        print("device does not exist")
+        cmd.stdout.write("device does not exist")
 
 
 class Command(BaseCommand):
-    help = 'capture sensor data'
+    help = 'serve configuration data over mqtt'
 
     def handle(self, *args, **options):
-        client = mqtt.Client()
+        client = mqtt.Client(userdata=self)
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)
 
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
         client.loop_forever()
