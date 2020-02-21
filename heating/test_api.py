@@ -175,4 +175,11 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
+        print(f'test {tcount} - device config')
+        r = requests.get(f'{host}/devices/MECHROOM/config')
+        self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
+        data = r.json()
+        pprint.pprint(data)
+        tcount += 1
+
 

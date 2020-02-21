@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.stdout.write(f"checking at {datetime.today()}")
-        sensors = Sensor.objects.all()
+        sensors = TempSensor.objects.all()
         for sensor in sensors:
             if sensor.last_ts_checked:
                 stime = sensor.last_ts_checked - timedelta(minutes=5)
