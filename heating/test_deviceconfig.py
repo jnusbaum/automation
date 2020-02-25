@@ -3,6 +3,8 @@ import pprint
 import json
 import paho.mqtt.client as mqtt
 
+loop = True
+
 def handler(obj):
     if hasattr(obj, 'isoformat'):
         return obj.isoformat()
@@ -18,6 +20,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
+    global loop
     # publish config data
     msg_pieces = msg.topic.split('/')
     device_name = msg_pieces[-1]
@@ -25,6 +28,7 @@ def on_message(client, userdata, msg):
     payload = json.loads(msg.payload)
     print(device_name)
     pprint.pprint(payload)
+    loop = False
 
 
 client = mqtt.Client()
@@ -37,4 +41,5 @@ client.connect("192.168.0.134", 1883, 60)
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
-client.loop_forever()
+while loop:
+    client.loop()
