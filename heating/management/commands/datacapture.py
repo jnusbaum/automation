@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         value_cache = {}
-        client = mqtt.Client(clean_session=False, userdata={'cache': value_cache, 'command': self})
+        client = mqtt.Client(client_id=settings.DCMQTTID, clean_session=False, userdata={'cache': value_cache, 'command': self})
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)
