@@ -1,0 +1,13 @@
+[Unit]
+Description=device config server
+Requires=mosquitto.service
+After=network.target multi-user.target mosquitto.service
+
+[Service]
+User=rjn
+Group=www-data
+WorkingDirectory=/home/rjn/Projects/automation
+ExecStart=/home/rjn/Projects/automation/venv/bin/python -O /home/rjn/Projects/automation/manage.py deviceconfig
+
+[Install]
+WantedBy=multi-user.target
