@@ -19,17 +19,15 @@
 # Default server configuration
 #
 server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-
-	server_name _;
+	listen 80;
+	server_name 192.168.0.134;
 
 	location /automation/static/ {
 		 root /home/rjn/Projects;
 	}
 
 	location /automation/ {
-		 proxy_read_timeout 300s;
+		proxy_read_timeout 300s;
 		proxy_set_header Host $host;
 		proxy_pass http://unix:/run/dashboard-gunicorn/socket;
 	}
