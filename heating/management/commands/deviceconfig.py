@@ -11,9 +11,9 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     cmd = userdata['command']
-    cmd.stdout.write("Connected with result code " + str(rc))
+    print("Connected with result code " + str(rc))
     client.subscribe('sorrelhills/device/config-request/+')
-    cmd.stdout.write(f"subscribed to sorrelhills/device/config-request/+")
+    print(f"subscribed to sorrelhills/device/config-request/+")
 
 
 def handler(obj):
@@ -26,7 +26,7 @@ def handler(obj):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     cmd = userdata['command']
-    cmd.stdout.write(f"request received on {msg.topic}")
+    print(f"request received on {msg.topic}")
     # publish config data
     msg_pieces = msg.topic.split('/')
     device_name = msg_pieces[-1]
@@ -43,13 +43,13 @@ def on_message(client, userdata, msg):
             djson['interfaces'].append(ojson)
             djson['num_interfaces'] = len(djson['interfaces'])
         jload = json.dumps(djson, default=handler)
-        cmd.stdout.write(f"publishing {jload} to sorrelhills/device/config/{device_name}")
+        print(f"publishing {jload} to sorrelhills/device/config/{device_name}")
         pres = client.publish(f"sorrelhills/device/config/{device_name}", jload)
         if pres.rc != mqtt.MQTT_ERR_SUCCESS:
-            cmd.stdout.write(f"error = {pres.rc}")
+            print(f"error = {pres.rc}")
     except Device.DoesNotExist:
         # error
-        cmd.stdout.write("device does not exist")
+        print("device does not exist")
 
 
 class Command(BaseCommand):
