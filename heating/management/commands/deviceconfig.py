@@ -10,9 +10,10 @@ from heating.models import Device
 def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    print("Connected with result code " + str(rc))
+    cmd = userdata['command']
+    cmd.stdout.write("Connected with result code " + str(rc))
     client.subscribe('sorrelhills/device/config-request/+')
-    print(f"subscribed to sorrelhills/device/config-request/+")
+    cmd.stdout.write(f"subscribed to sorrelhills/device/config-request/+")
 
 
 def handler(obj):
@@ -24,7 +25,7 @@ def handler(obj):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    cmd = userdata
+    cmd = userdata['command']
     cmd.stdout.write(f"request received on {msg.topic}")
     # publish config data
     msg_pieces = msg.topic.split('/')
@@ -55,7 +56,7 @@ class Command(BaseCommand):
     help = 'serve configuration data over mqtt'
 
     def handle(self, *args, **options):
-        client = mqtt.Client(userdata=self)
+        client = mqtt.Client(client_id=settings.DEVCFGMQTTID, userdata={'command': self})
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)

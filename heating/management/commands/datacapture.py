@@ -48,8 +48,6 @@ def on_message(client, userdata, msg):
             cache[fsname] = value
 
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
-    if __debug__:
-        cmd.stdout.write(f"inserting {fsname}, {timestamp}, {value}")
     s.save()
 
 
