@@ -5,13 +5,16 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from heating.models import TempSensorData
 
+import logging
+logger = logging.getLogger('datacapture')
+
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     cmd = userdata['command']
-    print(f"Connected with result code {rc}")
+    logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe(settings.TOPIC)
@@ -36,13 +39,13 @@ def on_message(client, userdata, msg):
     try:
         prev = cache[fsname]
         if (value < MIN_TEMP) or (abs(value - prev) > MAX_TEMP_MOVE):
-            print(f"replacing {value} with {prev} for {fsname}, {timestamp}")
+            logger.info(f"replacing {value} with {prev} for {fsname}, {timestamp}")
             value = prev
         else:
             cache[fsname] = value
     except KeyError:
         if value < MIN_TEMP:
-            print(f"replacing {value} with {MIN_TEMP} for {fsname}, {timestamp}")
+            logger.info(f"replacing {value} with {MIN_TEMP} for {fsname}, {timestamp}")
             value = MIN_TEMP
         else:
             cache[fsname] = value
