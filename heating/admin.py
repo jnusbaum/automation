@@ -16,9 +16,6 @@ class ZoneAdmin(admin.ModelAdmin):
         'name',
         'description',
     )
-    readonly_fields = (
-        'name',
-    )
 
 
 @admin.register(Device)
@@ -69,6 +66,7 @@ class DeviceAdmin(admin.ModelAdmin):
     device_actions.short_description = 'Device Actions'
     device_actions.allow_tags = True
 
+
 @admin.register(OneWireInterface)
 class OneWireInterfaceAdmin(admin.ModelAdmin):
     list_display = (
@@ -115,10 +113,6 @@ class TempSensorAdmin(admin.ModelAdmin):
         'total_bad',
         'last_scan_bad',
         'last_ts_checked',
-    )
-
-    readonly_fields = (
-        'name',
     )
 
     def zone_link(self, obj):
