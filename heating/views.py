@@ -50,7 +50,7 @@ def overlay(request):
                 dzones.append(z)
     osensors = []
     for z in dzones:
-        for sensor in z.sensor_set.all():
+        for sensor in z.tempsensor_set.all():
             osensors.append(sensor)
     return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST,
                                                             'datapts': datapts,
