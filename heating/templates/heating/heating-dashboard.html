@@ -492,11 +492,6 @@
                     <input type="checkbox" name="BOILER">
                 </div>
             </div>
-            <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'BOILER' %}"><h6 style="text-align: center">BOILER</h6></a>
-            </div>
-            <div class="col-lg-2 col-xl-1">
-            </div>
         </div>
         <div class="row">
             <div class="col-lg-2 col-xl-1 border">
@@ -566,6 +561,8 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
+            </div>
+            <div class="col-lg-2 col-xl-1">
                 <a href="{% url 'view_zone' 'WHEAT2' %}"><h6 style="text-align: center">WATER HEATER 2</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
@@ -574,17 +571,11 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'WHEAT' %}"><h6 style="text-align: center">HOT WATER</h6></a>
-            </div>
-            <div class="col-lg-2 col-xl-1">
-                <div class="checkbox center">
-                    <input type="checkbox" name="WHEAT">
-                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-2 col-xl-1 border">
-                <h6 style="text-align: center">BURN</h6>
+                <h6 style="text-align: center">IN</h6>
             </div>
             <div class="col-lg-2 col-xl-1 border">
                 <h6 style="text-align: center">OUT</h6>
@@ -593,16 +584,19 @@
                 <h6 style="text-align: center">BURN</h6>
             </div>
             <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
                 <h6 style="text-align: center">OUT</h6>
             </div>
             <div class="col-lg-2 col-xl-1 border">
-                <h6 style="text-align: center">RETURN</h6>
+                <h6 style="text-align: center">BURN</h6>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
-                    <circle id="WHEAT1-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="WHEAT1-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
@@ -614,7 +608,13 @@
             </div>
             <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
-                    <circle id="WHEAT2-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="WHEAT1-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT2-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
@@ -626,7 +626,7 @@
             </div>
             <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
-                    <circle id="WHEAT-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    <circle id="WHEAT2-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
