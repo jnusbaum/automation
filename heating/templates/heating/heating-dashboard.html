@@ -59,27 +59,20 @@
                       {'datapts': 1, 'endtime': ts},
                       function (adata) {
                           // process data
+                          let timestamp = null;
                           for (let sensor in adata['data']) {
                               let slist = adata['data'][sensor]['data'];
                               if (slist.length) {
-                                  if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                                      let inval = Number(slist[0]['attributes']['value']);
-                                      let timestamp = slist[0]['attributes']['timestamp'];
-                                      // update data in DOM
-                                      let newcls = selectColor(inval);
-                                      let oldcls = $('#' + sensor + '-LED').attr('class');
-                                      if (oldcls != newcls) {
-                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
-                                      }
+                                  if (!timestamp) {
+                                      timestamp = slist[0]['attributes']['timestamp'];
                                       $('#{{ zone.name }}-TS').text(timestamp);
-                                  } else if (sensor.endsWith('-OUT')) {
-                                      let outval = Number(slist[0]['attributes']['value']);
-                                      // update data in DOM
-                                      let newcls = selectColor(outval);
-                                      let oldcls = $('#' + sensor + '-LED').attr('class');
-                                      if (oldcls != newcls) {
-                                          $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
-                                      }
+                                  }
+                                  let val = Number(slist[0]['attributes']['value']);
+                                  // update data in DOM
+                                  let newcls = selectColor(val);
+                                  let oldcls = $('#' + sensor + '-LED').attr('class');
+                                  if (oldcls != newcls) {
+                                      $('#' + sensor + '-LED').removeClass(oldcls).addClass(newcls);
                                   }
                               }
                           }
@@ -157,83 +150,83 @@
 <div class="container-fluid">
     <form role="form" action="/automation/dashboard/heating/all" method="get">
         <div class="row mt-5">
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'MBR' %}"><h5 class="center">MBR</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'MBR' %}"><h6 class="center">MBR</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="MBR">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'MBATH' %}"><h5 class="center">MBATH</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'MBATH' %}"><h6 class="center">MBATH</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="MBATH">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'LIBRARY' %}"><h5 class="center">LIBRARY</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'LIBRARY' %}"><h6 class="center">LIBRARY</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="LIBRARY">
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="MBR-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="MBR-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="MBATH-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="MBATH-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="LIBRARY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="LIBRARY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
@@ -241,95 +234,95 @@
             </div>
         </div>
         <div class="row mt-1">
-            <div id="MBR-TS" class="col-sm-4 col-lg-2 center">
+            <div id="MBR-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="MBATH-TS" class="col-sm-4 col-lg-2 center">
+            <div id="MBATH-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="LIBRARY-TS" class="col-sm-4 col-lg-2 center">
+            <div id="LIBRARY-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
         </div>
 
         <div class="row mt-5">
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'KITCHEN' %}"><h5 style="text-align: center">KITCHEN</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'KITCHEN' %}"><h6 style="text-align: center">KITCHEN</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="KITCHEN">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'LAUNDRY' %}"><h5 style="text-align: center">LAUNDRY</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'LAUNDRY' %}"><h6 style="text-align: center">LAUNDRY</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="LAUNDRY">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'GARAGE' %}"><h5 style="text-align: center">GARAGE</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'GARAGE' %}"><h6 style="text-align: center">GARAGE</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="GARAGE">
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="KITCHEN-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="KITCHEN-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="LAUNDRY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="LAUNDRY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="GARAGE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="GARAGE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
@@ -337,95 +330,95 @@
             </div>
         </div>
         <div class="row">
-            <div id="KITCHEN-TS" class="col-sm-4 col-lg-2 center">
+            <div id="KITCHEN-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="LAUNDRY-TS" class="col-sm-4 col-lg-2 center">
+            <div id="LAUNDRY-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="GARAGE-TS" class="col-sm-4 col-lg-2 center">
+            <div id="GARAGE-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
         </div>
 
         <div class="row mt-5">
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'FAMILY' %}"><h5 style="text-align: center">FAMILY ROOM</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'FAMILY' %}"><h6 style="text-align: center">FAMILY ROOM</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="FAMILY">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'OFFICE' %}"><h5 style="text-align: center">OFFICE</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'OFFICE' %}"><h6 style="text-align: center">OFFICE</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="OFFICE">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'EXERCISE' %}"><h5 style="text-align: center">EXERCISE</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'EXERCISE' %}"><h6 style="text-align: center">EXERCISE</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="EXERCISE">
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="FAMILY-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="FAMILY-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="OFFICE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="OFFICE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="EXERCISE-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="EXERCISE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
@@ -433,122 +426,233 @@
             </div>
         </div>
         <div class="row">
-            <div id="FAMILY-TS" class="col-sm-4 col-lg-2 center">
+            <div id="FAMILY-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="OFFICE-TS" class="col-sm-4 col-lg-2 center">
+            <div id="OFFICE-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="EXERCISE-TS" class="col-sm-4 col-lg-2 center">
+            <div id="EXERCISE-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
         </div>
 
         <div class="row mt-5">
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'GUEST' %}"><h5 style="text-align: center">GUEST BR</h5></a>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'GUEST' %}"><h6 style="text-align: center">GUEST BR</h6></a>
             </div>
-            <div class="col-sm-2 col-lg-1">
+            <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
                     <input type="checkbox" name="GUEST">
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'VALVE' %}"><h5 style="text-align: center">VALVE</h5></a>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
             </div>
-            <div class="col-sm-2 col-lg-1">
-                <div class="checkbox center">
-                    <input type="checkbox" name="VALVE">
-                </div>
-            </div>
-            <div class="col-sm-2 col-lg-1">
-                <a href="{% url 'view_zone' 'BOILER' %}"><h5 style="text-align: center">BOILER</h5></a>
-            </div>
-            <div class="col-sm-2 col-lg-1">
-                <div class="checkbox center">
-                    <input type="checkbox" name="BOILER">
-                </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
-            </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
-            </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
-            </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
-            </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">IN</h5>
-            </div>
-            <div class="col-sm-2 col-lg-1 border">
-                <h5 style="text-align: center">OUT</h5>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="GUEST-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="GUEST-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+        </div>
+        <div class="row">
+            <div id="GUEST-TS" class="col-lg-4 col-xl-2 center">
+                0000-00-00-00-00-00
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'VALVE' %}"><h6 style="text-align: center">VALVE</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="VALVE">
+                </div>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'BOILER' %}"><h6 style="text-align: center">BOILER</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="BOILER">
+                </div>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'BOILER' %}"><h6 style="text-align: center">BOILER</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">IN</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">BURN</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="VALVE-INSYS-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="VALVE-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="BOILER-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
-            <div class="col-sm-2 col-lg-1 center border">
+            <div class="col-lg-2 col-xl-1 center border">
                 <svg height="50" width="50">
                     <circle id="BOILER-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
                     Sorry, your browser does not support inline SVG.
                 </svg>
             </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="BOILER-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
         </div>
         <div class="row">
-            <div id="GUEST-TS" class="col-sm-4 col-lg-2 center">
+            <div id="VALVE-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="VALVE-TS" class="col-sm-4 col-lg-2 center">
-                0000-00-00-00-00-00
-            </div>
-            <div id="BOILER-TS" class="col-sm-4 col-lg-2 center">
+            <div id="BOILER-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
         </div>
+
         <div class="row mt-5">
-            <div class="col-sm-2 col-lg-1 center">
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'WHEAT1' %}"><h6 style="text-align: center">WATER HEATER 1</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="WHEAT1">
+                </div>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'WHEAT2' %}"><h6 style="text-align: center">WATER HEATER 2</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="WHEAT2">
+                </div>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <a href="{% url 'view_zone' 'WHEAT' %}"><h6 style="text-align: center">HOT WATER</h6></a>
+            </div>
+            <div class="col-lg-2 col-xl-1">
+                <div class="checkbox center">
+                    <input type="checkbox" name="WHEAT">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">BURN</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">BURN</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">OUT</h6>
+            </div>
+            <div class="col-lg-2 col-xl-1 border">
+                <h6 style="text-align: center">RETURN</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT1-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT1-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT2-BURN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT2-OUT-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+            <div class="col-lg-2 col-xl-1 center border">
+                <svg height="50" width="50">
+                    <circle id="WHEAT-IN-LED" class="cold" cx="25" cy="25" r="20" stroke="black" stroke-width="2"></circle>
+                    Sorry, your browser does not support inline SVG.
+                </svg>
+            </div>
+        </div>
+        <div class="row">
+            <div id="WHEAT1-TS" class="col-lg-4 col-xl-2 center">
+                0000-00-00-00-00-00
+            </div>
+            <div id="WHEAT2-TS" class="col-lg-4 col-xl-2 center">
+                0000-00-00-00-00-00
+            </div>
+            <div id="WHEAT-TS" class="col-lg-4 col-xl-2 center">
+                0000-00-00-00-00-00
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-lg-2 col-xl-1 center">
                 <div class="checkbox">
                     <label><input type="checkbox" name="ALL"> ALL</label>
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1 center">
+            <div class="col-lg-2 col-xl-1 center">
                     <label for="tsel">History:</label>
             </div>
-            <div class="col-sm-2 col-lg-1 center">
+            <div class="col-lg-2 col-xl-1 center">
                 <div class="form-group">
                     <select class="form-control" name="datapts" id="tsel">
                         <option value="360">1 hr</option>
@@ -559,10 +663,10 @@
                     </select>
                 </div>
             </div>
-            <div class="col-sm-2 col-lg-1 center">
+            <div class="col-lg-2 col-xl-1 center">
                 <button type="submit" class="btn btn-default border">Compare</button>
             </div>
-            <div class="col-sm-2 col-lg-1 center">
+            <div class="col-lg-2 col-xl-1 center">
                 <button type="submit" formaction="/automation/dashboard/heating/overlay" class="btn btn-default border">Overlay</button>
             </div>
         </div>

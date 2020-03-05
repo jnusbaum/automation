@@ -11,7 +11,12 @@ def dashboard(request):
 
 def zone(request, zone_name):
     zones = Zone.objects.all().order_by('name')
-    return render(request, 'heating/heating-zone.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
+    if zone_name in ('BOILER', 'WHEAT1', 'WHEAT2'):
+        return render(request, 'heating/heating-zone-wburn.html',
+                      {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
+    else:
+        return render(request, 'heating/heating-zone.html',
+                      {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
 
 
 def all_zones(request):

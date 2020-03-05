@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Heating Zone</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <script type="text/javascript">
+        $( document ).ready(setupCharts);
+
+        var ts;
+        var gaugeIn;
+        var gaugeOut;
+        var gaugeBurn;
+        var lineChart;
+		var chartConfig = {
+			type: 'line',
+			data: {
+				labels: new Array(9000).fill(new Date()),
+				datasets: [{
+					label: 'IN',
+                    borderColor: 'orange',
+					fill: false,
+                    pointRadius: 0,
+					data: new Array(9000).fill(Number(0)),
+				}, {
+					label: 'OUT',
+                    borderColor: 'skyblue',
+					fill: false,
+                    pointRadius: 0,
+					data: new Array(9000).fill(Number(0)),
+				}, {
+					label: 'BURN',
+                    borderColor: 'red',
+					fill: false,
+                    pointRadius: 0,
+					data: new Array(9000).fill(Number(0)),
+				}]
+			},
+			options: {
+			    maintainAspectRatio: false,
+				scales: {
+					xAxes: [{
+						type: 'time',
+                        ticks: {
+                            stepSize: 10
+                        },
+                        time: {
+						    unit: 'minute',
+                            displayFormats: { minute: 'MM-DD HH:mm' }
+                        },
+						scaleLabel: {
+							display: true,
+							labelString: 'Time'
+						}
+					}],
+					yAxes: [{
+					    ticks: {
+                            suggestedMin: 30,
+                            suggestedMax: 270,
+                            stepSize: 30
+                        },
+						scaleLabel: {
+							display: true,
+							labelString: 'temp'
+						}
+					}]
+				},
+			}
+		};
+
+		function strToDate(its) {
+            var year = Number(its.substr(0, 4));
+            var month = Number(its.substr(5, 2))-1;
+            var day = Number(its.substr(8, 2));
+            var hour = Number(its.substr(11, 2));
+            var minute = Number(its.substr(14, 2));
+            var second = Number(its.substr(17, 2));
+
+            return new Date(year, month, day, hour, minute, second);
+        }
+
+        function curDateStr() {
+            var d = new Date();
+            return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+                ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+                ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+        }
+
+
+        function drawCharts() {
+            gaugeIn.draw();
+            gaugeOut.draw();
+            gaugeBurn.draw();
+            lineChart.update();
+        }
+
+
+        function updateData(adata) {
+            for (let sensor in adata['data']) {
+                let slist = adata['data'][sensor]['data'];
+                let numpts = slist.length;
+                if (numpts > 0) {
+                    if (sensor.endsWith('-IN')) {
+                        gaugeIn.value = Number(slist[0]['attributes']['value']);
+                        // shift arrays
+                        for (let i = 0; i < 9000 - numpts; i++) {
+                            chartConfig.data.labels[i] = chartConfig.data.labels[i + numpts];
+                            chartConfig.data.datasets[0].data[i] = chartConfig.data.datasets[0].data[i + numpts];
+                        }
+                        // reverse load
+                        let j = numpts;
+                        for (let i = 9000 - numpts; i < 9000; i++) {
+                            --j;
+                            chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
+                            chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value']);
+                        }
+                    } else if (sensor.endsWith('-OUT')) {
+                        gaugeOut.value = Number(slist[0]['attributes']['value']);
+                        // shift arrays
+                        for (let i = 0; i < 9000 - numpts; i++) {
+                            chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[1].data[i + numpts];
+                        }
+                        // reverse load
+                        let j = numpts;
+                        for (let i = 9000 - numpts; i < 9000; i++) {
+                            --j;
+                            chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value']);
+                        }
+                    } else if (sensor.endsWith('-BURN')) {
+                        gaugeBurn.value = Number(slist[0]['attributes']['value']);
+                        // shift arrays
+                        for (let i = 0; i < 9000 - numpts; i++) {
+                            chartConfig.data.datasets[2].data[i] = chartConfig.data.datasets[2].data[i + numpts];
+                        }
+                        // reverse load
+                        let j = numpts;
+                        for (let i = 9000 - numpts; i < 9000; i++) {
+                            --j;
+                            chartConfig.data.datasets[2].data[i] = Number(slist[j]['attributes']['value']);
+                        }
+                    }
+                }
+            }
+            drawCharts();
+            setTimeout(startUpdate, 5000);
+        }
+
+
+        function startUpdate() {
+		    let sts = ts;
+            ts = curDateStr();
+            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                { 'starttime': sts, 'endtime': ts, 'datapts': 9000 },
+                updateData);
+        }
+
+
+        function setupCharts() {
+            gaugeIn = new RadialGauge({renderTo: 'gauge_in_div',
+                title: 'IN',
+                width: 225, height: 225,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{ from: 30, to: 60, color: 'skyblue' },
+                    { from: 60, to: 90, color: 'aliceblue' },
+                    { from: 90, to: 120, color: 'yellow' },
+                    { from: 120, to: 150, color: 'orange' },
+                    { from: 150, to: 180, color: 'red' }
+                ],
+                valueBox: true,
+                value: 30});
+            gaugeOut = new RadialGauge({renderTo: 'gauge_out_div',
+                title: 'OUT',
+                width: 225, height: 225,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{ from: 30, to: 60, color: 'skyblue' },
+                    { from: 60, to: 90, color: 'aliceblue' },
+                    { from: 90, to: 120, color: 'yellow' },
+                    { from: 120, to: 150, color: 'orange' },
+                    { from: 150, to: 180, color: 'red' }
+                ],
+                valueBox: true,
+                value: 30});
+            gaugeBurn = new RadialGauge({renderTo: 'gauge_burn_div',
+                title: 'BURN',
+                width: 225, height: 225,
+                units: 'F', minValue: 30, maxValue: 270,
+                majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
+                minorTicks: 6,
+                highlights: [{ from: 30, to: 90, color: 'skyblue' },
+                    { from: 90, to: 120, color: 'aliceblue' },
+                    { from: 120, to: 150, color: 'yellow' },
+                    { from: 150, to: 180, color: 'orange' },
+                    { from: 180, to: 270, color: 'red' }
+                ],
+                valueBox: true,
+                value: 30});
+            var ctx = document.getElementById('chart_div').getContext('2d');
+            lineChart = new Chart(ctx, chartConfig);
+            ts = curDateStr();
+            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                { 'endtime': ts, 'datapts': 9000 },
+                updateData);
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Zone {{ zone }}</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Zones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for zone in zones %}
+                  <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
+                {% endfor %}
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container-fluid mt-3">
+        <div class="row mt-3">
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="gauge_in_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="gauge_out_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="gauge_burn_div" style="width: 100%;"></canvas>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

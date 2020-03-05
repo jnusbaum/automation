@@ -282,6 +282,11 @@ def zone_data(request, zone_name):
     dseries = {}
     for s in z.tempsensor_set.all():
         dseries[s.name] = get_sensor_data(request, s)
+    # total hack for now
+    if zone_name in ('WHEAT1', 'WHEAT2'):
+        # get WHEAT-IN
+        s = TempSensor.objects.get(pk='WHEAT-IN')
+        dseries[s.name] = get_sensor_data(request, s)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 

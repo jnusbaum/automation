@@ -21,10 +21,10 @@
                 textStyle: {fontSize: 14},
             },
             vAxis: {
-                maxValue: 200,
-                 minValue: 30
+                maxValue: 270,
+                minValue: 30
             },
-            colors: ['orange', 'skyblue']
+            colors: ['orange', 'skyblue', 'red']
         };
 
         {% for zone in zones %}
@@ -96,6 +96,17 @@
                                        --j;
                                        {{ zone.name }}data.setValue(i, 2, Number(slist[j]['attributes']['value']));
                                    }
+                               } else if (sensor.endsWith('-BURN')) {
+                                   // shift arrays
+                                   for (let i = 0; i < {{ datapts }} - numpts; i++) {
+                                       {{ zone.name }}data.setValue(i, 3, {{ zone.name }}data.getValue(i+numpts, 3));
+                                   }
+                                   // reverse load
+                                   let j = numpts;
+                                   for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
+                                       --j;
+                                       {{ zone.name }}data.setValue(i, 3, Number(slist[j]['attributes']['value']));
+                                   }
                                }
                            }
                        }
@@ -114,8 +125,12 @@
             {{ zone.name }}data.addColumn('datetime', 'Time');
             {{ zone.name }}data.addColumn('number', 'IN');
             {{ zone.name }}data.addColumn('number', 'OUT');
+            if (['BOILER', 'WHEAT1', 'WHEAT2'].includes('{{ zone.name }}')) {
+                {{ zone.name }}data.addColumn('number', 'BURN');
+            }
             {{ zone.name }}data.addRows({{ datapts }});
             {{ zone.name }}chart = new google.visualization.LineChart(document.getElementById('{{ zone.name }}_div'));
+
         {% endfor %}
 
         updateData();
