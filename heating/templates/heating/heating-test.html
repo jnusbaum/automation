@@ -1,68 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Heating Zone</title>
+    <title>Test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
     <script type="text/javascript">
         $( document ).ready(setupCharts);
-
-
-        var gaugeIn;
-        var gaugeOut;
-        var lineChart;
-		var chartConfig = {
-			type: 'line',
-			data: {
-				labels: new Array(9000).fill(new Date()),
-				datasets: [{
-					label: 'IN',
-                    borderColor: 'orange',
-					fill: false,
-                    pointRadius: 0,
-					data: new Array(9000).fill(Number(0)),
-				}, {
-					label: 'OUT',
-                    borderColor: 'skyblue',
-					fill: false,
-                    pointRadius: 0,
-					data: new Array(9000).fill(Number(0)),
-				}]
-			},
-			options: {
-			    maintainAspectRatio: false,
-				scales: {
-					xAxes: [{
-						type: 'time',
-                        time: {
-						    unit: 'second',
-                            displayFormats: { second: 'MM-DD HH:mm:ss' }
-                        },
-						scaleLabel: {
-							display: true,
-							labelString: 'Time'
-						}
-					}],
-					yAxes: [{
-					    ticks: {
-                            suggestedMin: 30,
-                            suggestedMax: 180,
-                            stepSize: 30
-                        },
-						scaleLabel: {
-							display: true,
-							labelString: 'temp'
-						}
-					}]
-				},
-			}
-		};
 
 		function strToDate(its) {
             var year = Number(its.substr(0, 4));
@@ -71,126 +18,56 @@
             var hour = Number(its.substr(11, 2));
             var minute = Number(its.substr(14, 2));
             var second = Number(its.substr(17, 2));
-
             return new Date(year, month, day, hour, minute, second);
         }
 
 
-        function drawCharts() {
-            gaugeIn.draw();
-            gaugeOut.draw();
-            lineChart.update();
-        }
-
-
-        function updateData(adata) {
-            for (let sensor in adata['data']) {
-                let slist = adata['data'][sensor]['data'];
-                if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                    gaugeIn.value = Number(slist[0]['attributes']['value'])
-                    // reverse load
-                    let j = 9000;
-                      for (let i=0; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.labels[i] = strToDate(slist[j]['attributes']['timestamp']);
-                          chartConfig.data.datasets[0].data[i] = Number(slist[j]['attributes']['value']);
-                      }
-                }
-                else if (sensor.endsWith('-OUT')) {
-                    gaugeOut.value = Number(slist[0]['attributes']['value'])
-                    // reverse load
-                    let j = 9000;
-                      for (let i=0; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[1].data[i] = Number(slist[j]['attributes']['value']);
-                      }                }
-            }
-            drawCharts();
-            setTimeout(startUpdate, 5000);
-        }
-
-
-        function startUpdate() {
-            $.getJSON('{{ host }}/zones/{{ zone }}/data',
-                { 'datapts': 9000 },
-                updateData);
-        }
-
-
         function setupCharts() {
-            gaugeIn = new RadialGauge({renderTo: 'gauge_in_div',
-                title: 'IN',
-                width: 250, height: 250,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '50', '70', '90', '110', '130', '150', '180'],
-                minorTicks: 5,
-                highlights: [{ from: 30, to: 70, color: 'skyblue' },
-                    { from: 70, to: 100, color: 'aliceblue' },
-                    { from: 100, to: 130, color: 'yellow' },
-                    { from: 130, to: 150, color: 'orange' },
-                    { from: 150, to: 180, color: 'red' }
-                ],
-                valueBox: true,
-                value: 30});
-            gaugeOut = new RadialGauge({renderTo: 'gauge_out_div',
-                title: 'OUT',
-                width: 250, height: 250,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '60', '90', '120', '150', '180'],
-                minorTicks: 6,
-                highlights: [{ from: 30, to: 60, color: 'skyblue' },
-                    { from: 60, to: 90, color: 'aliceblue' },
-                    { from: 90, to: 120, color: 'yellow' },
-                    { from: 120, to: 150, color: 'orange' },
-                    { from: 150, to: 180, color: 'red' }
-                ],
-                valueBox: true,
-                value: 30});
-            var ctx = document.getElementById('chart_div').getContext('2d');
-            lineChart = new Chart(ctx, chartConfig);
-            startUpdate();
+		    $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                    { 'datapts': 9000 },
+                    function(adata) {
+                        let data = {series: []};
+                        for (let sensor in adata['data']) {
+                            let j = adata['data'][sensor]['count'];
+                            let slist = adata['data'][sensor]['data'];
+                            let series = {name: sensor, data: []};
+                            // reverse load
+                            let c = j;
+                            for (let i = 0; i < c; i++) {
+                                --j;
+                                let pt = {x: strToDate(slist[j]['attributes']['timestamp']),
+                                          y: Number(slist[j]['attributes']['value'])};
+                                series['data'].push(pt);
+                            }
+                            data['series'].push(series);
+                        }
+                        let o = {
+                            showPoint: false,
+                            height: 500,
+                            width: "100%",
+                            low: 20,
+                            high: 200,
+                            lineSmooth: true,
+                            axisX: {
+                                type: Chartist.FixedScaleAxis,
+                                divisor: 20,
+                                scaleMinSpace: 100,
+                                labelInterpolationFnc: function (value) {
+                                    return moment(value).format("DD-MM HH:mm");
+                                }
+                            },
+                            axisY: {
+                                onlyInteger: true,
+                                scaleMinSpace: 20,
+                            }
+                        };
+                        new Chartist.Line('.ct-chart', data, o);
+                    }
+            );
         }
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Zone {{ zone }}</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Zones
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for zone in zones %}
-                  <a class="dropdown-item" href="{% url 'view_zone' zone.id %}">{{ zone.id }}</a>
-                {% endfor %}
-            </div>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container-fluid mt-3">
-        <div class="row mt-3">
-            <div class="col-sm-6 col-lg-4 col-xl-3">
-                <canvas id="gauge_in_div" style="width: 100%;"></canvas>
-            </div>
-            <div class="col-sm-6 col-lg-4 col-xl-3">
-                <canvas id="gauge_out_div" style="width: 100%;"></canvas>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col">
-                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
-            </div>
-        </div>
-    </div>
+    <div class="ct-chart"></div>
 </body>
 </html>

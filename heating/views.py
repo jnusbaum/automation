@@ -59,5 +59,5 @@ def overlay(request):
                                                             'sensors': osensors})
 
 
-def test(request):
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST})
+def test(request, zone_name):
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name})
