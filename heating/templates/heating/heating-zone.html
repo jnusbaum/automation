@@ -148,7 +148,7 @@
                         gaugeOut.value = Number(slist[0]['attributes']['value']);
                         // shift arrays
                         for (let i = 0; i < 9000 - numpts; i++) {
-                            chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[0].data[i + numpts];
+                            chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[1].data[i + numpts];
                         }
                         // reverse load
                         let j = numpts;
