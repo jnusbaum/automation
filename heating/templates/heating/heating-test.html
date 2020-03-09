@@ -4,70 +4,86 @@
     <title>Test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
-    <script src="//cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-		function strToDate(its) {
-            var year = Number(its.substr(0, 4));
-            var month = Number(its.substr(5, 2))-1;
-            var day = Number(its.substr(8, 2));
-            var hour = Number(its.substr(11, 2));
-            var minute = Number(its.substr(14, 2));
-            var second = Number(its.substr(17, 2));
-            return new Date(year, month, day, hour, minute, second);
+		function strToTimestamp(its) {
+            let year = Number(its.substr(0, 4));
+            let month = Number(its.substr(5, 2))-1;
+            let day = Number(its.substr(8, 2));
+            let hour = Number(its.substr(11, 2));
+            let minute = Number(its.substr(14, 2));
+            let second = Number(its.substr(17, 2));
+            let d = new Date(year, month, day, hour, minute, second);
+            return d.getTime();
         }
 
 
         function setupCharts() {
-		    $.getJSON('{{ host }}/zones/{{ zone }}/data',
-                    { 'datapts': 9000 },
-                    function(adata) {
-                        let data = {series: []};
-                        for (let sensor in adata['data']) {
-                            let j = adata['data'][sensor]['count'];
-                            let slist = adata['data'][sensor]['data'];
-                            let series = {name: sensor, data: []};
-                            // reverse load
-                            let c = j;
-                            for (let i = 0; i < c; i++) {
-                                --j;
-                                let pt = {x: strToDate(slist[j]['attributes']['timestamp']),
-                                          y: Number(slist[j]['attributes']['value'])};
-                                series['data'].push(pt);
+            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+                {'datapts': 1000},
+                function (adata) {
+                    let chartData = {
+                        type: 'line',
+                        'series': [],
+                    };
+                    let minTs = Number.MAX_SAFE_INTEGER;
+                    let maxTs = 0;
+                    for (let sensor in adata['data']) {
+                        let j = adata['data'][sensor]['count'];
+                        let slist = adata['data'][sensor]['data'];
+                        let series = {'values': []};
+                        // reverse load
+                        let c = j;
+                        for (let i = 0; i < c; i++) {
+                            --j;
+                            let pt = [strToTimestamp(slist[j]['attributes']['timestamp']),
+                                        Number(slist[j]['attributes']['value'])];
+                            if (pt[0] < minTs) {
+                                minTs = pt[0];
                             }
-                            data['series'].push(series);
+                            if (pt[0] > maxTs) {
+                                maxTs = pt[0];
+                            }
+                            series['values'].push(pt);
                         }
-                        let o = {
-                            showPoint: false,
-                            height: 500,
-                            width: "100%",
-                            low: 20,
-                            high: 200,
-                            lineSmooth: true,
-                            axisX: {
-                                type: Chartist.FixedScaleAxis,
-                                divisor: 20,
-                                scaleMinSpace: 100,
-                                labelInterpolationFnc: function (value) {
-                                    return moment(value).format("DD-MM HH:mm");
-                                }
-                            },
-                            axisY: {
-                                onlyInteger: true,
-                                scaleMinSpace: 20,
-                            }
-                        };
-                        new Chartist.Line('.ct-chart', data, o);
+                        chartData['series'].push(series);
                     }
+                    // Render your chart [3]
+                    chartData['scale-x'] = {
+                            'min-value': minTs,
+                            'max-value': maxTs,
+                            step: 'hour',
+                            'items-overlap': true,
+                            'max-items': 100,
+                            transform: {
+                              type: 'date',
+                              all: '%m/%d/%Y<br>%h:%i:%s'
+                            },
+                            item: {
+                              'font-size':9
+                            },
+                            guide: {
+                                'visible': true,
+                                'line-style': "dashdot"
+                            },
+
+                        };
+                    zingchart.render({
+                        id: 'chartDiv',
+                        data: chartData,
+                        height: 400,
+                        width: '100%'
+                    });
+                }
             );
         }
+
     </script>
 </head>
 <body>
-    <div class="ct-chart"></div>
+    <div id="chartDiv"></div>
 </body>
 </html>
