@@ -101,23 +101,23 @@
                         gaugeIn.value = Number(slist[0]['attributes']['value']);
                         // reverse load
                         for (let i = 0; i < 9000-numpts; i++) {
-                            chartConfig.data.datasets[0].data[i] = {x: strToDate(slist[0]['attributes']['timestamp']), y: Number(slist[0]['attributes']['value'])};
+                            chartConfig.data.datasets[0].data[i] = {t: strToDate(slist[numpts-1]['attributes']['timestamp']), y: Number(slist[numpts-1]['attributes']['value'])};
                         }
                         let j = numpts;
                         for (let i = 9000 - numpts; i < 9000; i++) {
                             --j;
-                            chartConfig.data.datasets[0].data[i] = {x: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                            chartConfig.data.datasets[0].data[i] = {t: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
                         }
                     } else if (sensor.endsWith('-OUT')) {
                         gaugeOut.value = Number(slist[0]['attributes']['value']);
                         // reverse load
                         for (let i = 0; i < 9000-numpts; i++) {
-                            chartConfig.data.datasets[1].data[i] = {x: strToDate(slist[0]['attributes']['timestamp']), y: Number(slist[0]['attributes']['value'])};
+                            chartConfig.data.datasets[1].data[i] = {t: strToDate(slist[numpts-1]['attributes']['timestamp']), y: Number(slist[numpts-1]['attributes']['value'])};
                         }
                         let j = numpts;
                         for (let i = 9000 - numpts; i < 9000; i++) {
                             --j;
-                            chartConfig.data.datasets[1].data[i] = {x: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                            chartConfig.data.datasets[1].data[i] = {t: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
                         }
                     }
                 }
@@ -142,7 +142,7 @@
                         let j = numpts;
                         for (let i = 9000 - numpts; i < 9000; i++) {
                             --j;
-                            chartConfig.data.datasets[0].data[i] = {x: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                            chartConfig.data.datasets[0].data[i] = {t: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
                         }
                     } else if (sensor.endsWith('-OUT')) {
                         gaugeOut.value = Number(slist[0]['attributes']['value']);
@@ -154,7 +154,7 @@
                         let j = numpts;
                         for (let i = 9000 - numpts; i < 9000; i++) {
                             --j;
-                            chartConfig.data.datasets[1].data[i] = {x: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                            chartConfig.data.datasets[1].data[i] = {t: strToDate(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
                         }
                     }
 
@@ -206,6 +206,7 @@
             var ctx = document.getElementById('chart_div').getContext('2d');
             lineChart = new Chart(ctx, chartConfig);
             ts = curDateStr();
+            sts = t
             $.getJSON('{{ host }}/zones/{{ zone }}/data',
                 { 'endtime': ts, 'datapts': 9000 },
                 startData);
