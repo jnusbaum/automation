@@ -88,8 +88,8 @@
                       };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[0].data[i] = {
-                              x: strToDate(slist[0]['attributes']['timestamp']),
-                              y: Number(slist[0]['attributes']['value'])
+                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
                       let j = numpts;
@@ -110,8 +110,8 @@
                         };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[1].data[i] = {
-                              x: strToDate(slist[0]['attributes']['timestamp']),
-                              y: Number(slist[0]['attributes']['value'])
+                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
                       let j = numpts;
@@ -132,8 +132,8 @@
                       };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[2].data[i] = {
-                              x: strToDate(slist[0]['attributes']['timestamp']),
-                              y: Number(slist[0]['attributes']['value'])
+                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
                       let j = numpts;
