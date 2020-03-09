@@ -26,8 +26,9 @@
                         scales: {
                             xAxes: [{
                                 type: 'time',
+                                distribution: 'linear',
                                 ticks: {
-                                    stepSize: 10
+                                    stepSize: 30
                                 },
                                 time: {
                                     unit: 'minute',
@@ -88,7 +89,7 @@
                       };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[0].data[i] = {
-                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
                               y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
@@ -96,7 +97,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[0].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
@@ -110,7 +111,7 @@
                         };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[1].data[i] = {
-                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
                               y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
@@ -118,7 +119,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[1].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
@@ -132,7 +133,7 @@
                       };
                       for (let i = 0; i < 9000 - numpts; i++) {
                           chartConfig.data.datasets[2].data[i] = {
-                              x: strToDate(slist[numpts-1]['attributes']['timestamp']),
+                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
                               y: Number(slist[numpts-1]['attributes']['value'])
                           };
                       }
@@ -140,7 +141,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[2].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
@@ -166,7 +167,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[0].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
@@ -180,7 +181,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[1].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
@@ -194,7 +195,7 @@
                       for (let i = 9000 - numpts; i < 9000; i++) {
                           --j;
                           chartConfig.data.datasets[2].data[i] = {
-                              x: strToDate(slist[j]['attributes']['timestamp']),
+                              t: strToDate(slist[j]['attributes']['timestamp']),
                               y: Number(slist[j]['attributes']['value'])
                           };
                       }
