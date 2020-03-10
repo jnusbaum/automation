@@ -109,10 +109,9 @@ class TempSensorData(models.Model):
             models.Index(fields=['sensor', '-timestamp'], name='heating_tsensordata_sid_ts'),
         ]
 
-    def as_json(self, altvalue=None):
-        dself = {'attributes': {'timestamp': self.timestamp,
-                                # this is a decimal so we convert it to a string here
-                                'value': altvalue if altvalue else self.value,
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'value': self.value,
                                 'original_value': self.original_value},
                  'id': self.id,
                  'type': 'TempSensorData',

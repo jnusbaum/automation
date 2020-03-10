@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import *
 from http import HTTPStatus
+from dateutil.parser import *
 
 from django.http import JsonResponse, HttpResponse
 
@@ -248,15 +249,15 @@ def get_sensor_data(request, sensor):
     sdata = sensor.tempsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = datetime.fromisoformat(stime)
+        stime = isoparse(stime).replace(tzinfo=None)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = datetime.fromisoformat(etime)
+        etime = isoparse(etime).replace(tzinfo=None)
     except KeyError:
-        etime = datetime.today()
+        etime = datetime.utcnow()
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']

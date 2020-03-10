@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'database.sqlite',
+        'NAME': 'automation.sqlite',
     }
 }
 
@@ -100,6 +100,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'datacapture': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './log/datacapture.log',
+        },
+        'deviceconfig': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': './log/deviceconfig.log',
+        },
+    },
+    'loggers': {
+        'datacapture': {
+            'handlers': ['datacapture'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'deviceconfig': {
+            'handlers': ['deviceconfig'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

@@ -8,26 +8,16 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(updateData);
+  <script type="text/javascript">
 
-      function strToDate(ts) {
-          var year = Number(ts.substr(0, 4));
-          var month = Number(ts.substr(5, 2))-1;
-          var day = Number(ts.substr(8, 2));
-          var hour = Number(ts.substr(11, 2));
-          var minute = Number(ts.substr(14, 2));
-          var second = Number(ts.substr(17, 2));
-
-          return new Date(year, month, day, hour, minute, second);
-      }
-
+      $(document).ready(updateData);
 
       function curDateStr() {
           var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
-              ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+          return d.toISOString();
+          // return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
+          //     ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
+          //     ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
       }
 
 
@@ -64,8 +54,9 @@
                               let slist = adata['data'][sensor]['data'];
                               if (slist.length) {
                                   if (!timestamp) {
-                                      timestamp = slist[0]['attributes']['timestamp'];
-                                      $('#{{ zone.name }}-TS').text(timestamp);
+                                      timestamp = new Date(slist[0]['attributes']['timestamp']);
+
+                                      $('#{{ zone.name }}-TS').text(timestamp.toLocaleString('en-US', { timeZone: 'America/Denver' }));
                                   }
                                   let val = Number(slist[0]['attributes']['value']);
                                   // update data in DOM
@@ -546,7 +537,7 @@
             <div id="VALVE-TS" class="col-lg-4 col-xl-2 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="BOILER-TS" class="col-lg-4 col-xl-2 center">
+            <div id="BOILER-TS" class="col-lg-6 col-xl-3 center">
                 0000-00-00-00-00-00
             </div>
         </div>
@@ -632,13 +623,10 @@
             </div>
         </div>
         <div class="row">
-            <div id="WHEAT1-TS" class="col-lg-4 col-xl-2 center">
+            <div id="WHEAT1-TS" class="col-lg-6 col-xl-3 center">
                 0000-00-00-00-00-00
             </div>
-            <div id="WHEAT2-TS" class="col-lg-4 col-xl-2 center">
-                0000-00-00-00-00-00
-            </div>
-            <div id="WHEAT-TS" class="col-lg-4 col-xl-2 center">
+            <div id="WHEAT2-TS" class="col-lg-6 col-xl-3 center">
                 0000-00-00-00-00-00
             </div>
         </div>

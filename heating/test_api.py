@@ -88,7 +88,7 @@ class TestAPI(unittest.TestCase):
         tcount += 1
 
         print('test %d - add data' % tcount)
-        tdt = datetime.today()
+        tdt = datetime.utcnow()
         tstr = tdt.isoformat()
         data = {'value': '138.2', 'timestamp': tstr}
         r = requests.post(f'{host}/sensors/{in_sensor_name}/data', data=data)
@@ -97,7 +97,7 @@ class TestAPI(unittest.TestCase):
         r = requests.post(f'{host}/sensors/{out_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         sleep(10)
-        tdt = datetime.today()
+        tdt = datetime.utcnow()
         savstr = tstr = tdt.isoformat()
         data = {'value': '136', 'timestamp': tstr}
         r = requests.post(f'{host}/sensors/{in_sensor_name}/data', data=data)
@@ -106,7 +106,7 @@ class TestAPI(unittest.TestCase):
         r = requests.post(f'{host}/sensors/{out_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         sleep(10)
-        tdt = datetime.today()
+        tdt = datetime.utcnow()
         tstr = tdt.isoformat()
         data = {'value': '143.25', 'timestamp': tstr}
         r = requests.post(f'{host}/sensors/{in_sensor_name}/data', data=data)

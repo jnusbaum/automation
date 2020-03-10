@@ -32,8 +32,9 @@ def on_message(client, userdata, msg):
     #             'value': 142.3
     #         }
     payload = json.loads(msg.payload)
+    logger.debug(f"got mesg, payload = {payload}")
     fsname = payload['sensor']
-    timestamp = datetime.fromisoformat(payload['timestamp'])
+    timestamp = datetime.fromtimestamp(payload['timestamp'])
     value = payload['value']
     ovalue = value
     try:
