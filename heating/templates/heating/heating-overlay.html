@@ -54,87 +54,30 @@
 
 
 
-      function loadData(adata) {
-          for (let sensor in adata['data']) {
-              let slist = adata['data'][sensor]['data'];
-              let numpts = adata['data'][sensor]['count'];
-              if (numpts > 0) {
-                  if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                      chartConfig.data.datasets[0] = {
-                          label: 'IN',
-                          borderColor: 'orange',
-                          fill: false,
-                          pointRadius: 0,
-                          data: [],
-                      };
-                      // reverse load
-                      for (let i = 0; i < numpts; i++) {
-                          chartConfig.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                      }
-                  } else if (sensor.endsWith('-OUT')) {
-                      chartConfig.data.datasets[1] = {
-                            label: 'OUT',
-                            borderColor: 'skyblue',
-                            fill: false,
-                            pointRadius: 0,
-                            data: [],
-                        };
-                      // reverse load
-                        for (let i = 0; i < numpts; i++) {
-                            chartConfig.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                  } else if (sensor.endsWith('-BURN')) {
-                      chartConfig.data.datasets[2] = {
-                            label: 'BURN',
-                            borderColor: 'red',
-                            fill: false,
-                            pointRadius: 0,
-                            data: [],
-                      };
-                      // reverse load
-                      for (let i = 0; i < numpts; i++) {
-                          chartConfig.data.datasets[2].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                      }
-                  }
+      function loadData(adata, sensor_name) {
+          let slist = adata['data'];
+          let numpts = adata['count'];
+          if (numpts > 0) {
+              // reverse load
+              for (let i = 0; i < numpts; i++) {
+                  chartConfig.data.datasets[dsidxs[sensor_name]].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
               }
           }
           chart.update();
       }
 
 
-      function updateData(adata) {
-          for (let sensor in adata['data']) {
-              let slist = adata['data'][sensor]['data'];
-              let numpts = slist.length;
-              if (numpts > 0) {
-                  if (sensor.endsWith('-IN')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[0].data.shift();
-                        }
-                  } else if (sensor.endsWith('-OUT')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[1].data.shift();
-                        }
-                  } else if (sensor.endsWith('-BURN')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[2].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[2].data.shift();
-                        }
-                  }
+      function updateData(adata, sensor_name) {
+          let slist = adata['data'];
+          let numpts = adata['count'];
+          if (numpts > 0) {
+              // reverse load
+              for (let i = numpts-1; i >= 0; i--) {
+                  chart.data.datasets[dsidxs[sensor_name]].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+              }
+              // remove extras
+              for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
+                  chart.data.datasets[dsidxs[sensor_name]].data.shift();
               }
           }
           chart.update();
@@ -142,55 +85,66 @@
 
 
       {% for sensor in sensors %}
-          function {{ sensor.name }}updateData(adata) {
-              updateData(adata);
+          function {{ sensor.name|cut:"-" }}updateData(adata) {
+              updateData(adata, '{{ sensor.name }}');
               //schedule next update
-              setTimeout({{ sensor.name }}queryData, 30000);
+              setTimeout({{ sensor.name|cut:"-" }}queryData, 30000);
           }
 
-          function {{ sensor.name }}queryData() {
+          function {{ sensor.name|cut:"-" }}queryData() {
               // fire off an update
-              let sts = new Date({{ sensor.name }}Config['ts']);
-              {{ sensor.name }}Config['ts'] = new Date();
+              let sts = new Date(ts['{{ sensor.name }}']);
+              ts['{{ sensor.name }}'] = new Date();
               let args = { 'starttime': sts.toISOString(),
-                           'endtime': {{ sensor.name }}Config['ts'].toISOString(),
+                           'endtime': ts['{{ sensor.name }}'].toISOString(),
                            'datapts': 9000};
-              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name }}updateData);
+              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}updateData);
           }
 
-          function {{ sensor.name }}loadData(adata) {
-              loadData(adata, {{ sensor.name }}Config['chart'], {{ sensor.name }}Config['chartConfig']);
-              setTimeout({{ sensor.name }}queryData, 30000);
+          function {{ sensor.name|cut:"-" }}loadData(adata) {
+              loadData(adata, '{{ sensor.name }}');
+              setTimeout({{ sensor.name|cut:"-" }}queryData, 30000);
           }
 
-          function {{ sensor.name }}SetupChart() {
-              let ctx = document.getElementById('{{ sensor.name }}chart_div').getContext('2d');
-              {{ sensor.name }}Config['chart'] = new Chart(ctx, {{ sensor.name }}Config['chartConfig']);
+          function {{ sensor.name|cut:"-" }}SetupChart() {
               // for each zone fire off an update
               let sts = new Date();
-              {{ sensor.name }}Config['ts'] = new Date(sts);
+              ts['{{ sensor.name }}'] = new Date(sts);
               sts.setHours(sts.getHours() - {{ datapts }});
               let args = {'starttime': sts.toISOString(),
-                          'endtime': {{ sensor.name }}Config['ts'].toISOString(),
+                          'endtime': ts['{{ sensor.name }}'].toISOString(),
                           'datapts': 9000};
-              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name }}loadData);
+              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}loadData);
           }
       {%  endfor %}
+
+
+    function get_random_color() {
+      function c() {
+        var hex = Math.floor(Math.random()*256).toString(16);
+        return ("0"+String(hex)).substr(-2); // pad with zero
+      }
+      return "#"+c()+c()+c();
+    }
+
 
     function setupCharts() {
         let x = 0;
         {% for sensor in sensors %}
-            colidxs['{{ sensor.name }}'] = x;
+            dsidxs['{{ sensor.name }}'] = x;
             chartConfig.data.datasets[x] = {
                 label: '{{ sensor.name }}',
+                borderColor: get_random_color(),
                 fill: false,
                 pointRadius: 0,
                 data: [],
             };
             ++x;
         {%  endfor %}
-        {% for zone in zones %}
-            {{ zone.name }}SetupChart();
+        let ctx = document.getElementById('chart_div').getContext('2d');
+        chart = new Chart(ctx, chartConfig);
+        {% for sensor in sensors %}
+            {{ sensor.name|cut:"-" }}SetupChart();
         {%  endfor %}
     }
     </script>
@@ -223,172 +177,14 @@
     </nav>
 
     <div class="container-fluid mt-3">
-        {% for zone in zones %}
         <div class="row">
             <div class="col">
-                <h6>{{ zone.name }}</h6>
+                <h6>Comparison</h6>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <canvas id="{{ zone.name }}chart_div" style=" width: 100%; height: 400px"></canvas>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-</body>
-</html>
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Heating Overlay</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart', 'line']});
-        google.charts.setOnLoadCallback(setupCharts);
-
-        var colidxs = {};
-        {% for sensor in sensors %}
-            colidxs['{{ sensor.name }}'] = 0;
-        {% endfor %}
-
-        var options = {
-            chartArea: {width: '90%', height: '80%'},
-            legend: {
-                position: 'in',
-                textStyle: {fontSize: 14},
-            },
-            vAxis: {
-                maxValue: 270,
-                minValue: 30
-            },
-        };
-
-        var data;
-        var chart;
-        var ts = false;
-
-        function strToDate(ts) {
-            var year = Number(ts.substr(0, 4));
-            var month = Number(ts.substr(5, 2))-1;
-            var day = Number(ts.substr(8, 2));
-            var hour = Number(ts.substr(11, 2));
-            var minute = Number(ts.substr(14, 2));
-            var second = Number(ts.substr(17, 2));
-
-            return new Date(year, month, day, hour, minute, second);
-        }
-
-        function curDateStr() {
-            var d = new Date();
-            return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-                ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
-                ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
-        }
-
-
-        function updateData() {
-            let args;
-            if (ts) {
-                let sts = ts;
-                ts = curDateStr();
-                args = {'datapts': {{ datapts }}, 'starttime': sts, 'endtime': ts }
-            }
-            else {
-                ts = curDateStr();
-                args = {'datapts': {{ datapts }}, 'endtime': ts }
-            }
-            {% for sensor in sensors %}
-                $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data',
-                    args,
-                    function (adata) {
-                        // process data
-                        let slist = adata['data'];
-                        let numpts = adata['count'];
-                        if (numpts > 0) {
-                            for (let i = 0; i < {{ datapts }} - numpts; i++) {
-                                data.setValue(i, 0, data.getValue(i + numpts, 0));
-                                data.setValue(i, colidxs['{{ sensor.name }}'], data.getValue(i + numpts, colidxs['{{ sensor.name }}']));
-                            }
-                            let j = numpts;
-                            for (let i = {{ datapts }} - numpts; i < {{ datapts }}; i++) {
-                                --j;
-                                data.setValue(i, 0, strToDate(adata['data'][j]['attributes']['timestamp']));
-                                data.setValue(i, colidxs['{{ sensor.name }}'], Number(adata['data'][j]['attributes']['value']));
-                            }
-                            chart.draw(data, options);
-                        }
-                    }
-                );
-            {%  endfor %}
-            //schedule next update
-            setTimeout(updateData, 30000);
-        }
-
-
-        function setupCharts() {
-            data = new google.visualization.DataTable();
-            data.addColumn('datetime', 'Time');
-            let x = 1;
-            {% for sensor in sensors %}
-                colidxs['{{ sensor.name }}'] = x;
-                ++x;
-                data.addColumn('number', '{{ sensor.name }}', '{{ sensor.name }}');
-            {%  endfor %}
-            data.addRows({{ datapts }});
-            chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-            updateData();
-        }
-    </script>
-
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Zone Comparison</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Zones
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for zone in allzones %}
-                  <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
-                {% endfor %}
-            </div>
-          </li>
-        </ul>
-      </div>
-    </nav>
-
-    <div class="container-fluid mt-3">
-        <div class="row">
-            <div class="col">
-                <h6>{{ zone.name }}</h6>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {#  calculate width based on number of data points #}
-                <div id="chart_div" style="width: 100%; height: 800px;"></div>
+                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
     </div>
