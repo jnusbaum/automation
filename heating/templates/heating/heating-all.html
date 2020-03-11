@@ -10,10 +10,62 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
     <script type="text/javascript">
-        $( document ).ready(setupCharts);
+        $( document ).ready(buildPage);
 
-        {% for zone in zones %}
-            var {{ zone.name }}Config = {
+        let charts = {};
+
+
+        function queryData(zone) {
+            // fire off an update
+            let sts = new Date(charts[zone].ts);
+            charts[zone].ts = new Date();
+            let args = { 'starttime': sts.toISOString(),
+                'endtime': charts[zone].ts.toISOString(),
+                'datapts': 9000};
+            $.getJSON('{{ host }}/zones/' + zone + '/data', args,
+                function(resp) {
+                    for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
+                        let numpts = sensor_data.count;
+                        if (numpts > 0) {
+                            if (sensor_name.endsWith('-IN')) {
+                                // reverse load
+                                for (let i = numpts-1; i >= 0; i--) {
+                                    charts[zone].chart.data.datasets[0].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                }
+                                // remove extras
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                    charts[zone].chart.data.datasets[0].data.shift();
+                                }
+                            } else if (sensor_name.endsWith('-OUT')) {
+                                // reverse load
+                                for (let i = numpts-1; i >= 0; i--) {
+                                    charts[zone].chart.data.datasets[1].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                }
+                                // remove extras
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                    charts[zone].chart.data.datasets[1].data.shift();
+                                }
+                            } else if (sensor_name.endsWith('-BURN')) {
+                                // reverse load
+                                for (let i = numpts-1; i >= 0; i--) {
+                                    charts[zone].chart.data.datasets[2].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                }
+                                // remove extras
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                    charts[zone].chart.data.datasets[2].data.shift();
+                                }
+                            }
+                        }
+                    }
+                    charts[zone].chart.update();
+                    setTimeout(queryData, 30000, zone);
+                }
+            );
+        }
+
+
+        function buildZone(zone) {
+            charts[zone] = {
                 ts: null,
                 chart: null,
                 chartConfig: {
@@ -53,137 +105,83 @@
                     },
                 },
             };
-        {% endfor %}
 
-
-      function loadData(adata, chart, chartConfig) {
-          for (let sensor in adata['data']) {
-              let slist = adata['data'][sensor]['data'];
-              let numpts = adata['data'][sensor]['count'];
-              if (numpts > 0) {
-                  if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                      chartConfig.data.datasets[0] = {
-                          label: 'IN',
-                          borderColor: 'orange',
-                          fill: false,
-                          pointRadius: 0,
-                          data: [],
-                      };
-                      // reverse load
-                      for (let i = 0; i < numpts; i++) {
-                          chartConfig.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                      }
-                  } else if (sensor.endsWith('-OUT')) {
-                      chartConfig.data.datasets[1] = {
-                            label: 'OUT',
-                            borderColor: 'skyblue',
-                            fill: false,
-                            pointRadius: 0,
-                            data: [],
-                        };
-                      // reverse load
-                        for (let i = 0; i < numpts; i++) {
-                            chartConfig.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+            let ctx = document.getElementById(zone + 'chart_div').getContext('2d');
+            charts[zone].chart = new Chart(ctx, charts[zone].chartConfig);
+            // for each zone fire off an update
+            let sts = new Date();
+            charts[zone].ts = new Date(sts);
+            sts.setHours(sts.getHours() - {{ datapts }});
+            let args = {
+                'starttime': sts.toISOString(),
+                'endtime': charts[zone].ts.toISOString(),
+                'datapts': 9000
+            };
+            $.getJSON('{{ host }}/zones/' + zone + '/data', args,
+                function (resp) {
+                    for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
+                        let numpts = sensor_data.count;
+                        if (numpts > 0) {
+                            if (sensor_name.endsWith('-IN') || sensor_name.endsWith('-INSYS')) {
+                                charts[zone].chart.data.datasets[0] = {
+                                    label: 'IN',
+                                    borderColor: 'orange',
+                                    fill: false,
+                                    pointRadius: 0,
+                                    data: [],
+                                };
+                                // reverse load
+                                for (let i = 0; i < numpts; i++) {
+                                    charts[zone].chart.data.datasets[0].data.unshift({
+                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        y: sensor_data.data[i]['attributes']['value']
+                                    });
+                                }
+                            } else if (sensor_name.endsWith('-OUT')) {
+                                charts[zone].chart.data.datasets[1] = {
+                                    label: 'OUT',
+                                    borderColor: 'skyblue',
+                                    fill: false,
+                                    pointRadius: 0,
+                                    data: [],
+                                };
+                                // reverse load
+                                for (let i = 0; i < numpts; i++) {
+                                    charts[zone].chart.data.datasets[1].data.unshift({
+                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        y: sensor_data.data[i]['attributes']['value']
+                                    });
+                                }
+                            } else if (sensor_name.endsWith('-BURN')) {
+                                charts[zone].chart.data.datasets[2] = {
+                                    label: 'BURN',
+                                    borderColor: 'red',
+                                    fill: false,
+                                    pointRadius: 0,
+                                    data: [],
+                                };
+                                // reverse load
+                                for (let i = 0; i < numpts; i++) {
+                                    charts[zone].chart.data.datasets[2].data.unshift({
+                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        y: sensor_data.data[i]['attributes']['value']
+                                    });
+                                }
+                            }
                         }
-                  } else if (sensor.endsWith('-BURN')) {
-                      chartConfig.data.datasets[2] = {
-                            label: 'BURN',
-                            borderColor: 'red',
-                            fill: false,
-                            pointRadius: 0,
-                            data: [],
-                      };
-                      // reverse load
-                      for (let i = 0; i < numpts; i++) {
-                          chartConfig.data.datasets[2].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                      }
-                  }
-              }
-          }
-          chart.update();
-      }
+                    }
+                    charts[zone].chart.update();
+                    setTimeout(queryData, 30000, zone);
+                }
+            );
+        }
 
 
-      function updateData(adata, chart, chartConfig) {
-          for (let sensor in adata['data']) {
-              let slist = adata['data'][sensor]['data'];
-              let numpts = slist.length;
-              if (numpts > 0) {
-                  if (sensor.endsWith('-IN')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[0].data.shift();
-                        }
-                  } else if (sensor.endsWith('-OUT')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[1].data.shift();
-                        }
-                  } else if (sensor.endsWith('-BURN')) {
-                      // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            chart.data.datasets[2].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
-                            chart.data.datasets[2].data.shift();
-                        }
-                  }
-              }
-          }
-          chart.update();
-      }
-
-
-      {% for zone in zones %}
-          function {{ zone.name }}updateData(adata) {
-              updateData(adata, {{ zone.name }}Config['chart'], {{ zone.name }}Config['chartConfig']);
-              //schedule next update
-              setTimeout({{ zone.name }}queryData, 30000);
-          }
-
-          function {{ zone.name }}queryData() {
-              // fire off an update
-              let sts = new Date({{ zone.name }}Config['ts']);
-              {{ zone.name }}Config['ts'] = new Date();
-              let args = { 'starttime': sts.toISOString(),
-                           'endtime': {{ zone.name }}Config['ts'].toISOString(),
-                           'datapts': 9000};
-              $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}updateData);
-          }
-
-          function {{ zone.name }}loadData(adata) {
-              loadData(adata, {{ zone.name }}Config['chart'], {{ zone.name }}Config['chartConfig']);
-              setTimeout({{ zone.name }}queryData, 30000);
-          }
-
-          function {{ zone.name }}SetupChart() {
-              let ctx = document.getElementById('{{ zone.name }}chart_div').getContext('2d');
-              {{ zone.name }}Config['chart'] = new Chart(ctx, {{ zone.name }}Config['chartConfig']);
-              // for each zone fire off an update
-              let sts = new Date();
-              {{ zone.name }}Config['ts'] = new Date(sts);
-              sts.setHours(sts.getHours() - {{ datapts }});
-              let args = {'starttime': sts.toISOString(),
-                          'endtime': {{ zone.name }}Config['ts'].toISOString(),
-                          'datapts': 9000};
-              $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}loadData);
-          }
-      {%  endfor %}
-
-    function setupCharts() {
-        {% for zone in zones %}
-            {{ zone.name }}SetupChart();
-        {%  endfor %}
-    }
+        function buildPage() {
+            {% for zone in zones %}
+                buildZone('{{ zone.name }}');
+            {% endfor %}
+        }
     </script>
 
 </head>
