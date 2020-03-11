@@ -12,21 +12,13 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-        var ts = null;
+        var dsidxs = {};
+        var ts = {};
         var chart = null;
         var chartConfig = {
             type: 'line',
             data: {
-                datasets: [
-                    {% for sensor in sensors %}
-                        {
-                            label: '{{ sensor.name }}',
-                            fill: false,
-                            pointRadius: 0,
-                            data: [],
-                        },
-                    {% endfor %}
-                ]
+                datasets: []
             },
             options: {
                 maintainAspectRatio: false,
@@ -62,7 +54,7 @@
 
 
 
-      function loadData(adata, chart, chartConfig) {
+      function loadData(adata) {
           for (let sensor in adata['data']) {
               let slist = adata['data'][sensor]['data'];
               let numpts = adata['data'][sensor]['count'];
@@ -110,7 +102,7 @@
       }
 
 
-      function updateData(adata, chart, chartConfig) {
+      function updateData(adata) {
           for (let sensor in adata['data']) {
               let slist = adata['data'][sensor]['data'];
               let numpts = slist.length;
@@ -149,43 +141,54 @@
       }
 
 
-      {% for zone in zones %}
-          function {{ zone.name }}updateData(adata) {
-              updateData(adata, {{ zone.name }}Config['chart'], {{ zone.name }}Config['chartConfig']);
+      {% for sensor in sensors %}
+          function {{ sensor.name }}updateData(adata) {
+              updateData(adata);
               //schedule next update
-              setTimeout({{ zone.name }}queryData, 30000);
+              setTimeout({{ sensor.name }}queryData, 30000);
           }
 
-          function {{ zone.name }}queryData() {
+          function {{ sensor.name }}queryData() {
               // fire off an update
-              let sts = new Date({{ zone.name }}Config['ts']);
-              {{ zone.name }}Config['ts'] = new Date();
+              let sts = new Date({{ sensor.name }}Config['ts']);
+              {{ sensor.name }}Config['ts'] = new Date();
               let args = { 'starttime': sts.toISOString(),
-                           'endtime': {{ zone.name }}Config['ts'].toISOString(),
+                           'endtime': {{ sensor.name }}Config['ts'].toISOString(),
                            'datapts': 9000};
-              $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}updateData);
+              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name }}updateData);
           }
 
-          function {{ zone.name }}loadData(adata) {
-              loadData(adata, {{ zone.name }}Config['chart'], {{ zone.name }}Config['chartConfig']);
-              setTimeout({{ zone.name }}queryData, 30000);
+          function {{ sensor.name }}loadData(adata) {
+              loadData(adata, {{ sensor.name }}Config['chart'], {{ sensor.name }}Config['chartConfig']);
+              setTimeout({{ sensor.name }}queryData, 30000);
           }
 
-          function {{ zone.name }}SetupChart() {
-              let ctx = document.getElementById('{{ zone.name }}chart_div').getContext('2d');
-              {{ zone.name }}Config['chart'] = new Chart(ctx, {{ zone.name }}Config['chartConfig']);
+          function {{ sensor.name }}SetupChart() {
+              let ctx = document.getElementById('{{ sensor.name }}chart_div').getContext('2d');
+              {{ sensor.name }}Config['chart'] = new Chart(ctx, {{ sensor.name }}Config['chartConfig']);
               // for each zone fire off an update
               let sts = new Date();
-              {{ zone.name }}Config['ts'] = new Date(sts);
+              {{ sensor.name }}Config['ts'] = new Date(sts);
               sts.setHours(sts.getHours() - {{ datapts }});
               let args = {'starttime': sts.toISOString(),
-                          'endtime': {{ zone.name }}Config['ts'].toISOString(),
+                          'endtime': {{ sensor.name }}Config['ts'].toISOString(),
                           'datapts': 9000};
-              $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}loadData);
+              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name }}loadData);
           }
       {%  endfor %}
 
     function setupCharts() {
+        let x = 0;
+        {% for sensor in sensors %}
+            colidxs['{{ sensor.name }}'] = x;
+            chartConfig.data.datasets[x] = {
+                label: '{{ sensor.name }}',
+                fill: false,
+                pointRadius: 0,
+                data: [],
+            };
+            ++x;
+        {%  endfor %}
         {% for zone in zones %}
             {{ zone.name }}SetupChart();
         {%  endfor %}
