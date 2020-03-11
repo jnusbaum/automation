@@ -12,14 +12,6 @@
 
       $(document).ready(updateData);
 
-      function curDateStr() {
-          var d = new Date();
-          return d.toISOString();
-          // return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-          //     ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
-          //     ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
-      }
-
 
       function selectColor(temp) {
           let dclass = 'cold';
@@ -44,9 +36,9 @@
           // for each zone fire off an update
           {% for zone in zones %}
               {
-                  let ts = curDateStr();
+                  let ts = new Date();
                   $.getJSON('{{ host }}/zones/{{ zone.name }}/data',
-                      {'datapts': 1, 'endtime': ts},
+                      {'datapts': 1, 'endtime': ts.toISOString()},
                       function (adata) {
                           // process data
                           let timestamp = null;
@@ -55,10 +47,9 @@
                               if (slist.length) {
                                   if (!timestamp) {
                                       timestamp = new Date(slist[0]['attributes']['timestamp']);
-
                                       $('#{{ zone.name }}-TS').text(timestamp.toLocaleString('en-US', { timeZone: 'America/Denver' }));
                                   }
-                                  let val = Number(slist[0]['attributes']['value']);
+                                  let val = slist[0]['attributes']['value'];
                                   // update data in DOM
                                   let newcls = selectColor(val);
                                   let oldcls = $('#' + sensor + '-LED').attr('class');
@@ -643,11 +634,11 @@
             <div class="col-lg-2 col-xl-1 center">
                 <div class="form-group">
                     <select class="form-control" name="datapts" id="tsel">
-                        <option value="360">1 hr</option>
-                        <option value="1080">3 hr</option>
-                        <option value="2160">6 hr</option>
-                        <option value="4320">12 hr</option>
-                        <option value="8640">24 hr</option>
+                        <option value="1">1 hr</option>
+                        <option value="3">3 hr</option>
+                        <option value="6">6 hr</option>
+                        <option value="12">12 hr</option>
+                        <option value="24">24 hr</option>
                     </select>
                 </div>
             </div>

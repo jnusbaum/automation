@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -34,7 +35,8 @@ def on_message(client, userdata, msg):
     payload = json.loads(msg.payload)
     logger.debug(f"got mesg, payload = {payload}")
     fsname = payload['sensor']
-    timestamp = datetime.fromtimestamp(payload['timestamp'])
+    timestamp = datetime.fromtimestamp(payload['timestamp'], tz=pytz.timezone("UTC"))
+    timestamp = timestamp.replace(tzinfo=None)
     value = payload['value']
     ovalue = value
     try:

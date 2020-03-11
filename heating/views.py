@@ -21,7 +21,7 @@ def zone(request, zone_name):
 
 def all_zones(request):
     # get data for all zones
-    datapts = request.GET.get('datapts', '100')
+    datapts = int(request.GET.get('datapts', '24'))
     zones = Zone.objects.all().order_by('name')
     dzones = []
     if 'ALL' in request.GET:
@@ -39,7 +39,7 @@ def all_zones(request):
 
 def overlay(request):
     # get data for all zones
-    datapts = request.GET.get('datapts', '100')
+    datapts = request.GET.get('datapts', '24')
     zones = Zone.objects.all().order_by('name')
     dzones = []
     if 'ALL' in request.GET:

@@ -25,13 +25,13 @@
                     borderColor: 'orange',
 					fill: false,
                     pointRadius: 0,
-					data: new Array(9000),
+					data: [],
 				}, {
 					label: 'OUT',
                     borderColor: 'skyblue',
 					fill: false,
                     pointRadius: 0,
-					data: new Array(9000),
+					data: [],
 				}]
 			},
 			options: {
@@ -80,32 +80,22 @@
                 let numpts = slist.length;
                 if (numpts > 0) {
                     if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                        gaugeIn.value = Number(slist[0]['attributes']['value']);
+                        gaugeIn.value = slist[0]['attributes']['value'];
                         // reverse load
-                        for (let i = 0; i < 9000-numpts; i++) {
-                            chartConfig.data.datasets[0].data[i] = {t: new Date(slist[numpts-1]['attributes']['timestamp']), y: Number(slist[numpts-1]['attributes']['value'])};
-                        }
-                        let j = numpts;
-                        for (let i = 9000 - numpts; i < 9000; i++) {
-                            --j;
-                            chartConfig.data.datasets[0].data[i] = {t: new Date(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                        for (let i = 0; i < numpts; i++) {
+                            lineChart.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
                         }
                     } else if (sensor.endsWith('-OUT')) {
-                        gaugeOut.value = Number(slist[0]['attributes']['value']);
+                        gaugeOut.value = slist[0]['attributes']['value'];
                         // reverse load
-                        for (let i = 0; i < 9000-numpts; i++) {
-                            chartConfig.data.datasets[1].data[i] = {t: new Date(slist[numpts-1]['attributes']['timestamp']), y: Number(slist[numpts-1]['attributes']['value'])};
-                        }
-                        let j = numpts;
-                        for (let i = 9000 - numpts; i < 9000; i++) {
-                            --j;
-                            chartConfig.data.datasets[1].data[i] = {t: new Date(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                        for (let i = 0; i < numpts; i++) {
+                            lineChart.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
                         }
                     }
                 }
             }
             drawCharts();
-            setTimeout(startUpdate, 5000);
+            setTimeout(startUpdate, 10000);
         }
 
 
@@ -115,31 +105,26 @@
                 let numpts = slist.length;
                 if (numpts > 0) {
                     if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                        gaugeIn.value = Number(slist[0]['attributes']['value']);
-                        // shift arrays
-                        for (let i = 0; i < 9000 - numpts; i++) {
-                            chartConfig.data.datasets[0].data[i] = chartConfig.data.datasets[0].data[i + numpts];
-                        }
+                        gaugeIn.value = slist[0]['attributes']['value'];
                         // reverse load
-                        let j = numpts;
-                        for (let i = 9000 - numpts; i < 9000; i++) {
-                            --j;
-                            chartConfig.data.datasets[0].data[i] = {t: new Date(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                        for (let i = numpts-1; i >= 0; i--) {
+                            lineChart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
+                        // remove extras
+                        for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
+                            lineChart.data.datasets[0].data.shift();
                         }
                     } else if (sensor.endsWith('-OUT')) {
-                        gaugeOut.value = Number(slist[0]['attributes']['value']);
-                        // shift arrays
-                        for (let i = 0; i < 9000 - numpts; i++) {
-                            chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[1].data[i + numpts];
-                        }
+                        gaugeOut.value = slist[0]['attributes']['value'];
                         // reverse load
-                        let j = numpts;
-                        for (let i = 9000 - numpts; i < 9000; i++) {
-                            --j;
-                            chartConfig.data.datasets[1].data[i] = {t: new Date(slist[j]['attributes']['timestamp']), y: Number(slist[j]['attributes']['value'])};
+                        for (let i = numpts-1; i >= 0; i--) {
+                            lineChart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
+                        // remove extras
+                        for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
+                            lineChart.data.datasets[1].data.shift();
                         }
                     }
-
                 }
             }
             drawCharts();
@@ -148,7 +133,7 @@
 
 
         function startUpdate() {
-		    let sts = ts;
+		    let sts = new Date(ts);
             ts = new Date();
             $.getJSON('{{ host }}/zones/{{ zone }}/data',
                 { 'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
@@ -187,10 +172,11 @@
                 value: 30});
             var ctx = document.getElementById('chart_div').getContext('2d');
             lineChart = new Chart(ctx, chartConfig);
-            ts = sts = new Date();
+            let sts = new Date();
+            ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);
             $.getJSON('{{ host }}/zones/{{ zone }}/data',
-                { 'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
+                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
                 startData);
         }
     </script>

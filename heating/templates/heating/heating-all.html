@@ -26,9 +26,8 @@
                         scales: {
                             xAxes: [{
                                 type: 'time',
-                                distribution: 'linear',
                                 ticks: {
-                                    stepSize: 30
+                                    stepSize: 10
                                 },
                                 time: {
                                     unit: 'minute',
@@ -52,26 +51,9 @@
                             }]
                         },
                     },
-                }
+                },
             };
         {% endfor %}
-
-      function strToDate(ts) {
-          var year = Number(ts.substr(0, 4));
-          var month = Number(ts.substr(5, 2))-1;
-          var day = Number(ts.substr(8, 2));
-          var hour = Number(ts.substr(11, 2));
-          var minute = Number(ts.substr(14, 2));
-          var second = Number(ts.substr(17, 2));
-          return new Date(year, month, day, hour, minute, second);
-      }
-
-      function curDateStr() {
-          var d = new Date();
-          return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" +
-              ("0" + d.getDate()).slice(-2) + "T" + ("0" + d.getHours()).slice(-2) + ":" +
-              ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
-      }
 
 
       function loadData(adata, chart, chartConfig) {
@@ -85,21 +67,11 @@
                           borderColor: 'orange',
                           fill: false,
                           pointRadius: 0,
-                          data: new Array(9000)
+                          data: [],
                       };
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[0].data[i] = {
-                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
-                              y: Number(slist[numpts-1]['attributes']['value'])
-                          };
-                      }
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[0].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
+                      // reverse load
+                      for (let i = 0; i < numpts; i++) {
+                          chartConfig.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
                       }
                   } else if (sensor.endsWith('-OUT')) {
                       chartConfig.data.datasets[1] = {
@@ -107,43 +79,23 @@
                             borderColor: 'skyblue',
                             fill: false,
                             pointRadius: 0,
-                            data: new Array(9000),
+                            data: [],
                         };
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[1].data[i] = {
-                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
-                              y: Number(slist[numpts-1]['attributes']['value'])
-                          };
-                      }
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[1].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
-                      }
+                      // reverse load
+                        for (let i = 0; i < numpts; i++) {
+                            chartConfig.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
                   } else if (sensor.endsWith('-BURN')) {
                       chartConfig.data.datasets[2] = {
                             label: 'BURN',
                             borderColor: 'red',
                             fill: false,
                             pointRadius: 0,
-                            data: new Array(9000),
+                            data: [],
                       };
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[2].data[i] = {
-                              t: strToDate(slist[numpts-1]['attributes']['timestamp']),
-                              y: Number(slist[numpts-1]['attributes']['value'])
-                          };
-                      }
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[2].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
+                      // reverse load
+                      for (let i = 0; i < numpts; i++) {
+                          chartConfig.data.datasets[2].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
                       }
                   }
               }
@@ -158,47 +110,32 @@
               let numpts = slist.length;
               if (numpts > 0) {
                   if (sensor.endsWith('-IN')) {
-                      // load initial
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[0].data[i] = chartConfig.data.datasets[0].data[i + numpts];
-                      }
                       // reverse load
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[0].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
-                      }
+                        for (let i = numpts-1; i >= 0; i--) {
+                            chart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
+                        // remove extras
+                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
+                            chart.data.datasets[0].data.shift();
+                        }
                   } else if (sensor.endsWith('-OUT')) {
-                      // shift arrays
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[1].data[i] = chartConfig.data.datasets[1].data[i + numpts];
-                      }
                       // reverse load
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[1].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
-                      }
+                        for (let i = numpts-1; i >= 0; i--) {
+                            chart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
+                        // remove extras
+                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
+                            chart.data.datasets[1].data.shift();
+                        }
                   } else if (sensor.endsWith('-BURN')) {
-                      // shift arrays
-                      for (let i = 0; i < 9000 - numpts; i++) {
-                          chartConfig.data.datasets[2].data[i] = chartConfig.data.datasets[2].data[i + numpts];
-                      }
                       // reverse load
-                      let j = numpts;
-                      for (let i = 9000 - numpts; i < 9000; i++) {
-                          --j;
-                          chartConfig.data.datasets[2].data[i] = {
-                              t: strToDate(slist[j]['attributes']['timestamp']),
-                              y: Number(slist[j]['attributes']['value'])
-                          };
-                      }
+                        for (let i = numpts-1; i >= 0; i--) {
+                            chart.data.datasets[2].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                        }
+                        // remove extras
+                        for (let i = 0; i < chart.data.datasets[0].data.length - 9000; i++) {
+                            chart.data.datasets[2].data.shift();
+                        }
                   }
               }
           }
@@ -215,9 +152,11 @@
 
           function {{ zone.name }}queryData() {
               // fire off an update
-              let sts = {{ zone.name }}Config['ts'];
-              {{ zone.name }}Config['ts'] = curDateStr();
-              let args = { 'starttime': sts, 'endtime': {{ zone.name }}Config['ts'], 'datapts': 9000 };
+              let sts = new Date({{ zone.name }}Config['ts']);
+              {{ zone.name }}Config['ts'] = new Date();
+              let args = { 'starttime': sts.toISOString(),
+                           'endtime': {{ zone.name }}Config['ts'].toISOString(),
+                           'datapts': 9000};
               $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}updateData);
           }
 
@@ -230,8 +169,12 @@
               let ctx = document.getElementById('{{ zone.name }}chart_div').getContext('2d');
               {{ zone.name }}Config['chart'] = new Chart(ctx, {{ zone.name }}Config['chartConfig']);
               // for each zone fire off an update
-              {{ zone.name }}Config['ts'] = curDateStr();
-              let args = {'datapts': {{ datapts }}, 'endtime': {{ zone.name }}Config['ts']};
+              let sts = new Date();
+              {{ zone.name }}Config['ts'] = new Date(sts);
+              sts.setHours(sts.getHours() - {{ datapts }});
+              let args = {'starttime': sts.toISOString(),
+                          'endtime': {{ zone.name }}Config['ts'].toISOString(),
+                          'datapts': 9000};
               $.getJSON('{{ host }}/zones/{{ zone.name }}/data', args, {{ zone.name }}loadData);
           }
       {%  endfor %}
