@@ -12,6 +12,8 @@
     <script type="text/javascript">
         $( document ).ready(buildPage);
 
+        let offset = new Date().getTimezoneOffset() * 60 * 1000;
+
         let charts = {};
 
 
@@ -30,7 +32,7 @@
                             if (sensor_name.endsWith('-IN')) {
                                 // reverse load
                                 for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[0].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                    charts[zone].chart.data.datasets[0].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
                                 for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
@@ -39,7 +41,7 @@
                             } else if (sensor_name.endsWith('-OUT')) {
                                 // reverse load
                                 for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[1].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                    charts[zone].chart.data.datasets[1].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
                                 for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
@@ -48,7 +50,7 @@
                             } else if (sensor_name.endsWith('-BURN')) {
                                 // reverse load
                                 for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[2].data.push({t: sensor_data.data[i]['attributes']['timestamp'], y: sensor_data.data[i]['attributes']['value']});
+                                    charts[zone].chart.data.datasets[2].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
                                 for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
@@ -133,7 +135,7 @@
                                 // reverse load
                                 for (let i = 0; i < numpts; i++) {
                                     charts[zone].chart.data.datasets[0].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
                                         y: sensor_data.data[i]['attributes']['value']
                                     });
                                 }
@@ -148,7 +150,7 @@
                                 // reverse load
                                 for (let i = 0; i < numpts; i++) {
                                     charts[zone].chart.data.datasets[1].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
                                         y: sensor_data.data[i]['attributes']['value']
                                     });
                                 }
@@ -163,7 +165,7 @@
                                 // reverse load
                                 for (let i = 0; i < numpts; i++) {
                                     charts[zone].chart.data.datasets[2].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp'],
+                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
                                         y: sensor_data.data[i]['attributes']['value']
                                     });
                                 }
