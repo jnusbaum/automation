@@ -12,10 +12,12 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-        var dsidxs = {};
-        var ts = {};
-        var chart = null;
-        var chartConfig = {
+        var offset = new Date().getTimezoneOffset() * 60 * 1000;
+
+        let dsidxs = {};
+        let ts = {};
+        let chart = null;
+        let chartConfig = {
             type: 'line',
             data: {
                 datasets: []
@@ -53,8 +55,7 @@
         };
 
 
-
-      function loadData(adata, sensor_name) {
+        function loadData(adata, sensor_name) {
           let slist = adata['data'];
           let numpts = adata['count'];
           if (numpts > 0) {

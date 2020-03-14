@@ -13,6 +13,8 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
+        var offset = new Date().getTimezoneOffset() * 60 * 1000;
+
         var ts;
         var gaugeIn;
         var gaugeOut;
@@ -91,19 +93,19 @@
                         gaugeIn.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = 0; i < numpts; i++) {
-                            lineChart.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                     } else if (sensor.endsWith('-OUT')) {
                         gaugeOut.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = 0; i < numpts; i++) {
-                            lineChart.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                     } else if (sensor.endsWith('-BURN')) {
                         gaugeBurn.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = 0; i < numpts; i++) {
-                            lineChart.data.datasets[2].data.unshift({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[2].data.unshift({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                     }
                 }
@@ -122,7 +124,7 @@
                         gaugeIn.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = numpts-1; i >= 0; i--) {
-                            lineChart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                         // remove extras
                         for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
@@ -132,7 +134,7 @@
                         gaugeOut.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = numpts-1; i >= 0; i--) {
-                            lineChart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                         // remove extras
                         for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
@@ -142,7 +144,7 @@
                         gaugeBurn.value = slist[0]['attributes']['value'];
                         // reverse load
                         for (let i = numpts-1; i >= 0; i--) {
-                            lineChart.data.datasets[2].data.push({t: slist[i]['attributes']['timestamp'], y: slist[i]['attributes']['value']});
+                            lineChart.data.datasets[2].data.push({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
                         }
                         // remove extras
                         for (let i = 0; i < lineChart.data.datasets[2].data.length - 9000; i++) {
