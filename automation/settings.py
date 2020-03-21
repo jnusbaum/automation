@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'automation.sqlite',
+        'NAME': '/mnt/db/sqlite/automation.sqlite',
     }
 }
 
@@ -107,12 +107,12 @@ LOGGING = {
         'datacapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './log/datacapture.log',
+            'filename': '/home/rjn/Projects/automation/log/datacapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './log/deviceconfig.log',
+            'filename': '/home/rjn/Projects/automation/log/deviceconfig.log',
         },
     },
     'loggers': {
@@ -143,16 +143,11 @@ USE_L10N = True
 USE_TZ = False
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/automation/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# dataserver host
-# DATASERVER_HOST = 'http://192.168.0.134/dataserver'
-DATASERVER_HOST = 'http://localhost:8000/automation/api/heating'
+DATASERVER_HOST = 'http://192.168.0.134/automation/api/heating'
 MQTTHOST = '192.168.0.134'
-DCMQTTID = 'test-datacapture'
-DEVCFGMQTTID = 'test-deviceconfig'
+DCMQTTID = 'datacapture'
+DEVCFGMQTTID = 'deviceconfig'
 TOPIC = 'sorrelhills/temperature/+'

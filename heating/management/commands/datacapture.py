@@ -8,6 +8,7 @@ from heating.models import TempSensorData
 
 import logging
 logger = logging.getLogger('datacapture')
+logger.setLevel('INFO')
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
