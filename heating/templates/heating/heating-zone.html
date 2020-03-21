@@ -15,60 +15,60 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-        var offset = new Date().getTimezoneOffset() * 60 * 1000;
+        let offset = new Date().getTimezoneOffset() * 60 * 1000;
 
-        var ts;
-        var gaugeIn;
-        var gaugeOut;
-        var lineChart;
-		var chartConfig = {
-			type: 'line',
-			data: {
-				datasets: [{
-					label: 'IN',
+        let ts;
+        let gaugeIn;
+        let gaugeOut;
+        let lineChart;
+        let chartConfig = {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'IN',
                     borderColor: 'orange',
-					fill: false,
+                    fill: false,
                     pointRadius: 0,
-					data: [],
-				}, {
-					label: 'OUT',
+                    data: [],
+                }, {
+                    label: 'OUT',
                     borderColor: 'skyblue',
-					fill: false,
+                    fill: false,
                     pointRadius: 0,
-					data: [],
-				}]
-			},
-			options: {
-			    maintainAspectRatio: false,
-				scales: {
-					xAxes: [{
-						type: 'time',
+                    data: [],
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        type: 'time',
                         ticks: {
                             stepSize: 10
                         },
                         time: {
-						    unit: 'minute',
-                            displayFormats: { minute: 'MM-DD HH:mm' },
+                            unit: 'minute',
+                            displayFormats: {minute: 'MM-DD HH:mm'},
                         },
-						scaleLabel: {
-							display: true,
-							labelString: 'Time'
-						}
-					}],
-					yAxes: [{
-					    ticks: {
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Time'
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
                             suggestedMin: 30,
                             suggestedMax: 180,
                             stepSize: 30
                         },
-						scaleLabel: {
-							display: true,
-							labelString: 'temp'
-						}
-					}]
-				},
-			}
-		};
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'temp'
+                        }
+                    }]
+                },
+            }
+        };
 
 
         function drawCharts() {
@@ -174,7 +174,7 @@
                 ],
                 valueBox: true,
                 value: 30});
-            var ctx = document.getElementById('chart_div').getContext('2d');
+            let ctx = document.getElementById('chart_div').getContext('2d');
             lineChart = new Chart(ctx, chartConfig);
             let sts = new Date();
             ts = new Date(sts);
