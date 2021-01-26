@@ -16,6 +16,7 @@
 
         let charts = {};
 
+        const MAXPTS = 30000;
 
         function queryData(zone) {
             // fire off an update
@@ -23,7 +24,7 @@
             charts[zone].ts = new Date();
             let args = { 'starttime': sts.toISOString(),
                 'endtime': charts[zone].ts.toISOString(),
-                'datapts': 9000};
+                'datapts': MAXPTS};
             $.getJSON('{{ host }}/zones/' + zone + '/data', args,
                 function(resp) {
                     for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
@@ -35,7 +36,7 @@
                                     charts[zone].chart.data.datasets[0].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
                                     charts[zone].chart.data.datasets[0].data.shift();
                                 }
                             } else if (sensor_name.endsWith('-OUT')) {
@@ -44,7 +45,7 @@
                                     charts[zone].chart.data.datasets[1].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
                                     charts[zone].chart.data.datasets[1].data.shift();
                                 }
                             } else if (sensor_name.endsWith('-BURN')) {
@@ -53,7 +54,7 @@
                                     charts[zone].chart.data.datasets[2].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
                                 }
                                 // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - 9000; i++) {
+                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
                                     charts[zone].chart.data.datasets[2].data.shift();
                                 }
                             }
@@ -117,7 +118,7 @@
             let args = {
                 'starttime': sts.toISOString(),
                 'endtime': charts[zone].ts.toISOString(),
-                'datapts': 9000
+                'datapts': MAXPTS
             };
             $.getJSON('{{ host }}/zones/' + zone + '/data', args,
                 function (resp) {

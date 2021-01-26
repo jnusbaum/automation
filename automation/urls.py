@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('automation/admin/', admin.site.urls),
-    path('automation/dashboard/', include('heating.urls')),
-    path('automation/api/', include('heating.api-urls')),
+    path('automation/heating/dashboard/', include('heating.urls')),
+    path('automation/heating/api/', include('heating.api-urls')),
+    path('automation/hwcirc/dashboard/', include('hwcirc.urls')),
 ]

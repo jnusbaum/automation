@@ -24,47 +24,46 @@ class DeviceAdmin(admin.ModelAdmin):
         'name',
         'description',
         'client_id',
-        'device_actions',
+        # 'device_actions',
     )
     fields = (
         'name',
         'description',
         'client_id',
-        'device_actions',
+        # 'device_actions',
     )
-    readonly_fields = (
-        'name',
-        'device_actions',
-    )
+    # readonly_fields = (
+    #     'device_actions',
+    # )
 
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            re_path(
-                r'^(?P<device_name>.+)/config/$',
-                self.admin_site.admin_view(self.process_config),
-                name='device-config',
-            ),
-        ]
-        return custom_urls + urls
-
-    def device_actions(self, obj):
-        return format_html('<a class="button" href="{}">Config</a>&nbsp;', reverse('admin:device-config', args=[obj.pk]),
-        )
-
-    def process_config(self, request, device_name, *args, **kwargs):
-        # publish config-request to to sorrelhills/device/config-request/<device_name>
-        # this will cause device config server to publish configuration
-        self.message_user(request, f"Configured {device_name}")
-        url = reverse(
-            'admin:heating_device_change',
-            args=[device_name],
-            current_app=self.admin_site.name,
-        )
-        return HttpResponseRedirect(url)
-
-    device_actions.short_description = 'Device Actions'
-    device_actions.allow_tags = True
+    # def get_urls(self):
+    #     urls = super().get_urls()
+    #     custom_urls = [
+    #         re_path(
+    #             r'^(?P<device_name>.+)/config-device/$',
+    #             self.admin_site.admin_view(self.process_config),
+    #             name='device-config',
+    #         ),
+    #     ]
+    #     return custom_urls + urls
+    #
+    # def device_actions(self, obj):
+    #     return format_html('<a class="button" href="{}">Config</a>&nbsp;', reverse('admin:device-config', args=[obj.pk]),
+    #     )
+    #
+    # def process_config(self, request, device_name, *args, **kwargs):
+    #     # publish config-request to to sorrelhills/device/config-request/<device_name>
+    #     # this will cause device config server to publish configuration
+    #     self.message_user(request, f"Configured {device_name}")
+    #     url = reverse(
+    #         'admin:heating_device_change',
+    #         args=[device_name],
+    #         current_app=self.admin_site.name,
+    #     )
+    #     return HttpResponseRedirect(url)
+    #
+    # device_actions.short_description = 'Device Actions'
+    # device_actions.allow_tags = True
 
 
 @admin.register(OneWireInterface)

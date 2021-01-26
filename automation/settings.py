@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'heating.apps.HeatingConfig',
+    'hwcirc.apps.HwcircConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
