@@ -4,14 +4,16 @@ import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from heating.models import TempSensorData
+from sensors.models import TempSensorData
 
 import logging
-logger = logging.getLogger('datacapture')
+
+logger = logging.getLogger('tempcapture')
 logger.setLevel('INFO')
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
+
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -19,7 +21,7 @@ def on_connect(client, userdata, flags, rc):
     logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(settings.TOPIC)
+    client.subscribe(settings.BASETOPIC + '/temperature/+')
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -63,7 +65,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         value_cache = {}
-        client = mqtt.Client(client_id=settings.DCMQTTID, clean_session=False, userdata={'cache': value_cache, 'command': self})
+        client = mqtt.Client(client_id=settings.DCMQTTID, clean_session=False,
+                             userdata={'cache': value_cache, 'command': self})
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)

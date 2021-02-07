@@ -1,6 +1,6 @@
-from django.http import HttpResponse, HttpResponseNotFound
-from django.shortcuts import render
 from django.conf import settings
+from django.shortcuts import render
+
 from heating.models import *
 
 
@@ -31,7 +31,7 @@ def all_zones(request):
             if z.name in request.GET:
                 dzones.append(z)
 
-    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST + "/heating/api",
                                                         'datapts': datapts,
                                                         'allzones': zones,
                                                         'zones': dzones})
@@ -52,7 +52,7 @@ def overlay(request):
     for z in dzones:
         for sensor in z.tempsensor_set.all():
             osensors.append(sensor)
-    return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST + "/heating/api",
                                                             'datapts': datapts,
                                                             'allzones': zones,
                                                             'zones': dzones,
@@ -60,4 +60,5 @@ def overlay(request):
 
 
 def test(request, zone_name):
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST, 'zone': zone_name})
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST + "/heating/api",
+                                                         'zone': zone_name})

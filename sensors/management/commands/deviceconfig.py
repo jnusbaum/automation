@@ -1,11 +1,12 @@
 import json
-from datetime import datetime
+import logging
+
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from heating.models import Device
 
-import logging
+from sensors.models import Device
+
 logger = logging.getLogger('deviceconfig')
 
 
@@ -15,8 +16,15 @@ def on_connect(client, userdata, flags, rc):
     # reconnect then subscriptions will be renewed.
     cmd = userdata['command']
     logger.info("Connected with result code " + str(rc))
-    client.subscribe('sorrelhills/device/config-request/+')
-    logger.info(f"subscribed to sorrelhills/device/config-request/+")
+    client.subscribe(f"{settings.BASETOPIC}/device/config-request/+")
+    logger.info(f"subscribed to {settings.BASETOPIC}/device/config-request/+")
+
+
+def on_disconnect(client, userdata, rc):
+    cmd = userdata['command']
+    if rc != 0:
+        logger.error("unexpected disconnect")
+    logger.info("disconnected")
 
 
 def handler(obj):
@@ -35,24 +43,26 @@ def on_message(client, userdata, msg):
     device_name = msg_pieces[-1]
     try:
         d = Device.objects.get(pk=device_name)
-        djson = {'client_id': d.client_id}
-        djson['interfaces'] = []
+        # one wire temp busses
+        djson = {'client_id': d.client_id, 'interfaces': []}
         for onew in d.onewireinterface_set.all():
-            ojson = {'pin_number': onew.pin_number}
-            ojson['sensors'] = []
+            ojson = {'pin_number': onew.pin_number, 'sensors': []}
             for s in onew.tempsensor_set.all():
                 ojson['sensors'].append({'name': s.name, 'address': s.address})
             ojson['num_sensors'] = len(ojson['sensors'])
             djson['interfaces'].append(ojson)
             djson['num_interfaces'] = len(djson['interfaces'])
+        # digital relays
+        for rnew in d.relay_set.all():
+            djson['relay'] = {'name': rnew.name, 'pin_number': rnew.pin_number}
         jload = json.dumps(djson, default=handler)
-        logger.info(f"publishing {jload} to sorrelhills/device/config/{device_name}")
-        pres = client.publish(f"sorrelhills/device/config/{device_name}", jload)
+        logger.info(f"publishing {jload} to {settings.BASETOPIC}/device/config/{device_name}")
+        pres = client.publish(f"{settings.BASETOPIC}/device/config/{device_name}", jload)
         if pres.rc != mqtt.MQTT_ERR_SUCCESS:
             logger.error(f"error = {pres.rc}")
     except Device.DoesNotExist:
         # error
-        logger.error("device does not exist")
+        logger.warning("device does not exist")
 
 
 class Command(BaseCommand):
@@ -62,6 +72,7 @@ class Command(BaseCommand):
         client = mqtt.Client(client_id=settings.DEVCFGMQTTID, userdata={'command': self})
         client.on_connect = on_connect
         client.on_message = on_message
+        client.on_disconnect = on_disconnect
         client.connect(settings.MQTTHOST)
 
         client.loop_forever()

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class Device(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
     description = models.CharField(max_length=512)
@@ -46,7 +47,7 @@ class OneWireInterface(models.Model):
 
 class TempSensor(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
-    zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, blank=True, null=True)
+
     one_wire_interface = models.ForeignKey(OneWireInterface, on_delete=models.SET_NULL, blank=True, null=True)
     address = models.CharField(max_length=128, blank=True, null=True)
     description = models.CharField(max_length=512)
@@ -68,8 +69,7 @@ class TempSensor(models.Model):
                  'type': 'TempSensor',
                  'self': f"/sensors/{self.name}",
                  'relationships': {'data': f"/sensors/{self.name}/data",
-                                    'zone': f"/zones/{self.zone.name}" if self.zone else '',
-                                    'device': f"/devices/{self.zone.name}" if self.zone else ''}
+                                   'device': f"/devices/{self.one_wire_interface.device.name}"}
                  }
         return dself
 
@@ -101,3 +101,50 @@ class TempSensorData(models.Model):
                  }
         return dself
 
+
+class Relay(models.Model):
+    name = models.CharField(max_length=64, primary_key=True)
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    pin_number = models.IntegerField()
+    description = models.CharField(max_length=512)
+
+    class Meta:
+        verbose_name = "Relay"
+        verbose_name_plural = "Relays"
+
+    def as_json(self):
+        dself = {'attributes': {'description': self.description,
+                                'pin_number': self.pin_number},
+                 'id': self.name,
+                 'type': 'Relay',
+                 'self': f"/relays/{self.name}",
+                 'relationships': {'device': f"/devices/{self.device.name}"}
+                 }
+        return dself
+
+
+class RelayData(models.Model):
+    relay = models.ForeignKey(Relay, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    value = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.relay_id}:{self.timestamp}"
+
+    class Meta:
+        verbose_name = "RelayData"
+        verbose_name_plural = "RelayData"
+        indexes = [
+            models.Index(fields=['relay', '-timestamp'], name='sensors_relay_sid_ts'),
+        ]
+
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'value': self.value,
+                                },
+                 'id': self.id,
+                 'type': 'RelayData',
+                 'self': f"/relays/{self.relay.name}/data/{self.id}",
+                 'relationships': {'relay': f"/relays/{self.relay.name}"}
+                 }
+        return dself

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'sensors.apps.SensorsConfig',
     'heating.apps.HeatingConfig',
     'hwcirc.apps.HwcircConfig',
     'django.contrib.admin',
@@ -105,10 +106,15 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'datacapture': {
+        'tempcapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/datacapture.log',
+            'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
+        },
+        'relaycapture': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/rjn/Projects/automation/log/relaycapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
@@ -117,8 +123,13 @@ LOGGING = {
         },
     },
     'loggers': {
-        'datacapture': {
-            'handlers': ['datacapture'],
+        'tempcapture': {
+            'handlers': ['tempcapture'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'relaycapture': {
+            'handlers': ['relaycapture'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -147,8 +158,16 @@ USE_TZ = False
 STATIC_URL = '/automation/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-DATASERVER_HOST = 'http://192.168.0.134/automation/api/heating'
+# DATASERVER_HOST = 'http://192.168.0.134/automation'
+# MQTTHOST = '192.168.0.134'
+# TEMPMQTTID = 'tempcapture'
+# RELAYMQTTID = 'relaycapture'
+# DEVCFGMQTTID = 'deviceconfig'
+# BASETOPIC = 'sorrelhills'
+
+DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
 MQTTHOST = '192.168.0.134'
-DCMQTTID = 'datacapture'
-DEVCFGMQTTID = 'deviceconfig'
-TOPIC = 'sorrelhills/temperature/+'
+TEMPMQTTID = 'testtempcapture'
+RELAYMQTTID = 'testrelaycapture'
+DEVCFGMQTTID = 'testdeviceconfig'
+BASETOPIC = 'sorrelhills'

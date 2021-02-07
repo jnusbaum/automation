@@ -4,14 +4,16 @@ import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from heating.models import TempSensorData
+from sensors.models import RelayData
 
 import logging
-logger = logging.getLogger('datacapture')
+
+logger = logging.getLogger('relaycapture')
 logger.setLevel('INFO')
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
+
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -19,51 +21,35 @@ def on_connect(client, userdata, flags, rc):
     logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(settings.TOPIC)
+    client.subscribe(settings.BASETOPIC + '/relay/+')
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     cmd = userdata['command']
-    cache = userdata['cache']
     # save data to db
     # zone payload is JSON object containing sensor value
     #         {
-    #             'sensor': 'BOILER-IN',
+    #             'relay': 'CIRC',
     #             'timestamp': '2020-01-11T14:33:10.772357',
-    #             'value': 142.3
+    #             'value': true
     #         }
     payload = json.loads(msg.payload)
     logger.debug(f"got mesg, payload = {payload}")
-    fsname = payload['sensor']
+    fsname = payload['relay']
     timestamp = datetime.fromtimestamp(payload['timestamp'], tz=pytz.timezone("UTC"))
     timestamp = timestamp.replace(tzinfo=None)
     value = payload['value']
-    ovalue = value
-    try:
-        prev = cache[fsname]
-        if (value < MIN_TEMP) or (abs(value - prev) > MAX_TEMP_MOVE):
-            logger.info(f"replacing {value} with {prev} for {fsname}, {timestamp}")
-            value = prev
-        else:
-            cache[fsname] = value
-    except KeyError:
-        if value < MIN_TEMP:
-            logger.info(f"replacing {value} with {MIN_TEMP} for {fsname}, {timestamp}")
-            value = MIN_TEMP
-        else:
-            cache[fsname] = value
-
-    s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
+    s = RelayData(relay=fsname, timestamp=timestamp, value=value)
     s.save()
 
 
 class Command(BaseCommand):
-    help = 'capture sensor data'
+    help = 'capture relay data'
 
     def handle(self, *args, **options):
-        value_cache = {}
-        client = mqtt.Client(client_id=settings.DCMQTTID, clean_session=False, userdata={'cache': value_cache, 'command': self})
+        client = mqtt.Client(client_id=settings.RELAYMQTTID, clean_session=False,
+                             userdata=dict(command=self))
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)

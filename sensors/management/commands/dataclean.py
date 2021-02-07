@@ -1,11 +1,12 @@
 from django.core.management.base import BaseCommand
-from heating.models import *
+from sensors.models import *
 from statistics import mean
 from decimal import *
 from datetime import timedelta
 
 MAX_TEMP_MOVE = 25
 MIN_TEMP = 25
+
 
 class Command(BaseCommand):
     help = 'clean sensor data'
@@ -25,12 +26,12 @@ class Command(BaseCommand):
                 # first pass - set any values less than MIN_TEMP to MIN_TEMP or prev
                 s = sdata[0]
                 if s.value < MIN_TEMP:
-                        s.value = Decimal(MIN_TEMP)
-                        s.save()
+                    s.value = Decimal(MIN_TEMP)
+                    s.save()
                 for i in range(1, len(sdata)):
                     s = sdata[i]
                     if s.value < MIN_TEMP:
-                        s.value = sdata[i-1].value
+                        s.value = sdata[i - 1].value
                         s.save()
                 if len(sdata) >= 4:
                     # initialize algorithm
@@ -40,19 +41,21 @@ class Command(BaseCommand):
                     if abs(val - avgval) > MAX_TEMP_MOVE:
                         # bad value
                         bad += 1
-                        self.stdout.write(f"{sensor.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
+                        self.stdout.write(
+                            f"{sensor.name}: replacing {val} with {avgval} at index 0, timestamp {sdata[0].timestamp}")
                         sdata[0].value = avgval
                         sdata[0].save()
                 for i in range(1, len(sdata)):
                     # null all clearly bad values
-                    prev = sdata[i-1].value
+                    prev = sdata[i - 1].value
                     val = sdata[i].value
                     if abs(val - prev) > MAX_TEMP_MOVE:
                         bad += 1
-                        self.stdout.write(f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
+                        self.stdout.write(
+                            f"{sensor.name}: replacing {val} with {prev} at index {i}, timestamp {sdata[i].timestamp}")
                         sdata[i].value = prev
                         sdata[i].save()
-                sensor.last_ts_checked = sdata[len(sdata)-1].timestamp
+                sensor.last_ts_checked = sdata[len(sdata) - 1].timestamp
                 sensor.last_scan_bad = bad
                 sensor.total_bad = sensor.total_bad + bad
                 sensor.save()
