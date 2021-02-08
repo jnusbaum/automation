@@ -6,7 +6,9 @@ from heating.models import *
 
 def dashboard(request):
     zones = Zone.objects.all().order_by('name')
-    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST, 'zones': zones})
+    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST,
+                                                              'allzones': zones,
+                                                              'zones': zones})
 
 
 def zone(request, zone_name):

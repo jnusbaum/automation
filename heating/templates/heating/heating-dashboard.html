@@ -112,19 +112,25 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Zones
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% for zone in zones %}
-              <a class="dropdown-item" href="{% url 'view_zone' zone.name %}">{{ zone.name }}</a>
-            {% endfor %}
-        </div>
-      </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{% url 'view_heating_dashboard' %}">Heating<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'view_hwcirc_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'view_sensors_dashboard' %}">Sensors<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Zones
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for zone in allzones %}
+                  <a class="dropdown-item" href="{% url 'view_heating_zone' zone.name %}">{{ zone.name }}</a>
+                {% endfor %}
+            </div>
+        </li>
     </ul>
   </div>
 </nav>
@@ -134,7 +140,7 @@
     <form role="form" action="/automation/dashboard/heating/all" method="get">
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'MBR' %}"><h6 class="center">MBR</h6></a>
+                <a href="{% url 'view_heating_zone' 'MBR' %}"><h6 class="center">MBR</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -142,7 +148,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'MBATH' %}"><h6 class="center">MBATH</h6></a>
+                <a href="{% url 'view_heating_zone' 'MBATH' %}"><h6 class="center">MBATH</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -150,7 +156,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'LIBRARY' %}"><h6 class="center">LIBRARY</h6></a>
+                <a href="{% url 'view_heating_zone' 'LIBRARY' %}"><h6 class="center">LIBRARY</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -230,7 +236,7 @@
 
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'KITCHEN' %}"><h6 style="text-align: center">KITCHEN</h6></a>
+                <a href="{% url 'view_heating_zone' 'KITCHEN' %}"><h6 style="text-align: center">KITCHEN</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -238,7 +244,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'LAUNDRY' %}"><h6 style="text-align: center">LAUNDRY</h6></a>
+                <a href="{% url 'view_heating_zone' 'LAUNDRY' %}"><h6 style="text-align: center">LAUNDRY</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -246,7 +252,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'GARAGE' %}"><h6 style="text-align: center">GARAGE</h6></a>
+                <a href="{% url 'view_heating_zone' 'GARAGE' %}"><h6 style="text-align: center">GARAGE</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -326,7 +332,7 @@
 
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'FAMILY' %}"><h6 style="text-align: center">FAMILY ROOM</h6></a>
+                <a href="{% url 'view_heating_zone' 'FAMILY' %}"><h6 style="text-align: center">FAMILY ROOM</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -334,7 +340,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'OFFICE' %}"><h6 style="text-align: center">OFFICE</h6></a>
+                <a href="{% url 'view_heating_zone' 'OFFICE' %}"><h6 style="text-align: center">OFFICE</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -342,7 +348,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'EXERCISE' %}"><h6 style="text-align: center">EXERCISE</h6></a>
+                <a href="{% url 'view_heating_zone' 'EXERCISE' %}"><h6 style="text-align: center">EXERCISE</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -422,7 +428,7 @@
 
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'GUEST' %}"><h6 style="text-align: center">GUEST BR</h6></a>
+                <a href="{% url 'view_heating_zone' 'GUEST' %}"><h6 style="text-align: center">GUEST BR</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -460,7 +466,7 @@
 
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'VALVE' %}"><h6 style="text-align: center">VALVE</h6></a>
+                <a href="{% url 'view_heating_zone' 'VALVE' %}"><h6 style="text-align: center">VALVE</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -468,7 +474,7 @@
                 </div>
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'BOILER' %}"><h6 style="text-align: center">BOILER</h6></a>
+                <a href="{% url 'view_heating_zone' 'BOILER' %}"><h6 style="text-align: center">BOILER</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -536,7 +542,7 @@
 
         <div class="row mt-5">
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'WHEAT1' %}"><h6 style="text-align: center">WATER HEATER 1</h6></a>
+                <a href="{% url 'view_heating_zone' 'WHEAT1' %}"><h6 style="text-align: center">WATER HEATER 1</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">
@@ -546,7 +552,7 @@
             <div class="col-lg-2 col-xl-1">
             </div>
             <div class="col-lg-2 col-xl-1">
-                <a href="{% url 'view_zone' 'WHEAT2' %}"><h6 style="text-align: center">WATER HEATER 2</h6></a>
+                <a href="{% url 'view_heating_zone' 'WHEAT2' %}"><h6 style="text-align: center">WATER HEATER 2</h6></a>
             </div>
             <div class="col-lg-2 col-xl-1">
                 <div class="checkbox center">

@@ -16,11 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from . import views
+
 urlpatterns = [
+    path('automation/', views.dashboard, name='view_automation_dashboard'),
     path('automation/admin/', admin.site.urls),
     path('automation/sensors/dashboard/', include('sensors.urls')),
     path('automation/sensors/api/', include('sensors.api-urls')),
     path('automation/heating/dashboard/', include('heating.urls')),
     path('automation/heating/api/', include('heating.api-urls')),
-    # path('automation/hwcirc/dashboard/', include('hwcirc.urls')),
+    path('automation/hwcirc/dashboard/', include('hwcirc.urls')),
 ]

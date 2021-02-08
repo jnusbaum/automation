@@ -56,7 +56,10 @@ ROOT_URLCONF = 'automation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'heating/templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'automation/templates'),
+                 os.path.join(BASE_DIR, 'heating/templates'),
+                 os.path.join(BASE_DIR, 'hwcirc/templates'),
+                 os.path.join(BASE_DIR, 'sensors/templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {

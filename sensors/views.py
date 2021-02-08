@@ -5,7 +5,7 @@ from sensors.models import *
 
 
 def dashboard(request):
-    pass
+    return render(request, 'sensors/sensors-dashboard.html')
 
 def all_sensors(request):
     pass
