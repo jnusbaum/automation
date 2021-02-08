@@ -22,6 +22,33 @@ class Device(models.Model):
         return dself
 
 
+class DeviceStatus(models.Model):
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=512)
+
+    def __str__(self):
+        return f"{self.device_id}:{self.timestamp}"
+
+    class Meta:
+        verbose_name = "DeviceStatus"
+        verbose_name_plural = "DeviceStatus"
+        indexes = [
+            models.Index(fields=['device', '-timestamp'], name='sensors_device_sid_ts'),
+        ]
+
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'status': self.status,
+                                },
+                 'id': self.id,
+                 'type': 'DeviceStatus',
+                 'self': f"/relays/{self.device.name}/data/{self.id}",
+                 'relationships': {'relay': f"/devices/{self.device.name}"}
+                 }
+        return dself
+
+
 class OneWireInterface(models.Model):
     description = models.CharField(max_length=512)
     pin_number = models.IntegerField()
