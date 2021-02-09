@@ -25,7 +25,7 @@
             let args = { 'starttime': sts.toISOString(),
                 'endtime': charts[zone].ts.toISOString(),
                 'datapts': MAXPTS};
-            $.getJSON('{{ host }}/zones/' + zone + '/data', args,
+            $.getJSON('{{ host }}/heating/api/zones/' + zone + '/data', args,
                 function(resp) {
                     for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
                         let numpts = sensor_data.count;
@@ -120,7 +120,7 @@
                 'endtime': charts[zone].ts.toISOString(),
                 'datapts': MAXPTS
             };
-            $.getJSON('{{ host }}/zones/' + zone + '/data', args,
+            $.getJSON('{{ host }}/heating/api/zones/' + zone + '/data', args,
                 function (resp) {
                     for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
                         let numpts = sensor_data.count;

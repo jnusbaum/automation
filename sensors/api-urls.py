@@ -10,7 +10,7 @@ urlpatterns = [
     path('devices/<device_name>/data', api.device_data, name='api_device_data'),
     path('devices/<device_name>/config', api.device_config, name='api_device_config'),
     # sensor
-    path('sensor', api.sensors, name='api_sensors'),
-    path('sensor/<sensor_name>', api.sensor, name='api_sensor'),
-    path('sensor/<sensor_name>/data', api.sensor_data, name='api_sensor_data'),
+    path('sensors', api.sensors, name='api_sensors'),
+    path('sensors/<sensor_name>', api.sensor, name='api_sensor'),
+    path('sensors/<sensor_name>/data', api.sensor_data, name='api_sensor_data'),
 ]

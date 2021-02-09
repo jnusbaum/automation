@@ -99,7 +99,7 @@
               let args = { 'starttime': sts.toISOString(),
                            'endtime': ts['{{ sensor.name }}'].toISOString(),
                            'datapts': 9000};
-              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}updateData);
+              $.getJSON('{{ host }}/sensors/api/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}updateData);
           }
 
           function {{ sensor.name|cut:"-" }}loadData(adata) {
@@ -115,7 +115,7 @@
               let args = {'starttime': sts.toISOString(),
                           'endtime': ts['{{ sensor.name }}'].toISOString(),
                           'datapts': 9000};
-              $.getJSON('{{ host }}/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}loadData);
+              $.getJSON('{{ host }}/sensors/api/sensors/{{ sensor.name }}/data', args, {{ sensor.name|cut:"-" }}loadData);
           }
       {%  endfor %}
 

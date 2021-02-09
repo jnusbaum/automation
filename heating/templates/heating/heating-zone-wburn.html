@@ -161,7 +161,7 @@
         function startUpdate() {
 		    let sts = new Date(ts);
             ts = new Date();
-            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
                 { 'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
                 updateData);
         }
@@ -215,7 +215,7 @@
             let sts = new Date();
             ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/zones/{{ zone }}/data',
+            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
                 {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
                 startData);
         }

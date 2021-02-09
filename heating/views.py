@@ -33,7 +33,7 @@ def all_zones(request):
             if z.name in request.GET:
                 dzones.append(z)
 
-    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST + "/heating/api",
+    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
                                                         'datapts': datapts,
                                                         'allzones': zones,
                                                         'zones': dzones})
@@ -52,9 +52,9 @@ def overlay(request):
                 dzones.append(z)
     osensors = []
     for z in dzones:
-        for sensor in z.tempsensor_set.all():
+        for sensor in z.sensors.all():
             osensors.append(sensor)
-    return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST + "/heating/api",
+    return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST,
                                                             'datapts': datapts,
                                                             'allzones': zones,
                                                             'zones': dzones,
@@ -62,5 +62,5 @@ def overlay(request):
 
 
 def test(request, zone_name):
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST + "/heating/api",
+    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST,
                                                          'zone': zone_name})
