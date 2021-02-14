@@ -5,7 +5,9 @@ from sensors.models import TempSensor, Relay
 class WaterHeater(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
     description = models.CharField(max_length=512)
-    sensors = models.ManyToManyField(TempSensor)
+    sensor_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
+    sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
+    sensor_burn = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
 
     class Meta:
         verbose_name = "WaterHeater"
@@ -16,7 +18,7 @@ class WaterHeater(models.Model):
                  'id': self.name,
                  'type': 'WaterHeater',
                  'self': f"/zones/{self.name}",
-                 'relationships': {'sensors': f"/sensors/zone/{self.name}"}
+                 'relationships': {'sensor_in': f"/sensors/zone/{self.name}"}
                  }
         return dself
 
@@ -24,8 +26,8 @@ class WaterHeater(models.Model):
 class CircPump(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
     description = models.CharField(max_length=512)
-    sensor = models.OneToOneField(TempSensor)
-    relay = models.OneToOneField(Relay)
+    sensor = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
+    relay = models.OneToOneField(Relay, related_name='+', on_delete=models.RESTRICT)
 
     class Meta:
         verbose_name = "CircPump"

@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/mnt/db/sqlite/automation.sqlite',
+        'NAME': './sqlite/automation.sqlite',
     }
 }
 
@@ -112,17 +112,17 @@ LOGGING = {
         'tempcapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
+            'filename': './log/tempcapture.log',
         },
         'relaycapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/relaycapture.log',
+            'filename': './log/relaycapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/deviceconfig.log',
+            'filename': './log/deviceconfig.log',
         },
     },
     'loggers': {
