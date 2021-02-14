@@ -161,6 +161,8 @@ USE_TZ = False
 STATIC_URL = '/automation/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# app specific settings - should they be here?
+
 # DATASERVER_HOST = 'http://192.168.0.134/automation'
 # MQTTHOST = '192.168.0.134'
 # TEMPMQTTID = 'tempcapture'

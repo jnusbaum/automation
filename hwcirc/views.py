@@ -1,7 +1,11 @@
-from django.conf import settings
+from . import settings
 from django.shortcuts import render
+
+from sensors.models import Device
 
 
 def dashboard(request):
-    return render(request, 'hwcirc/hwcirc-dashboard.html')
+    device = Device.objects.get(id=settings.HWCIRCDEVICE)
+    return render(request, 'hwcirc/hwcirc-dashboard.html',
+                          {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
 
