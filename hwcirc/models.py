@@ -18,7 +18,9 @@ class WaterHeater(models.Model):
                  'id': self.name,
                  'type': 'WaterHeater',
                  'self': f"/zones/{self.name}",
-                 'relationships': {'sensor_in': f"/sensors/zone/{self.name}"}
+                 'relationships': {'sensor_in': f"/sensors/{self.sensor_in.name}",
+                                   'sensor_out': f"/sensors/{self.sensor_out.name}",
+                                   'sensor_burn': f"/sensors/{self.sensor_burn.name}"},
                  }
         return dself
 
@@ -38,6 +40,7 @@ class CircPump(models.Model):
                  'id': self.name,
                  'type': 'CircPump',
                  'self': f"/circpumps/{self.name}",
-                 'relationships': {'sensors': f"/sensors/zone/{self.name}"}
+                 'relationships': {'sensor': f"/sensors/{self.sensor.name}",
+                                   'relay': f"/relays/{self.relay.name}"},
                  }
         return dself
