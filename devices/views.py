@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.shortcuts import render
 
-from sensors.models import *
+from devices.models import *
 
 
 def dashboard(request):
-    return render(request, 'sensors/sensors-dashboard.html')
+    return render(request, 'devices/devices-dashboard.html')
 
 def all_sensors(request):
     pass

@@ -1,8 +1,5 @@
 from heating.models import *
-from sensors.api import *
-
-MAX_TEMP_MOVE = 25
-MIN_TEMP = 30
+from devices.api import *
 
 
 class JsonResponseNoContent(HttpResponse):
@@ -86,7 +83,7 @@ def sensors_for_zone(zone_name):
         z = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    # sensors for zone
+    # devices for zone
     rsensors = {'count': len(z.sensors), 'data': [s.as_json for s in z.sensors]}
     return JsonResponse(data=rsensors)
 
@@ -178,5 +175,83 @@ def boiler_data(request, boiler_name):
         return JsonResponseNotFound(reason="No Boiler with the specified id was found.")
     dseries = {}
     dseries['sensor_in'] = get_sensor_data(request, z.sensor_in)
+    dseries['sensor_out'] = get_sensor_data(request, z.sensor_out)
+    dseries['sensor_burn'] = get_sensor_data(request, z.sensor_burn)
+    rsensordata = {'count': 1, 'data': dseries}
+    return JsonResponse(data=rsensordata)
+
+
+# MixingValves
+
+def mixingvalves(request):
+    if request.method == 'POST':
+        try:
+            valve_name = request.POST['name']
+        except KeyError:
+            return JsonResponseBadRequest(reason="No name parameter supplied.")
+        # if POST add new mixingvalve
+        try:
+            MixingValve.objects.get(pk=valve_name)
+            return JsonResponseBadRequest(reason="MixingValve with supplied name already exists.")
+        except MixingValve.DoesNotExist:
+            description = request.POST.get('description', default=None)
+            sensor_sys_in = request.POST.get('sensor_sys_in', default=None)
+            sensor_out = request.POST.get('sensor_out', default=None)
+            sensor_boiler_in = request.POST.get('sensor_booiler_in', default=None)
+            z = MixingValve(name=valve_name, description=description,
+                       sensor_sys_in_id=sensor_sys_in,
+                       sensor_out_id=sensor_out,
+                       sensor_boiler_in_id=sensor_boiler_in)
+            z.save()
+            return JsonResponseCreated()
+    else:
+        # if GET return list of mixingvalves
+        zns = MixingValve.objects.all().order_by('name')
+        rmixingvalves = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        return JsonResponse(data=rmixingvalves)
+
+
+def mixingvalve(request, valve_name):
+    try:
+        z = MixingValve.objects.get(pk=valve_name)
+    except MixingValve.DoesNotExist:
+        return JsonResponseNotFound(reason="No MixingValve with the specified id was found.")
+    if request.method == 'PATCH':
+        # if PATCH add data for mixingvalve
+        # can't change pk (name)
+        try:
+            z.description = request.POST.get('description', default=z.description)
+            z.sensor_sys_in_id = request.POST.get('sensor_sys_in', default=z.sensor_sys_in_id)
+            z.sensor_out_id = request.POST.get('sensor_out', default=z.sensor_out_id)
+            z.sensor_boiler_in_id = request.POST.get('sensor_boiler_in', default=z.sensor_boiler_in_id)
+            z.save()
+        except KeyError:
+            pass
+        z.save()
+        return JsonResponseNoContent()
+    elif request.method == 'DELETE':
+        # if DELETE delete sensor
+        z.delete()
+        return JsonResponseNoContent()
+    else:
+        # if GET get mixingvalve meta data
+        rmixingvalve = {'count': 1, 'data': [z.as_json()]}
+        return JsonResponse(data=rmixingvalve)
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def mixingvalve_data(request, valve_name):
+    # if GET get mixingvalve meta data
+    try:
+        z = MixingValve.objects.get(pk=valve_name)
+    except MixingValve.DoesNotExist:
+        return JsonResponseNotFound(reason="No MixingValve with the specified id was found.")
+    dseries = {}
+    dseries['sensor_sys_in'] = get_sensor_data(request, z.sensor_sys_in)
+    dseries['sensor_out'] = get_sensor_data(request, z.sensor_out)
+    dseries['sensor_boiler_in'] = get_sensor_data(request, z.sensor_boiler_in)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from sensors.models import *
+from devices.models import *
 from statistics import mean
 from decimal import *
 from datetime import timedelta

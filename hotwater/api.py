@@ -1,8 +1,5 @@
-from hwcirc.models import *
-from sensors.api import *
-
-MAX_TEMP_MOVE = 25
-MIN_TEMP = 30
+from hotwater.models import *
+from devices.api import *
 
 
 class JsonResponseNoContent(HttpResponse):
@@ -31,38 +28,49 @@ class JsonResponseBadRequest(JsonResponse):
         super().__init__(status=HTTPStatus.BAD_REQUEST, data={'error': reason})
 
 
+# WaterHeaters
+
 def waterheaters(request):
     if request.method == 'POST':
         try:
             heater_name = request.POST['name']
         except KeyError:
             return JsonResponseBadRequest(reason="No name parameter supplied.")
-        # if POST add new heater
+        # if POST add new waterheater
         try:
             WaterHeater.objects.get(pk=heater_name)
-            return JsonResponseBadRequest(reason="Zone with supplied name already exists.")
+            return JsonResponseBadRequest(reason="WaterHeater with supplied name already exists.")
         except WaterHeater.DoesNotExist:
             description = request.POST.get('description', default=None)
-            z = WaterHeater(name=heater_name, description=description)
+            sensor_in = request.POST.get('sensor_in', default=None)
+            sensor_out = request.POST.get('sensor_out', default=None)
+            sensor_burn = request.POST.get('sensor_burn', default=None)
+            z = WaterHeater(name=heater_name, description=description,
+                       sensor_in_id=sensor_in,
+                       sensor_out_id=sensor_out,
+                       sensor_burn_id=sensor_burn)
             z.save()
             return JsonResponseCreated()
     else:
-        # if GET return list of heaters
+        # if GET return list of waterheaters
         zns = WaterHeater.objects.all().order_by('name')
-        rheaters = {'count': len(zns), 'data': [z.as_json() for z in zns]}
-        return JsonResponse(data=rheaters)
+        rwaterheaters = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        return JsonResponse(data=rwaterheaters)
 
 
 def waterheater(request, heater_name):
     try:
         z = WaterHeater.objects.get(pk=heater_name)
     except WaterHeater.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
+        return JsonResponseNotFound(reason="No WaterHeater with the specified id was found.")
     if request.method == 'PATCH':
-        # if PATCH add data for heater
+        # if PATCH add data for waterheater
         # can't change pk (name)
         try:
-            z.description = request.POST['description']
+            z.description = request.POST.get('description', default=z.description)
+            z.sensor_in_id = request.POST.get('sensor_in', default=z.sensor_in_id)
+            z.sensor_out_id = request.POST.get('sensor_out', default=z.sensor_out_id)
+            z.sensor_burn_id = request.POST.get('sensor_burn', default=z.sensor_burn_id)
             z.save()
         except KeyError:
             pass
@@ -73,20 +81,9 @@ def waterheater(request, heater_name):
         z.delete()
         return JsonResponseNoContent()
     else:
-        # if GET get heater meta data
-        rheater = {'count': 1, 'data': [z.as_json()]}
-        return JsonResponse(data=rheater)
-
-
-def sensors_for_waterheater(heater_name):
-    # if GET get heater meta data
-    try:
-        z = WaterHeater.objects.get(pk=heater_name)
-    except WaterHeater.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    # sensors for heater
-    rsensors = {'count': len(z.sensors), 'data': [s.as_json for s in z.sensors]}
-    return JsonResponse(data=rsensors)
+        # if GET get waterheater meta data
+        rwaterheater = {'count': 1, 'data': [z.as_json()]}
+        return JsonResponse(data=rwaterheater)
 
 
 # url options for GET
@@ -94,17 +91,20 @@ def sensors_for_waterheater(heater_name):
 # datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
 # default is to get latest sensor reading for sensor
 def waterheater_data(request, heater_name):
-    # if GET get heater meta data
+    # if GET get waterheater meta data
     try:
         z = WaterHeater.objects.get(pk=heater_name)
     except WaterHeater.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
+        return JsonResponseNotFound(reason="No WaterHeater with the specified id was found.")
     dseries = {}
-    for s in z.sensors.all():
-        dseries[s.name] = get_sensor_data(request, s)
+    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
+    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
+    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
+
+# CircPumps
 
 def circpumps(request):
     if request.method == 'POST':
@@ -112,32 +112,41 @@ def circpumps(request):
             pump_name = request.POST['name']
         except KeyError:
             return JsonResponseBadRequest(reason="No name parameter supplied.")
-        # if POST add new pump
+        # if POST add new circpump
         try:
             CircPump.objects.get(pk=pump_name)
-            return JsonResponseBadRequest(reason="Zone with supplied name already exists.")
+            return JsonResponseBadRequest(reason="CircPump with supplied name already exists.")
         except CircPump.DoesNotExist:
             description = request.POST.get('description', default=None)
-            z = CircPump(name=pump_name, description=description)
+            sensor_in = request.POST.get('sensor_in', default=None)
+            sensor_out = request.POST.get('sensor_out', default=None)
+            sensor_burn = request.POST.get('sensor_burn', default=None)
+            z = CircPump(name=pump_name, description=description,
+                       sensor_in_id=sensor_in,
+                       sensor_out_id=sensor_out,
+                       sensor_burn_id=sensor_burn)
             z.save()
             return JsonResponseCreated()
     else:
-        # if GET return list of pumps
+        # if GET return list of circpumps
         zns = CircPump.objects.all().order_by('name')
-        rpumps = {'count': len(zns), 'data': [z.as_json() for z in zns]}
-        return JsonResponse(data=rpumps)
+        rcircpumps = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        return JsonResponse(data=rcircpumps)
 
 
 def circpump(request, pump_name):
     try:
         z = CircPump.objects.get(pk=pump_name)
     except CircPump.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
+        return JsonResponseNotFound(reason="No CircPump with the specified id was found.")
     if request.method == 'PATCH':
-        # if PATCH add data for pump
+        # if PATCH add data for circpump
         # can't change pk (name)
         try:
-            z.description = request.POST['description']
+            z.description = request.POST.get('description', default=z.description)
+            z.sensor_in_id = request.POST.get('sensor_in', default=z.sensor_in_id)
+            z.sensor_out_id = request.POST.get('sensor_out', default=z.sensor_out_id)
+            z.sensor_burn_id = request.POST.get('sensor_burn', default=z.sensor_burn_id)
             z.save()
         except KeyError:
             pass
@@ -148,20 +157,9 @@ def circpump(request, pump_name):
         z.delete()
         return JsonResponseNoContent()
     else:
-        # if GET get pump meta data
-        rpump = {'count': 1, 'data': [z.as_json()]}
-        return JsonResponse(data=rpump)
-
-
-def sensor_for_circpump(pump_name):
-    # if GET get pump meta data
-    try:
-        z = CircPump.objects.get(pk=pump_name)
-    except CircPump.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    # sensors for pump
-    rsensors = {'count': 1, 'data': [z.sensor.as_json]}
-    return JsonResponse(data=rsensors)
+        # if GET get circpump meta data
+        rcircpump = {'count': 1, 'data': [z.as_json()]}
+        return JsonResponse(data=rcircpump)
 
 
 # url options for GET
@@ -169,13 +167,14 @@ def sensor_for_circpump(pump_name):
 # datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
 # default is to get latest sensor reading for sensor
 def circpump_data(request, pump_name):
-    # if GET get pump meta data
+    # if GET get circpump meta data
     try:
         z = CircPump.objects.get(pk=pump_name)
     except CircPump.DoesNotExist:
-        return JsonResponseNotFound(reason="No Zone with the specified id was found.")
+        return JsonResponseNotFound(reason="No CircPump with the specified id was found.")
     dseries = {}
-    dseries[z.sensor.name] = get_sensor_data(request, z.sensor)
+    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
+    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
+    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
-

@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from sensors.models import Device
+from devices.models import Device
 
 logger = logging.getLogger('deviceconfig')
 
@@ -46,10 +46,10 @@ def on_message(client, userdata, msg):
         # one wire temp busses
         djson = {'client_id': d.client_id, 'interfaces': []}
         for onew in d.onewireinterface_set.all():
-            ojson = {'pin_number': onew.pin_number, 'sensors': []}
+            ojson = {'pin_number': onew.pin_number, 'devices': []}
             for s in onew.tempsensor_set.all():
-                ojson['sensors'].append({'name': s.name, 'address': s.address})
-            ojson['num_sensors'] = len(ojson['sensors'])
+                ojson['devices'].append({'name': s.name, 'address': s.address})
+            ojson['num_sensors'] = len(ojson['devices'])
             djson['interfaces'].append(ojson)
             djson['num_interfaces'] = len(djson['interfaces'])
         # digital relays

@@ -31,9 +31,9 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'sensors.apps.SensorsConfig',
+    'devices.apps.DevicesConfig',
     'heating.apps.HeatingConfig',
-    'hwcirc.apps.HwcircConfig',
+    'hotwater.apps.HotwaterConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,8 +58,8 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'automation/templates'),
                  os.path.join(BASE_DIR, 'heating/templates'),
-                 os.path.join(BASE_DIR, 'hwcirc/templates'),
-                 os.path.join(BASE_DIR, 'sensors/templates')]
+                 os.path.join(BASE_DIR, 'hotwater/templates'),
+                 os.path.join(BASE_DIR, 'devices/templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {

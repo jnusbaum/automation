@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 # Register your models here.
-from sensors.models import Device, OneWireInterface, TempSensor, TempSensorData, Relay, RelayData
+from devices.models import Device, DeviceStatus, OneWireInterface, TempSensor, TempSensorData, Relay, RelayData
 
 
 @admin.register(Device)
@@ -20,6 +20,38 @@ class DeviceAdmin(admin.ModelAdmin):
         'client_id',
         # 'device_actions',
     )
+
+
+@admin.register(DeviceStatus)
+class DeviceStatusAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'timestamp',
+        'status',
+        'device_link',
+    )
+
+    fields = ('id',
+              'timestamp',
+              'status',
+              'device'
+    )
+
+    readonly_fields = (
+        'id',
+        'timestamp',
+        'device'
+    )
+
+    def device_link(self, obj):
+        if obj.device:
+            return format_html('<a href="{}">{}</a>',
+                               reverse("admin:devices_device_change", args=(obj.device.pk,)),
+                               obj.device.pk)
+        else:
+            return format_html('-')
+
+    device_link.short_description = 'Device'
 
 
 @admin.register(OneWireInterface)
@@ -41,7 +73,7 @@ class OneWireInterfaceAdmin(admin.ModelAdmin):
     )
 
     def device_link(self, obj):
-        return format_html('<a href="{}">{}</a>', reverse("admin:sensors_device_change", args=(obj.device.pk,)),
+        return format_html('<a href="{}">{}</a>', reverse("admin:devices_device_change", args=(obj.device.pk,)),
                            obj.device.pk)
 
     device_link.short_description = 'Device'
@@ -72,7 +104,7 @@ class TempSensorAdmin(admin.ModelAdmin):
     def interface_link(self, obj):
         if obj.one_wire_interface:
             return format_html('<a href="{}">{}</a>',
-                               reverse("admin:sensors_onewireinterface_change", args=(obj.one_wire_interface.pk,)),
+                               reverse("admin:devices_onewireinterface_change", args=(obj.one_wire_interface.pk,)),
                                obj.one_wire_interface.description)
         else:
             return format_html('-')
@@ -94,18 +126,18 @@ class TempSensorDataAdmin(admin.ModelAdmin):
               'timestamp',
               'value',
               'original_value',
-              'sensor_link',)
+              'sensor',)
 
     readonly_fields = (
         'id',
         'timestamp',
-        'sensor_link',
+        'sensor',
     )
 
     def sensor_link(self, obj):
         if obj.sensor:
             return format_html('<a href="{}">{}</a>',
-                               reverse("admin:sensors_tempsensor_change", args=(obj.sensor.pk,)),
+                               reverse("admin:devices_tempsensor_change", args=(obj.sensor.pk,)),
                                obj.sensor.pk)
         else:
             return format_html('-')
@@ -117,7 +149,7 @@ class TempSensorDataAdmin(admin.ModelAdmin):
 class RelayAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'device',
+        'device_link',
         'pin_number',
         'description',
     )
@@ -128,6 +160,12 @@ class RelayAdmin(admin.ModelAdmin):
         'pin_number',
         'description',
     )
+
+    def device_link(self, obj):
+        return format_html('<a href="{}">{}</a>', reverse("admin:devices_device_change", args=(obj.device.pk,)),
+                           obj.device.pk)
+
+    device_link.short_description = 'Device'
 
 
 @admin.register(RelayData)
@@ -142,18 +180,18 @@ class RelayDataAdmin(admin.ModelAdmin):
     fields = ('id',
               'timestamp',
               'value',
-              'relay_link',)
+              'relay',)
 
     readonly_fields = (
         'id',
         'timestamp',
-        'relay_link',
+        'relay',
     )
 
     def relay_link(self, obj):
         if obj.relay:
             return format_html('<a href="{}">{}</a>',
-                               reverse("admin:sensors_relay_change", args=(obj.relay.pk,)),
+                               reverse("admin:devices_relay_change", args=(obj.relay.pk,)),
                                obj.relay.pk)
         else:
             return format_html('-')

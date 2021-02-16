@@ -4,7 +4,7 @@ import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from sensors.models import RelayData
+from devices.models import RelayData
 
 import logging
 

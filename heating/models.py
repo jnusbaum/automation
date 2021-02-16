@@ -1,5 +1,5 @@
 from django.db import models
-from sensors.models import TempSensor
+from devices.models import TempSensor
 
 
 class Boiler(models.Model):
@@ -18,9 +18,9 @@ class Boiler(models.Model):
                  'id': self.name,
                  'type': 'Boiler',
                  'self': f"/boilers/{self.name}",
-                 'relationships': {'sensor_in': f"/sensors/{self.sensor_in.name}",
-                                   'sensor_out': f"/sensors/{self.sensor_out.name}",
-                                   'sensor_burn': f"/sensors/{self.sensor_burn.name}"},
+                 'relationships': {'sensor_in': f"/devices/{self.sensor_in.name}",
+                                   'sensor_out': f"/devices/{self.sensor_out.name}",
+                                   'sensor_burn': f"/devices/{self.sensor_burn.name}"},
                  }
         return dself
 
@@ -41,9 +41,9 @@ class MixingValve(models.Model):
                  'id': self.name,
                  'type': 'MixingValve',
                  'self': f"/mixingvalves/{self.name}",
-                 'relationships': {'sensor_sys_in': f"/sensors/{self.sensor_sys_in.name}",
-                                   'sensor_out': f"/sensors/{self.sensor_out.name}",
-                                   'sensor_boiler_in': f"/sensors/{self.sensor_boiler_in.name}"},
+                 'relationships': {'sensor_sys_in': f"/devices/{self.sensor_sys_in.name}",
+                                   'sensor_out': f"/devices/{self.sensor_out.name}",
+                                   'sensor_boiler_in': f"/devices/{self.sensor_boiler_in.name}"},
                  }
         return dself
 
@@ -62,6 +62,6 @@ class Zone(models.Model):
                  'id': self.name,
                  'type': 'Zone',
                  'self': f"/zones/{self.name}",
-                 'relationships': {'sensors': f"/sensors/zone/{self.name}"}
+                 'relationships': {'devices': f"/devices/zone/{self.name}"}
                  }
         return dself

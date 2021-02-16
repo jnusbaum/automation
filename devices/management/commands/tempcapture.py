@@ -4,11 +4,11 @@ import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from sensors.models import DeviceStatus
+from devices.models import TempSensorData
 
 import logging
 
-logger = logging.getLogger('devstatuscapture')
+logger = logging.getLogger('tempcapture')
 logger.setLevel('INFO')
 
 MAX_TEMP_MOVE = 25
@@ -21,41 +21,52 @@ def on_connect(client, userdata, flags, rc):
     logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(settings.BASETOPIC + '/device/status/+')
+    client.subscribe(settings.BASETOPIC + '/temperature/+')
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     cmd = userdata['command']
+    cache = userdata['cache']
     # save data to db
     # zone payload is JSON object containing sensor value
     #         {
-    #             'device': 'CIRC',
+    #             'sensor': 'BOILER-IN',
     #             'timestamp': '2020-01-11T14:33:10.772357',
-    #             'status': 'RUNNING'
+    #             'value': 142.3
     #         }
     payload = json.loads(msg.payload)
     logger.debug(f"got mesg, payload = {payload}")
-    try:
-        fsname = payload['device']
-    except KeyError:
-        # old format status
-        # get device name from topic
-        tcomp = msg.topic.split('/')
-        fsname = tcomp[-1]
+    fsname = payload['sensor']
     timestamp = datetime.fromtimestamp(payload['timestamp'], tz=pytz.timezone("UTC"))
     timestamp = timestamp.replace(tzinfo=None)
-    status = payload['status']
-    s = DeviceStatus(device_id=fsname, timestamp=timestamp, status=status)
+    value = payload['value']
+    ovalue = value
+    try:
+        prev = cache[fsname]
+        if (value < MIN_TEMP) or (abs(value - prev) > MAX_TEMP_MOVE):
+            logger.info(f"replacing {value} with {prev} for {fsname}, {timestamp}")
+            value = prev
+        else:
+            cache[fsname] = value
+    except KeyError:
+        if value < MIN_TEMP:
+            logger.info(f"replacing {value} with {MIN_TEMP} for {fsname}, {timestamp}")
+            value = MIN_TEMP
+        else:
+            cache[fsname] = value
+
+    s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
     s.save()
 
 
 class Command(BaseCommand):
-    help = 'capture device status data'
+    help = 'capture sensor data'
 
     def handle(self, *args, **options):
-        client = mqtt.Client(client_id=settings.DEVSTATUSMQTTID, clean_session=False,
-                             userdata=dict(command=self))
+        value_cache = {}
+        client = mqtt.Client(client_id=settings.TEMPMQTTID, clean_session=False,
+                             userdata={'cache': value_cache, 'command': self})
         client.on_connect = on_connect
         client.on_message = on_message
         client.connect(settings.MQTTHOST)

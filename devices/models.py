@@ -17,7 +17,7 @@ class Device(models.Model):
                  'id': self.name,
                  'type': 'Device',
                  'self': f"/devices/{self.name}",
-                 'relationships': {'sensors': f"/sensors/device/{self.name}"}
+                 'relationships': {'devices': f"/devices/device/{self.name}"}
                  }
         return dself
 
@@ -43,8 +43,8 @@ class DeviceStatus(models.Model):
                                 },
                  'id': self.id,
                  'type': 'DeviceStatus',
-                 'self': f"/relays/{self.device.name}/data/{self.id}",
-                 'relationships': {'relay': f"/devices/{self.device.name}"}
+                 'self': f"automation/devices/api/devices/{self.device.name}/data/{self.id}",
+                 'relationships': {'relay': f"automation/devices/api/devices/{self.device.name}"}
                  }
         return dself
 
@@ -66,8 +66,8 @@ class OneWireInterface(models.Model):
                                 'pin_number': self.pin_number},
                  'id': self.id,
                  'type': 'OneWireInterface',
-                 'self': f"/onewireinterfaces/{self.id}",
-                 'relationships': {'device': f"/devices/{self.device.name}"}
+                 'self': f"automation/devices/api/onewireinterfaces/{self.id}",
+                 'relationships': {'device': f"automation/devices/api/devices/{self.device.name}"}
                  }
         return dself
 
@@ -94,8 +94,8 @@ class TempSensor(models.Model):
                                 'last_ts_checked': self.last_ts_checked},
                  'id': self.name,
                  'type': 'TempSensor',
-                 'self': f"/sensors/{self.name}",
-                 'relationships': {'data': f"/sensors/{self.name}/data",
+                 'self': f"/devices/{self.name}",
+                 'relationships': {'data': f"/devices/{self.name}/data",
                                    'device': f"/devices/{self.one_wire_interface.device.name}"}
                  }
         return dself
@@ -123,8 +123,8 @@ class TempSensorData(models.Model):
                                 'original_value': self.original_value},
                  'id': self.id,
                  'type': 'TempSensorData',
-                 'self': f"/sensors/{self.sensor.name}/data/{self.id}",
-                 'relationships': {'sensor': f"/sensors/{self.sensor.name}"}
+                 'self': f"/devices/{self.sensor.name}/data/{self.id}",
+                 'relationships': {'sensor': f"/devices/{self.sensor.name}"}
                  }
         return dself
 

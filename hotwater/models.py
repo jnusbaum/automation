@@ -1,5 +1,5 @@
 from django.db import models
-from sensors.models import TempSensor, Relay
+from devices.models import TempSensor, Relay
 
 
 class WaterHeater(models.Model):
@@ -18,9 +18,9 @@ class WaterHeater(models.Model):
                  'id': self.name,
                  'type': 'WaterHeater',
                  'self': f"/zones/{self.name}",
-                 'relationships': {'sensor_in': f"/sensors/{self.sensor_in.name}",
-                                   'sensor_out': f"/sensors/{self.sensor_out.name}",
-                                   'sensor_burn': f"/sensors/{self.sensor_burn.name}"},
+                 'relationships': {'sensor_in': f"automation/devices/api/tempsensors/{self.sensor_in.name}",
+                                   'sensor_out': f"automation/devices/api/tempsensors/{self.sensor_out.name}",
+                                   'sensor_burn': f"automation/devices/api/tempsensors/{self.sensor_burn.name}"},
                  }
         return dself
 
@@ -33,14 +33,14 @@ class CircPump(models.Model):
 
     class Meta:
         verbose_name = "CircPump"
-        verbose_name_plural = "CircPumpss"
+        verbose_name_plural = "CircPumps"
 
     def as_json(self):
         dself = {'attributes': {'description': self.description},
                  'id': self.name,
                  'type': 'CircPump',
                  'self': f"/circpumps/{self.name}",
-                 'relationships': {'sensor': f"/sensors/{self.sensor.name}",
-                                   'relay': f"/relays/{self.relay.name}"},
+                 'relationships': {'sensor': f"automation/devices/api/tempsensors/{self.sensor.name}",
+                                   'relay': f"automation/devices/api/relays/{self.relay.name}"},
                  }
         return dself
