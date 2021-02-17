@@ -118,19 +118,17 @@ def circpumps(request):
             return JsonResponseBadRequest(reason="CircPump with supplied name already exists.")
         except CircPump.DoesNotExist:
             description = request.POST.get('description', default=None)
-            sensor_in = request.POST.get('sensor_in', default=None)
-            sensor_out = request.POST.get('sensor_out', default=None)
-            sensor_burn = request.POST.get('sensor_burn', default=None)
+            sensor = request.POST.get('sensor', default=None)
+            relay = request.POST.get('relay', default=None)
             z = CircPump(name=pump_name, description=description,
-                       sensor_in_id=sensor_in,
-                       sensor_out_id=sensor_out,
-                       sensor_burn_id=sensor_burn)
+                        sensor_id=sensor,
+                        relay_id=relay)
             z.save()
             return JsonResponseCreated()
     else:
         # if GET return list of circpumps
-        zns = CircPump.objects.all().order_by('name')
-        rcircpumps = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        pumps = CircPump.objects.all().order_by('name')
+        rcircpumps = {'count': len(zns), 'data': [z.as_json() for z in pumps]}
         return JsonResponse(data=rcircpumps)
 
 
@@ -144,9 +142,8 @@ def circpump(request, pump_name):
         # can't change pk (name)
         try:
             z.description = request.POST.get('description', default=z.description)
-            z.sensor_in_id = request.POST.get('sensor_in', default=z.sensor_in_id)
-            z.sensor_out_id = request.POST.get('sensor_out', default=z.sensor_out_id)
-            z.sensor_burn_id = request.POST.get('sensor_burn', default=z.sensor_burn_id)
+            z.sensor_id = request.POST.get('sensor', default=z.sensor_id)
+            z.relay_id = request.POST.get('relay', default=z.relay_id)
             z.save()
         except KeyError:
             pass
@@ -173,8 +170,7 @@ def circpump_data(request, pump_name):
     except CircPump.DoesNotExist:
         return JsonResponseNotFound(reason="No CircPump with the specified id was found.")
     dseries = {}
-    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
-    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
-    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
+    dseries['sensor'] = get_tempsensor_data(request, z.sensor)
+    dseries['relay'] = get_relay_data(request, z.relay)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)

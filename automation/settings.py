@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': './sqlite/automation.sqlite',
+        'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
     }
 }
 

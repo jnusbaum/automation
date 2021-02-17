@@ -100,7 +100,7 @@ def zone_data(request, zone_name):
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
     dseries = {}
     for s in z.sensors.all():
-        dseries[s.name] = get_sensor_data(request, s)
+        dseries[s.name] = get_tempsensor_data(request, s)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
