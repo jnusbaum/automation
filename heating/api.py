@@ -174,9 +174,9 @@ def boiler_data(request, boiler_name):
     except Boiler.DoesNotExist:
         return JsonResponseNotFound(reason="No Boiler with the specified id was found.")
     dseries = {}
-    dseries['sensor_in'] = get_sensor_data(request, z.sensor_in)
-    dseries['sensor_out'] = get_sensor_data(request, z.sensor_out)
-    dseries['sensor_burn'] = get_sensor_data(request, z.sensor_burn)
+    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
+    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
+    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
@@ -250,8 +250,8 @@ def mixingvalve_data(request, valve_name):
     except MixingValve.DoesNotExist:
         return JsonResponseNotFound(reason="No MixingValve with the specified id was found.")
     dseries = {}
-    dseries['sensor_sys_in'] = get_sensor_data(request, z.sensor_sys_in)
-    dseries['sensor_out'] = get_sensor_data(request, z.sensor_out)
-    dseries['sensor_boiler_in'] = get_sensor_data(request, z.sensor_boiler_in)
+    dseries['sensor_sys_in'] = get_tempsensor_data(request, z.sensor_sys_in)
+    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
+    dseries['sensor_boiler_in'] = get_tempsensor_data(request, z.sensor_boiler_in)
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
