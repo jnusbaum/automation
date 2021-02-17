@@ -173,10 +173,9 @@ def boiler_data(request, boiler_name):
         z = Boiler.objects.get(pk=boiler_name)
     except Boiler.DoesNotExist:
         return JsonResponseNotFound(reason="No Boiler with the specified id was found.")
-    dseries = {}
-    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
-    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
-    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
+    dseries = {'sensor_in': get_tempsensor_data(request, z.sensor_in),
+               'sensor_out': get_tempsensor_data(request, z.sensor_out),
+               'sensor_burn': get_tempsensor_data(request, z.sensor_burn)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
@@ -199,9 +198,9 @@ def mixingvalves(request):
             sensor_out = request.POST.get('sensor_out', default=None)
             sensor_boiler_in = request.POST.get('sensor_booiler_in', default=None)
             z = MixingValve(name=valve_name, description=description,
-                       sensor_sys_in_id=sensor_sys_in,
-                       sensor_out_id=sensor_out,
-                       sensor_boiler_in_id=sensor_boiler_in)
+                            sensor_sys_in_id=sensor_sys_in,
+                            sensor_out_id=sensor_out,
+                            sensor_boiler_in_id=sensor_boiler_in)
             z.save()
             return JsonResponseCreated()
     else:
@@ -249,9 +248,8 @@ def mixingvalve_data(request, valve_name):
         z = MixingValve.objects.get(pk=valve_name)
     except MixingValve.DoesNotExist:
         return JsonResponseNotFound(reason="No MixingValve with the specified id was found.")
-    dseries = {}
-    dseries['sensor_sys_in'] = get_tempsensor_data(request, z.sensor_sys_in)
-    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
-    dseries['sensor_boiler_in'] = get_tempsensor_data(request, z.sensor_boiler_in)
+    dseries = {'sensor_sys_in': get_tempsensor_data(request, z.sensor_sys_in),
+               'sensor_out': get_tempsensor_data(request, z.sensor_out),
+               'sensor_boiler_in': get_tempsensor_data(request, z.sensor_boiler_in)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)

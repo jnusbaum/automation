@@ -8,4 +8,4 @@ def dashboard(request):
 
 def test_heater(request, heater_name):
     return render(request, 'hotwater/hotwater-waterheater.html', {'host': settings.DATASERVER_HOST,
-                                                                'heater': heater_name})
+                                                                  'heater': heater_name})

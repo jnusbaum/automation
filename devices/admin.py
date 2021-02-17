@@ -35,7 +35,7 @@ class DeviceStatusAdmin(admin.ModelAdmin):
               'timestamp',
               'status',
               'device'
-    )
+              )
 
     readonly_fields = (
         'id',

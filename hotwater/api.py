@@ -46,9 +46,9 @@ def waterheaters(request):
             sensor_out = request.POST.get('sensor_out', default=None)
             sensor_burn = request.POST.get('sensor_burn', default=None)
             z = WaterHeater(name=heater_name, description=description,
-                       sensor_in_id=sensor_in,
-                       sensor_out_id=sensor_out,
-                       sensor_burn_id=sensor_burn)
+                            sensor_in_id=sensor_in,
+                            sensor_out_id=sensor_out,
+                            sensor_burn_id=sensor_burn)
             z.save()
             return JsonResponseCreated()
     else:
@@ -96,10 +96,9 @@ def waterheater_data(request, heater_name):
         z = WaterHeater.objects.get(pk=heater_name)
     except WaterHeater.DoesNotExist:
         return JsonResponseNotFound(reason="No WaterHeater with the specified id was found.")
-    dseries = {}
-    dseries['sensor_in'] = get_tempsensor_data(request, z.sensor_in)
-    dseries['sensor_out'] = get_tempsensor_data(request, z.sensor_out)
-    dseries['sensor_burn'] = get_tempsensor_data(request, z.sensor_burn)
+    dseries = {'sensor_in': get_tempsensor_data(request, z.sensor_in),
+               'sensor_out': get_tempsensor_data(request, z.sensor_out),
+               'sensor_burn': get_tempsensor_data(request, z.sensor_burn)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
@@ -121,14 +120,14 @@ def circpumps(request):
             sensor = request.POST.get('sensor', default=None)
             relay = request.POST.get('relay', default=None)
             z = CircPump(name=pump_name, description=description,
-                        sensor_id=sensor,
-                        relay_id=relay)
+                         sensor_id=sensor,
+                         relay_id=relay)
             z.save()
             return JsonResponseCreated()
     else:
         # if GET return list of circpumps
         pumps = CircPump.objects.all().order_by('name')
-        rcircpumps = {'count': len(zns), 'data': [z.as_json() for z in pumps]}
+        rcircpumps = {'count': len(pumps), 'data': [z.as_json() for z in pumps]}
         return JsonResponse(data=rcircpumps)
 
 
@@ -169,8 +168,6 @@ def circpump_data(request, pump_name):
         z = CircPump.objects.get(pk=pump_name)
     except CircPump.DoesNotExist:
         return JsonResponseNotFound(reason="No CircPump with the specified id was found.")
-    dseries = {}
-    dseries['sensor'] = get_tempsensor_data(request, z.sensor)
-    dseries['relay'] = get_relay_data(request, z.relay)
+    dseries = {'sensor': get_tempsensor_data(request, z.sensor), 'relay': get_relay_data(request, z.relay)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
