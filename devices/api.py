@@ -170,27 +170,27 @@ def onewireinterface(request, ifc_id):
 
 
 def get_device_data(request, device):
-        sdata = device.devicestatus_set_set
-        try:
-            stime = request.GET['starttime']
-            stime = isoparse(stime).replace(tzinfo=None)
-            sdata = sdata.filter(timestamp__gt=stime)
-        except KeyError:
-            pass
-        try:
-            etime = request.GET['endtime']
-            etime = isoparse(etime).replace(tzinfo=None)
-        except KeyError:
-            etime = datetime.utcnow()
-        sdata = sdata.filter(timestamp__lte=etime)
-        try:
-            datapts = request.GET['datapts']
-            datapts = int(datapts)
-        except KeyError:
-            datapts = 1
-        sdata = sdata.order_by('-timestamp')[:datapts]
-        data = [s.as_json() for s in sdata]
-        return {'count': len(data), 'data': data}
+    sdata = device.devicestatus_set_set
+    try:
+        stime = request.GET['starttime']
+        stime = isoparse(stime).replace(tzinfo=None)
+        sdata = sdata.filter(timestamp__gt=stime)
+    except KeyError:
+        pass
+    try:
+        etime = request.GET['endtime']
+        etime = isoparse(etime).replace(tzinfo=None)
+    except KeyError:
+        etime = datetime.utcnow()
+    sdata = sdata.filter(timestamp__lte=etime)
+    try:
+        datapts = request.GET['datapts']
+        datapts = int(datapts)
+    except KeyError:
+        datapts = 1
+    sdata = sdata.order_by('-timestamp')[:datapts]
+    data = [s.as_json() for s in sdata]
+    return {'count': len(data), 'data': data}
 
 
 # url options for GET
@@ -219,7 +219,7 @@ def device_data(request, device_name):
     else:
         # if GET get data for relay
         try:
-            s = Device.objects.get(pk=Device_name)
+            s = Device.objects.get(pk=device_name)
         except Device.DoesNotExist:
             return JsonResponseNotFound("No Device with the specified id was found.")
         rdevicedata = get_device_data(request, s)
@@ -412,7 +412,6 @@ def get_relay_data(request, relay):
     sdata = sdata.order_by('-timestamp')[:datapts]
     data = [s.as_json() for s in sdata]
     return {'count': len(data), 'data': data}
-
 
 
 bool_values = {

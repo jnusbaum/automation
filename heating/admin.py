@@ -5,6 +5,7 @@ from django.utils.html import format_html
 # Register your models here.
 from heating.models import Zone, Boiler, MixingValve
 
+
 @admin.register(Boiler)
 class BoilerAdmin(admin.ModelAdmin):
     list_display = (
@@ -99,7 +100,6 @@ class MixingValveAdmin(admin.ModelAdmin):
             return format_html('-')
 
     sensor_boiler_in_link.short_description = 'Boiler Input Sensor'
-
 
 
 @admin.register(Zone)
