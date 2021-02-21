@@ -21,7 +21,9 @@ def on_connect(client, userdata, flags, rc):
     logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(settings.BASETOPIC + '/temperature/+')
+    topic = settings.BASETOPIC + '/temperature/+'
+    client.subscribe(topic)
+    logger.info(f"subscribed to {topic}")
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -58,6 +60,7 @@ def on_message(client, userdata, msg):
 
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
     s.save()
+    logger.debug(f"saved data for sendor = {fsname}")
 
 
 class Command(BaseCommand):
