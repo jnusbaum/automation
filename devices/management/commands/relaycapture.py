@@ -21,7 +21,9 @@ def on_connect(client, userdata, flags, rc):
     logger.info(f"Connected with result code {rc}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(settings.BASETOPIC + '/relay/+')
+    topic = settings.BASETOPIC + '/relay/+'
+    client.subscribe(topic)
+    logger.info(f"subscribed to {topic}")
 
 
 # The callback for when a PUBLISH message is received from the server.

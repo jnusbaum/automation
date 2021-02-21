@@ -79,7 +79,8 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
+        'NAME': '/mnt/db/sqlite/automation.sqlite',
+        # 'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
     }
 }
 
@@ -108,17 +109,22 @@ LOGGING = {
         'tempcapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './log/tempcapture.log',
+            'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
         },
         'relaycapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './log/relaycapture.log',
+            'filename': '/home/rjn/Projects/automation/log/relaycapture.log',
+        },
+        'devstatuscapture': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/rjn/Projects/automation/log/devstatuscapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': './log/deviceconfig.log',
+            'filename': '/home/rjn/Projects/automation/log/deviceconfig.log',
         },
     },
     'loggers': {
@@ -129,6 +135,11 @@ LOGGING = {
         },
         'relaycapture': {
             'handlers': ['relaycapture'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'devstatuscapture': {
+            'handlers': ['devstatuscapture'],
             'level': 'DEBUG',
             'propagate': True,
         },
@@ -158,17 +169,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # app specific settings - should they be here?
 
-# DATASERVER_HOST = 'http://192.168.0.134/automation'
-# MQTTHOST = '192.168.0.134'
-# TEMPMQTTID = 'tempcapture'
-# RELAYMQTTID = 'relaycapture'
-# DEVCFGMQTTID = 'deviceconfig'
-# BASETOPIC = 'sorrelhills'
-
-DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+DATASERVER_HOST = 'http://192.168.0.134/automation'
 MQTTHOST = '192.168.0.134'
-TEMPMQTTID = 'testtempcapture'
-RELAYMQTTID = 'testrelaycapture'
-DEVCFGMQTTID = 'testdeviceconfig'
-DEVSTATUSMQTTID = 'testdevstatuscapture'
+TEMPMQTTID = 'tempcapture'
+RELAYMQTTID = 'relaycapture'
+DEVCFGMQTTID = 'deviceconfig'
+DEVSTATUSMQTTID = 'devstatuscapture'
 BASETOPIC = 'sorrelhills'
+
+# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+# MQTTHOST = '192.168.0.134'
+# TEMPMQTTID = 'testtempcapture'
+# RELAYMQTTID = 'testrelaycapture'
+# DEVCFGMQTTID = 'testdeviceconfig'
+# DEVSTATUSMQTTID = 'testdevstatuscapture'
+# BASETOPIC = 'sorrelhills'
