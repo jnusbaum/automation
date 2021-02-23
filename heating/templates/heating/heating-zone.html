@@ -12,129 +12,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.28/moment-timezone-with-data-2012-2022.min.js"></script>
+    <script src="./zone.js"></script>
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
         let offset = new Date().getTimezoneOffset() * 60 * 1000;
+        var zone;
 
         let ts;
-        let gaugeIn;
-        let gaugeOut;
-        let lineChart;
-        let chartConfig = {
-            type: 'line',
-            data: {
-                datasets: [{
-                    label: 'IN',
-                    borderColor: 'orange',
-                    fill: false,
-                    pointRadius: 0,
-                    data: [],
-                }, {
-                    label: 'OUT',
-                    borderColor: 'skyblue',
-                    fill: false,
-                    pointRadius: 0,
-                    data: [],
-                }]
-            },
-            options: {
-                maintainAspectRatio: false,
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        ticks: {
-                            stepSize: 10
-                        },
-                        time: {
-                            unit: 'minute',
-                            displayFormats: {minute: 'MM-DD HH:mm'},
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'Time'
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            suggestedMin: 30,
-                            suggestedMax: 180,
-                            stepSize: 30
-                        },
-                        scaleLabel: {
-                            display: true,
-                            labelString: 'temp'
-                        }
-                    }]
-                },
-            }
-        };
-
-
-        function drawCharts() {
-            gaugeIn.draw();
-            gaugeOut.draw();
-            lineChart.update();
-        }
-
 
         function startData(adata) {
-            for (let sensor in adata['data']) {
-                let slist = adata['data'][sensor]['data'];
-                let numpts = slist.length;
-                if (numpts > 0) {
-                    if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                        gaugeIn.value = slist[0]['attributes']['value'];
-                        // reverse load
-                        for (let i = 0; i < numpts; i++) {
-                            lineChart.data.datasets[0].data.unshift({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
-                        }
-                    } else if (sensor.endsWith('-OUT')) {
-                        gaugeOut.value = slist[0]['attributes']['value'];
-                        // reverse load
-                        for (let i = 0; i < numpts; i++) {
-                            lineChart.data.datasets[1].data.unshift({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
-                        }
-                    }
-                }
-            }
-            drawCharts();
+            zone.updateData(adata, false);
+            zone.draw();
             setTimeout(startUpdate, 10000);
         }
 
-
         function updateData(adata) {
-            for (let sensor in adata['data']) {
-                let slist = adata['data'][sensor]['data'];
-                let numpts = slist.length;
-                if (numpts > 0) {
-                    if (sensor.endsWith('-IN') || sensor.endsWith('-INSYS')) {
-                        gaugeIn.value = slist[0]['attributes']['value'];
-                        // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            lineChart.data.datasets[0].data.push({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
-                            lineChart.data.datasets[0].data.shift();
-                        }
-                    } else if (sensor.endsWith('-OUT')) {
-                        gaugeOut.value = slist[0]['attributes']['value'];
-                        // reverse load
-                        for (let i = numpts-1; i >= 0; i--) {
-                            lineChart.data.datasets[1].data.push({t: slist[i]['attributes']['timestamp']-offset, y: slist[i]['attributes']['value']});
-                        }
-                        // remove extras
-                        for (let i = 0; i < lineChart.data.datasets[0].data.length - 9000; i++) {
-                            lineChart.data.datasets[1].data.shift();
-                        }
-                    }
-                }
-            }
-            drawCharts();
+            zone.updateData(adata, true);
+            zone.draw();
             setTimeout(startUpdate, 5000);
         }
-
 
         function startUpdate() {
 		    let sts = new Date(ts);
@@ -144,38 +41,8 @@
                 updateData);
         }
 
-
         function setupCharts() {
-            gaugeIn = new RadialGauge({renderTo: 'gauge_in_div',
-                title: 'IN',
-                width: 250, height: 250,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '60', '90', '120', '150', '180'],
-                minorTicks: 6,
-                highlights: [{ from: 30, to: 60, color: 'skyblue' },
-                    { from: 60, to: 90, color: 'aliceblue' },
-                    { from: 90, to: 120, color: 'yellow' },
-                    { from: 120, to: 150, color: 'orange' },
-                    { from: 150, to: 180, color: 'red' }
-                ],
-                valueBox: true,
-                value: 30});
-            gaugeOut = new RadialGauge({renderTo: 'gauge_out_div',
-                title: 'OUT',
-                width: 250, height: 250,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '60', '90', '120', '150', '180'],
-                minorTicks: 6,
-                highlights: [{ from: 30, to: 60, color: 'skyblue' },
-                    { from: 60, to: 90, color: 'aliceblue' },
-                    { from: 90, to: 120, color: 'yellow' },
-                    { from: 120, to: 150, color: 'orange' },
-                    { from: 150, to: 180, color: 'red' }
-                ],
-                valueBox: true,
-                value: 30});
-            let ctx = document.getElementById('chart_div').getContext('2d');
-            lineChart = new Chart(ctx, chartConfig);
+            zone = new Zone({{ zone.name }}, 'gauge_in_div', 'gauge_out_div', 'chart_div');
             let sts = new Date();
             ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);

@@ -1,6 +1,6 @@
 
 
-function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
+function Boiler(name, in_div, out_div, burn_div, chart_div) {
     this.name = name;
     this.chartConfig = {
         type: 'line',
@@ -106,7 +106,6 @@ function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
     });
     var ctx = document.getElementById(chart_div).getContext('2d');
     this.lineChart = new Chart(ctx, this.chartConfig);
-
     this.updateData = function(adata, shift) {
         let sindata = adata['data']['sensor_in']['data']
         let soutdata = adata['data']['sensor_out']['data']
