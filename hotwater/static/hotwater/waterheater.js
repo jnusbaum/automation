@@ -1,5 +1,4 @@
 
-
 function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
     this.name = name;
     this.chartConfig = {

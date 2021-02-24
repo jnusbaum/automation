@@ -1,5 +1,5 @@
 
-function CircPump(name, in_div, relay_div, chart_div) {
+function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
     this.name = name;
     this.tempChartConfig = {
         type: 'line',
@@ -127,7 +127,7 @@ function CircPump(name, in_div, relay_div, chart_div) {
         value: 30
     });
 
-    this.spinnerPump = null;
+    this.spinnerPump = pump_div;
 
     var ctx = document.getElementById(temp_chart_div).getContext('2d');
     this.tempChart = new Chart(ctx, this.chartConfig);
