@@ -6,12 +6,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'hotwater/circpump.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
-    <script src="../../static/hotwater/circpump.js"></script>
+    <script src="{% static 'hotwater/circpump.js' %}"></script>
     <script type="text/javascript">
         $( document ).ready(setupPump);
 
@@ -20,8 +21,8 @@
 
         function startPump(adata) {
             pump.updateData(adata, false);
-            heapumpter.draw();
-            setTimeout(startUpdateHeater, 10000);
+            pump.draw();
+            setTimeout(startUpdatePump, 10000);
         }
 
         function updatePump(adata) {
@@ -39,7 +40,7 @@
         }
 
         function setupPump() {
-            pump = new CircPump('PUMP', 'gauge_in_div', 'gauge_relay_div', 'chart_div');
+            pump = new CircPump('PUMP', 'gauge_in_div', 'gauge_pump_div', 'temp_chart_div', 'pump_chart_div');
             let sts = new Date();
             ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);
@@ -76,15 +77,17 @@
                 <canvas id="gauge_in_div" style="width: 100%;"></canvas>
             </div>
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="gauge_out_div" style="width: 100%;"></canvas>
-            </div>
-            <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="gauge_burn_div" style="width: 100%;"></canvas>
+                <div id="gauge_pump_div"></div>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="chart_div" style=" width: 100%; height: 300px"></canvas>
+                <canvas id="pump_chart_div" style=" width: 100%; height: 300px"></canvas>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="temp_chart_div" style=" width: 100%; height: 300px"></canvas>
             </div>
         </div>
     </div>

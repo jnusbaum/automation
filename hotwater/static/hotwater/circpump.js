@@ -1,4 +1,5 @@
 
+
 function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
     this.name = name;
     this.tempChartConfig = {
@@ -10,19 +11,7 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
                 fill: false,
                 pointRadius: 0,
                 data: [],
-            }, {
-                label: 'OUT',
-                borderColor: 'skyblue',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'BURN',
-                borderColor: 'red',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }]
+            },]
         },
         options: {
             maintainAspectRatio: false,
@@ -59,24 +48,12 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
         type: 'line',
         data: {
             datasets: [{
-                label: 'IN',
+                label: 'RUN',
                 borderColor: 'orange',
                 fill: false,
                 pointRadius: 0,
                 data: [],
-            }, {
-                label: 'OUT',
-                borderColor: 'skyblue',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'BURN',
-                borderColor: 'red',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }]
+            },]
         },
         options: {
             maintainAspectRatio: false,
@@ -97,13 +74,13 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
                 }],
                 yAxes: [{
                     ticks: {
-                        suggestedMin: 30,
-                        suggestedMax: 180,
-                        stepSize: 30
+                        suggestedMin: 0,
+                        suggestedMax: 1,
+                        stepSize: 1
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: 'temp'
+                        labelString: 'on/off'
                     }
                 }]
             },
@@ -127,51 +104,62 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
         value: 30
     });
 
-    this.spinnerPump = pump_div;
+    this.pumpTarget = document.getElementById(pump_div);
+    this.pumpVal = false;
 
     var ctx = document.getElementById(temp_chart_div).getContext('2d');
-    this.tempChart = new Chart(ctx, this.chartConfig);
+    this.tempChart = new Chart(ctx, this.tempChartConfig);
     ctx = document.getElementById(pump_chart_div).getContext('2d');
-    this.pumpChart = new Chart(ctx, this.chartConfig);
+    this.pumpChart = new Chart(ctx, this.pumpChartConfig);
 
     this.updateData = function(adata, shift) {
         let sindata = adata['data']['sensor']['data']
         let spumpdata = adata['data']['relay']['data']
-        let numpts = adata['data']['sensor_in']['count'];
-        if (numpts > 0) {
+        const scount = adata['data']['sensor']['count'];
+        const pcount = adata['data']['relay']['count'];
+        if (scount > 0) {
             this.gaugeIn.value = sindata[0]['attributes']['value'];
-            this.gaugeOut.value = soutdata[0]['attributes']['value'];
-            this.gaugeBurn.value = sburndata[0]['attributes']['value'];
-            // reverse load
-            for (let i = numpts - 1; i >= 0; i--) {
-                this.lineChart.data.datasets[0].data.push({
-                    t: sindata[i]['attributes']['timestamp'] - offset,
-                    y: sindata[i]['attributes']['value']
-                });
-                this.lineChart.data.datasets[1].data.push({
-                    t: soutdata[i]['attributes']['timestamp'] - offset,
-                    y: soutdata[i]['attributes']['value']
-                });
-                this.lineChart.data.datasets[2].data.push({
-                    t: sburndata[i]['attributes']['timestamp'] - offset,
-                    y: sburndata[i]['attributes']['value']
-                });
+        }
+        if (pcount > 0) {
+            this.pumpVal = spumpdata[0]['attributes']['value'];
+        }
+
+        // reverse load
+        for (let i = scount - 1; i >= 0; i--) {
+            this.tempChart.data.datasets[0].data.push({
+                t: sindata[i]['attributes']['timestamp'] - offset,
+                y: sindata[i]['attributes']['value']
+            });
+        }
+        for (let i = pcount - 1; i >= 0; i--) {
+            this.pumpChart.data.datasets[0].data.push({
+                    t: spumpdata[i]['attributes']['timestamp'] - offset,
+                    y: spumpdata[i]['attributes']['value']
+            });
+        }
+        if (shift) {
+            // remove extras
+            for (let i = 0; i < this.tempChart.data.datasets[0].data.length - 9000; i++) {
+                this.tempChart.data.datasets[0].data.shift();
             }
-            if (shift) {
-                // remove extras
-                for (let i = 0; i < this.lineChart.data.datasets[0].data.length - 9000; i++) {
-                    this.lineChart.data.datasets[0].data.shift();
-                    this.lineChart.data.datasets[1].data.shift();
-                    this.lineChart.data.datasets[2].data.shift();
-                }
+            for (let i = 0; i < this.pumpChart.data.datasets[0].data.length - 9000; i++) {
+                this.pumpChart.data.datasets[0].data.shift();
             }
         }
     };
+
     this.draw = function () {
         this.gaugeIn.draw();
-        this.gaugeOut.draw();
-        this.gaugeBurn.draw();
-        this.lineChart.update();
+        let newcls = 'circpump-stop';;
+        // if pumpVal = true spin
+        if (this.pumpVal) {
+            // change class to circpump-run
+            newcls = 'circpump-run';
+        }
+        this.pumpTarget.className = newcls;
+        this.tempChart.update();
+        this.pumpChart.update();
     };
 }
+
 

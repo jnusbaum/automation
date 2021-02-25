@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger('tempcapture')
 logger.setLevel('INFO')
 
-MAX_TEMP_MOVE = 25
+MAX_TEMP_MOVE = 35
 MIN_TEMP = 25
 
 
@@ -47,7 +47,7 @@ def on_message(client, userdata, msg):
     try:
         prev = cache[fsname]
         if (value < MIN_TEMP) or (abs(value - prev) > MAX_TEMP_MOVE):
-            logger.info(f"replacing {value} with {prev} for {fsname}, {timestamp}")
+            logger.info(f"replacing {value} with previous value {prev} for {fsname}, {timestamp}")
             value = prev
         else:
             cache[fsname] = value
@@ -60,7 +60,7 @@ def on_message(client, userdata, msg):
 
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
     s.save()
-    logger.debug(f"saved data for sendor = {fsname}")
+    logger.debug(f"saved data for sensor = {fsname}")
 
 
 class Command(BaseCommand):
