@@ -20,96 +20,28 @@ Display water heaters and circulation pump
     <script type="text/javascript">
         $( document ).ready(dashSetup);
 
-        var heaters = {};
-        var pumps = {};
-
-
-        function updateHeater(adata) {
-            let heater = heaters[adata.data.name];
-            heater.updateData(adata, true);
-            heater.draw();
-            setTimeout(function () {
-                            let sts = new Date();
-                            let ts = new Date(sts);
-                            sts.setHours(sts.getHours() - 24);
-                            $.getJSON(`{{ host }}/hotwater/api/waterheaters/${heater.name}/data`,
-                                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                                updateHeater);
-                        }, 10000);
-        }
-
-
-        function updatePump(adata) {
-            let pump = pumps[adata.data.name];
-            pump.updateData(adata, true);
-            pump.draw();
-            settimeout(function () {
-                            let sts = new Date();
-                            let ts = new Date(sts);
-                            sts.setHours(sts.getHours() - 24);
-                            $.getJSON(`{{ host }}/hotwater/api/circpumps/${pump.name}/data`,
-                                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                                updatePump);
-                            }, 10000);
-        }
-
-
         function dashSetup() {
             {% for hname in heaters %}
-            {
-                let heater = new WaterHeater('{{ hname }}',
-                                                '{{ hname }}_gauge_in_div',
-                                                '{{ hname }}_gauge_out_div',
-                                                '{{ hname }}_gauge_burn_div',
-                                                '{{ hname }}_chart_div');
-                heaters['{{ hname }}'] = heater;
-                let sts = new Date();
-                let ts = new Date(sts);
-                sts.setHours(sts.getHours() - 24);
-                $.getJSON('{{ host }}/hotwater/api/waterheaters/{{ hname }}/data',
-                    {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                    function (adata) {
-                        heater.updateData(adata, false);
-                        heater.draw();
-                        setTimeout(function () {
-                                        let sts = new Date();
-                                        let ts = new Date(sts);
-                                        sts.setHours(sts.getHours() - 24);
-                                        $.getJSON(`{{ host }}/hotwater/api/waterheaters/{{ hname }}/data`,
-                                                    {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                                                    updateHeater);
-                                    }, 10000);
-                    });
-            }
+                {
+                    let heater = new WaterHeater('{{ hname }}',
+                        '{{ hname }}_gauge_in_div',
+                        '{{ hname }}_gauge_out_div',
+                        '{{ hname }}_gauge_burn_div',
+                        '{{ hname }}_chart_div',
+                        `{{ host }}/hotwater/api/waterheaters/{{ hname }}/data`, 10000);
+                    heater.setupHeater();
+                }
             {% endfor %}
 
             {% for pname in pumps %}
-            {
-                let pump = new CircPump('{{ pname }}',
-                                        '{{ pname }}_gauge_in_div',
-                                        '{{ pname }}_gauge_pump_div',
-                                        '{{ pname }}_chart_in_div',
-                                        '{{ pname }}_chart_pump_div');
-                pumps['{{ pname }}'] = pump;
-                let sts = new Date();
-                let ts = new Date(sts);
-                sts.setHours(sts.getHours() - 24);
-                $.getJSON('{{ host }}/hotwater/api/circpumps/{{ pname }}/data',
-                    {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                    function (adata) {
-                        pump.updateData(adata, false);
-                        pump.draw();
-                        settimeout(function () {
-                                        let sts = new Date();
-                                        let ts = new Date(sts);
-                                        sts.setHours(sts.getHours() - 24);
-                                        $.getJSON(`{{ host }}/hotwater/api/circpumps/{{ pname }}/data`,
-                                            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                                            updatePump);
-                                    }, 10000);
-                    }
-                );
-            }
+                {
+                    {% comment %}let pump = new CircPump('{{ pname }}',
+                                            '{{ pname }}_gauge_in_div',
+                                            '{{ pname }}_gauge_pump_div',
+                                            '{{ pname }}_chart_in_div',
+                                            '{{ pname }}_chart_pump_div',
+                                            '{{ host }}', 10000);{% endcomment %}
+                }
             {% endfor %}
         }
     </script>
