@@ -112,7 +112,10 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
     ctx = document.getElementById(pump_chart_div).getContext('2d');
     this.pumpChart = new Chart(ctx, this.pumpChartConfig);
 
+    this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+
     this.updateData = function(adata, shift) {
+
         let sindata = adata['data']['sensor']['data']
         let spumpdata = adata['data']['relay']['data']
         const scount = adata['data']['sensor']['count'];
@@ -127,22 +130,24 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
         // reverse load
         for (let i = scount - 1; i >= 0; i--) {
             this.tempChart.data.datasets[0].data.push({
-                t: sindata[i]['attributes']['timestamp'] - offset,
+                t: sindata[i]['attributes']['timestamp'] - this.offset,
                 y: sindata[i]['attributes']['value']
             });
         }
         for (let i = pcount - 1; i >= 0; i--) {
             this.pumpChart.data.datasets[0].data.push({
-                    t: spumpdata[i]['attributes']['timestamp'] - offset,
+                    t: spumpdata[i]['attributes']['timestamp'] - this.offset,
                     y: spumpdata[i]['attributes']['value']
             });
         }
         if (shift) {
             // remove extras
-            for (let i = 0; i < this.tempChart.data.datasets[0].data.length - 9000; i++) {
+            let l = this.tempChart.data.datasets[0].data.length;
+            for (let i = 0; i < l - 9000; i++) {
                 this.tempChart.data.datasets[0].data.shift();
             }
-            for (let i = 0; i < this.pumpChart.data.datasets[0].data.length - 9000; i++) {
+            l = this.pumpChart.data.datasets[0].data.length;
+            for (let i = 0; i < l - 9000; i++) {
                 this.pumpChart.data.datasets[0].data.shift();
             }
         }
@@ -150,7 +155,7 @@ function CircPump(name, in_div, pump_div, temp_chart_div, pump_chart_div) {
 
     this.draw = function () {
         this.gaugeIn.draw();
-        let newcls = 'circpump-stop';;
+        let newcls = 'circpump-stop';
         // if pumpVal = true spin
         if (this.pumpVal) {
             // change class to circpump-run

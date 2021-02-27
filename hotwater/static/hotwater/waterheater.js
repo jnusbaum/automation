@@ -1,4 +1,6 @@
 
+
+
 function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
     this.name = name;
     this.chartConfig = {
@@ -106,7 +108,10 @@ function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
     var ctx = document.getElementById(chart_div).getContext('2d');
     this.lineChart = new Chart(ctx, this.chartConfig);
 
+    this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+
     this.updateData = function(adata, shift) {
+
         let sindata = adata['data']['sensor_in']['data']
         let soutdata = adata['data']['sensor_out']['data']
         let sburndata = adata['data']['sensor_burn']['data']
@@ -118,21 +123,22 @@ function WaterHeater(name, in_div, out_div, burn_div, chart_div) {
             // reverse load
             for (let i = numpts - 1; i >= 0; i--) {
                 this.lineChart.data.datasets[0].data.push({
-                    t: sindata[i]['attributes']['timestamp'] - offset,
+                    t: sindata[i]['attributes']['timestamp'] - this.offset,
                     y: sindata[i]['attributes']['value']
                 });
                 this.lineChart.data.datasets[1].data.push({
-                    t: soutdata[i]['attributes']['timestamp'] - offset,
+                    t: soutdata[i]['attributes']['timestamp'] - this.offset,
                     y: soutdata[i]['attributes']['value']
                 });
                 this.lineChart.data.datasets[2].data.push({
-                    t: sburndata[i]['attributes']['timestamp'] - offset,
+                    t: sburndata[i]['attributes']['timestamp'] - this.offset,
                     y: sburndata[i]['attributes']['value']
                 });
             }
             if (shift) {
                 // remove extras
-                for (let i = 0; i < this.lineChart.data.datasets[0].data.length - 9000; i++) {
+                let l = this.lineChart.data.datasets[0].data.length;
+                for (let i = 0; i < l - 9000; i++) {
                     this.lineChart.data.datasets[0].data.shift();
                     this.lineChart.data.datasets[1].data.shift();
                     this.lineChart.data.datasets[2].data.shift();

@@ -96,7 +96,8 @@ def waterheater_data(request, heater_name):
         z = WaterHeater.objects.get(pk=heater_name)
     except WaterHeater.DoesNotExist:
         return JsonResponseNotFound(reason="No WaterHeater with the specified id was found.")
-    dseries = {'sensor_in': get_tempsensor_data(request, z.sensor_in),
+    dseries = {'name': z.name,
+               'sensor_in': get_tempsensor_data(request, z.sensor_in),
                'sensor_out': get_tempsensor_data(request, z.sensor_out),
                'sensor_burn': get_tempsensor_data(request, z.sensor_burn)}
     rsensordata = {'count': 1, 'data': dseries}
@@ -168,6 +169,6 @@ def circpump_data(request, pump_name):
         z = CircPump.objects.get(pk=pump_name)
     except CircPump.DoesNotExist:
         return JsonResponseNotFound(reason="No CircPump with the specified id was found.")
-    dseries = {'sensor': get_tempsensor_data(request, z.sensor), 'relay': get_relay_data(request, z.relay)}
+    dseries = {'name': z.name, 'sensor': get_tempsensor_data(request, z.sensor), 'relay': get_relay_data(request, z.relay)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
