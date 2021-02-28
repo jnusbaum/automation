@@ -6,9 +6,13 @@ from heating.models import *
 
 def dashboard(request):
     zones = Zone.objects.all().order_by('name')
+    boilers = Boiler.objects.all().order_by('name')
+    valves = MixingValve.objects.all().order_by('name')
     return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST,
-                                                              'allzones': zones,
-                                                              'zones': zones})
+                                                              'zones': [z.name for z in zones],
+                                                              'boilers': [b.name for b in boilers],
+                                                              'valves': [v.name for v in valves],
+                                                              })
 
 
 def zone(request, zone_name):
@@ -22,21 +26,14 @@ def zone(request, zone_name):
 
 
 def all_zones(request):
-    # get data for all zones
-    datapts = int(request.GET.get('datapts', '24'))
     zones = Zone.objects.all().order_by('name')
-    dzones = []
-    if 'ALL' in request.GET:
-        dzones = zones
-    else:
-        for z in zones:
-            if z.name in request.GET:
-                dzones.append(z)
-
+    boilers = Boiler.objects.all().order_by('name')
+    valves = MixingValve.objects.all().order_by('name')
     return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
-                                                        'datapts': datapts,
-                                                        'allzones': zones,
-                                                        'zones': dzones})
+                                                              'zones': [z.name for z in zones],
+                                                              'boilers': [b.name for b in boilers],
+                                                              'valves': [v.name for v in valves],
+                                                              })
 
 
 def overlay(request):

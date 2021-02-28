@@ -51,7 +51,8 @@ class MixingValve(models.Model):
 class Zone(models.Model):
     name = models.CharField(max_length=64, primary_key=True)
     description = models.CharField(max_length=512)
-    sensors = models.ManyToManyField(TempSensor)
+    sensor_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
+    sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
 
     class Meta:
         verbose_name = "Zone"
@@ -62,6 +63,7 @@ class Zone(models.Model):
                  'id': self.name,
                  'type': 'Zone',
                  'self': f"/zones/{self.name}",
-                 'relationships': {'devices': f"/devices/zone/{self.name}"}
+                 'relationships': {'sensor_in': f"/devices/{self.sensor_in.name}",
+                                   'sensor_out': f"/devices/{self.sensor_out.name}",}
                  }
         return dself

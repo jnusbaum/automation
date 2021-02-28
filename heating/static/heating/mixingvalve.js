@@ -1,6 +1,6 @@
 
 
-function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
+function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, period) {
     this.name = name;
     this.url = url;
     this.period = period;
@@ -9,7 +9,7 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
         type: 'line',
         data: {
             datasets: [{
-                label: 'IN',
+                label: 'RETURN',
                 borderColor: 'orange',
                 fill: false,
                 pointRadius: 0,
@@ -21,7 +21,7 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
                 pointRadius: 0,
                 data: [],
             }, {
-                label: 'BURN',
+                label: 'BOILER',
                 borderColor: 'red',
                 fill: false,
                 pointRadius: 0,
@@ -59,9 +59,9 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
             },
         }
     };
-    this.gaugeIn = new RadialGauge({
-        renderTo: in_div,
-        title: 'IN',
+    this.gaugeReturn = new RadialGauge({
+        renderTo: return_div,
+        title: 'RETURN',
         width: 200, height: 200,
         units: 'F', minValue: 30, maxValue: 180,
         majorTicks: ['30', '60', '90', '120', '150', '180'],
@@ -91,9 +91,9 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
         valueBox: true,
         value: 30
     });
-    this.gaugeBurn = new RadialGauge({
-        renderTo: burn_div,
-        title: 'BURN',
+    this.gaugeBoiler = new RadialGauge({
+        renderTo: boiler_div,
+        title: 'BOILER',
         width: 200, height: 200,
         units: 'F', minValue: 30, maxValue: 270,
         majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
@@ -119,17 +119,17 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
     // dataset indices
     this.inIndex = 0;
     this.outIndex = 1;
-    this.burnIndex = 2;
+    this.boilerIndex = 2;
 
     // last ts loaded
     this.lastLoaded;
 
     this.updateData = function(adata) {
-        let sincount = adata['data']['sensor_in']['count'];
-        let sindata = adata['data']['sensor_in']['data']
+        let sincount = adata['data']['sensor_sys_in']['count'];
+        let sindata = adata['data']['sensor_sys_in']['data']
         if (sincount > 0) {
             // data comes in latest first
-            this.gaugeIn.value = sindata[0]['attributes']['value'];
+            this.gaugeReturn.value = sindata[0]['attributes']['value'];
             let sinLen = 0;
             if (this.lineChart.data.datasets[this.inIndex].data.length > 0) {
                 // already have data
@@ -189,31 +189,31 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
             }
         }
 
-        let sburncount = adata['data']['sensor_burn']['count']
-        let sburndata = adata['data']['sensor_burn']['data']
-        if (sburncount > 0) {
+        let sboilercount = adata['data']['sensor_boiler_in']['count']
+        let sboilerdata = adata['data']['sensor_boiler_in']['data']
+        if (sboilercount > 0) {
             // data comes in latest first
-            this.gaugeBurn.value = sburndata[0]['attributes']['value'];
-            let sburnLen = 0;
-            if (this.lineChart.data.datasets[this.burnIndex].data.length > 0) {
+            this.gaugeBoiler.value = sboilerdata[0]['attributes']['value'];
+            let sboilerLen = 0;
+            if (this.lineChart.data.datasets[this.boilerIndex].data.length > 0) {
                 // already have data
-                for (let i = sburncount - 1; i >= 0; i--) {
-                    sburnLen = this.lineChart.data.datasets[this.burnIndex].data.push({
-                        t: sburndata[i]['attributes']['timestamp'] - this.offset,
-                        y: sburndata[i]['attributes']['value']
+                for (let i = sboilercount - 1; i >= 0; i--) {
+                    sboilerLen = this.lineChart.data.datasets[this.boilerIndex].data.push({
+                        t: sboilerdata[i]['attributes']['timestamp'] - this.offset,
+                        y: sboilerdata[i]['attributes']['value']
                     });
-                    if (sburnLen > this.maxPoints) {
+                    if (sboilerLen > this.maxPoints) {
                         // remove extra
-                        this.lineChart.data.datasets[this.burnIndex].data.shift();
+                        this.lineChart.data.datasets[this.boilerIndex].data.shift();
                     }
                 }
             } else {
                 // no data
-                let sburnLen = 0;
-                for (let i = 0; i < sburncount; i++) {
-                    sburnLen = this.lineChart.data.datasets[this.burnIndex].data.unshift({
-                        t: sburndata[i]['attributes']['timestamp'] - this.offset,
-                        y: sburndata[i]['attributes']['value']
+                let sboilerLen = 0;
+                for (let i = 0; i < sboilercount; i++) {
+                    sboilerLen = this.lineChart.data.datasets[this.boilerIndex].data.unshift({
+                        t: sboilerdata[i]['attributes']['timestamp'] - this.offset,
+                        y: sboilerdata[i]['attributes']['value']
                     });
                 }
                 // guaranteed not to have more than maxPoints in the incoming data\
@@ -223,47 +223,47 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
     };
 
 
-    this.updateBoiler = function (adata) {
+    this.updateValve = function (adata) {
         this.updateData(adata);
         this.draw();
-        let boiler = this;
+        let valve = this;
         setTimeout(function () {
-                        boiler.startUpdateBoiler();
+                        valve.startUpdateValve();
                     }, this.period);
     };
 
-    this.startUpdateBoiler = function () {
+    this.startUpdateValve = function () {
         let sts = new Date(this.lastLoaded);
         let ts = new Date();
         this.lastLoaded = ts;
-        let boiler = this;
+        let valve = this;
         $.getJSON(this.url,
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
             function (data) {
                 // can't use this here as it is set at runtime
-                boiler.updateBoiler(data);
+                valve.updateValve(data);
             });
     };
 
-    this.setupBoiler = function () {
+    this.setupValve = function () {
         let sts = new Date();
         let ts = new Date(sts);
         sts.setHours(sts.getHours() - 24);
         this.lastLoaded = ts;
-        let boiler = this;
+        let valve = this;
         $.getJSON(this.url,
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
             function (data) {
             // can't use this here as it is set at runtime
-                boiler.updateBoiler(data);
+                valve.updateValve(data);
             });
     };
 
 
     this.draw = function () {
-        this.gaugeIn.draw();
+        this.gaugeReturn.draw();
         this.gaugeOut.draw();
-        this.gaugeBurn.draw();
+        this.gaugeBoiler.draw();
         this.lineChart.update();
     };
 }

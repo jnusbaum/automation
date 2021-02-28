@@ -98,9 +98,9 @@ def zone_data(request, zone_name):
         z = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    dseries = {}
-    for s in z.sensors.all():
-        dseries[s.name] = get_tempsensor_data(request, s)
+    dseries = {'sensor_in': get_tempsensor_data(request, z.sensor_in),
+               'sensor_out': get_tempsensor_data(request, z.sensor_out),
+                }
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
 
@@ -196,7 +196,7 @@ def mixingvalves(request):
             description = request.POST.get('description', default=None)
             sensor_sys_in = request.POST.get('sensor_sys_in', default=None)
             sensor_out = request.POST.get('sensor_out', default=None)
-            sensor_boiler_in = request.POST.get('sensor_booiler_in', default=None)
+            sensor_boiler_in = request.POST.get('sensor_boiler_in', default=None)
             z = MixingValve(name=valve_name, description=description,
                             sensor_sys_in_id=sensor_sys_in,
                             sensor_out_id=sensor_out,

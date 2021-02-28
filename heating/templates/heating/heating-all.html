@@ -1,240 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
+{% comment %}
+Display heating system
+{% endcomment %}
 <head>
-    <title>Heating Comparison</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <title>Heating Dashboard</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
-    <script type="text/javascript">
-        $( document ).ready(buildPage);
+    <script src="{% static 'heating/zone.js' %}"></script>
+    <script src="{% static 'heating/boiler.js' %}"></script>
+    <script src="{% static 'heating/mixingvalve.js' %}"></script>
+  <script type="text/javascript">
+        $( document ).ready(dashSetup);
 
-        let offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-        let charts = {};
-
-        const MAXPTS = 30000;
-
-        function queryData(zone) {
-            // fire off an update
-            let sts = new Date(charts[zone].ts);
-            charts[zone].ts = new Date();
-            let args = { 'starttime': sts.toISOString(),
-                'endtime': charts[zone].ts.toISOString(),
-                'datapts': MAXPTS};
-            $.getJSON('{{ host }}/heating/api/zones/' + zone + '/data', args,
-                function(resp) {
-                    for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
-                        let numpts = sensor_data.count;
-                        if (numpts > 0) {
-                            if (sensor_name.endsWith('-IN')) {
-                                // reverse load
-                                for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[0].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
-                                }
-                                // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
-                                    charts[zone].chart.data.datasets[0].data.shift();
-                                }
-                            } else if (sensor_name.endsWith('-OUT')) {
-                                // reverse load
-                                for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[1].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
-                                }
-                                // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
-                                    charts[zone].chart.data.datasets[1].data.shift();
-                                }
-                            } else if (sensor_name.endsWith('-BURN')) {
-                                // reverse load
-                                for (let i = numpts-1; i >= 0; i--) {
-                                    charts[zone].chart.data.datasets[2].data.push({t: sensor_data.data[i]['attributes']['timestamp']-offset, y: sensor_data.data[i]['attributes']['value']});
-                                }
-                                // remove extras
-                                for (let i = 0; i < charts[zone].chart.data.datasets[0].data.length - MAXPTS; i++) {
-                                    charts[zone].chart.data.datasets[2].data.shift();
-                                }
-                            }
-                        }
-                    }
-                    charts[zone].chart.update();
-                    setTimeout(queryData, 30000, zone);
+        function dashSetup() {
+            {% for zname in zones %}
+                {
+                    let zone= new Zone('{{ zname }}',
+                        null,
+                        null,
+                        '{{ zname }}_chart_div',
+                        `{{ host }}/heating/api/zones/{{ zname }}/data`, 10000);
+                    zone.setupZone();
                 }
-            );
-        }
+            {% endfor %}
 
-
-        function buildZone(zone) {
-            charts[zone] = {
-                ts: null,
-                chart: null,
-                chartConfig: {
-                    type: 'line',
-                    data: {
-                        datasets: []
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        scales: {
-                            xAxes: [{
-                                type: 'time',
-                                ticks: {
-                                    stepSize: 10
-                                },
-                                time: {
-                                    unit: 'minute',
-                                    displayFormats: {minute: 'MM-DD HH:mm'}
-                                },
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Time'
-                                }
-                            }],
-                            yAxes: [{
-                                ticks: {
-                                    suggestedMin: 30,
-                                    suggestedMax: 270,
-                                    stepSize: 30
-                                },
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'temp'
-                                }
-                            }]
-                        },
-                    },
-                },
-            };
-
-            let ctx = document.getElementById(zone + 'chart_div').getContext('2d');
-            charts[zone].chart = new Chart(ctx, charts[zone].chartConfig);
-            // for each zone fire off an update
-            let sts = new Date();
-            charts[zone].ts = new Date(sts);
-            sts.setHours(sts.getHours() - {{ datapts }});
-            let args = {
-                'starttime': sts.toISOString(),
-                'endtime': charts[zone].ts.toISOString(),
-                'datapts': MAXPTS
-            };
-            $.getJSON('{{ host }}/heating/api/zones/' + zone + '/data', args,
-                function (resp) {
-                    for (let [sensor_name, sensor_data] of Object.entries(resp['data'])) {
-                        let numpts = sensor_data.count;
-                        if (numpts > 0) {
-                            if (sensor_name.endsWith('-IN') || sensor_name.endsWith('-INSYS')) {
-                                charts[zone].chart.data.datasets[0] = {
-                                    label: 'IN',
-                                    borderColor: 'orange',
-                                    fill: false,
-                                    pointRadius: 0,
-                                    data: [],
-                                };
-                                // reverse load
-                                for (let i = 0; i < numpts; i++) {
-                                    charts[zone].chart.data.datasets[0].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
-                                        y: sensor_data.data[i]['attributes']['value']
-                                    });
-                                }
-                            } else if (sensor_name.endsWith('-OUT')) {
-                                charts[zone].chart.data.datasets[1] = {
-                                    label: 'OUT',
-                                    borderColor: 'skyblue',
-                                    fill: false,
-                                    pointRadius: 0,
-                                    data: [],
-                                };
-                                // reverse load
-                                for (let i = 0; i < numpts; i++) {
-                                    charts[zone].chart.data.datasets[1].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
-                                        y: sensor_data.data[i]['attributes']['value']
-                                    });
-                                }
-                            } else if (sensor_name.endsWith('-BURN')) {
-                                charts[zone].chart.data.datasets[2] = {
-                                    label: 'BURN',
-                                    borderColor: 'red',
-                                    fill: false,
-                                    pointRadius: 0,
-                                    data: [],
-                                };
-                                // reverse load
-                                for (let i = 0; i < numpts; i++) {
-                                    charts[zone].chart.data.datasets[2].data.unshift({
-                                        t: sensor_data.data[i]['attributes']['timestamp']-offset,
-                                        y: sensor_data.data[i]['attributes']['value']
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    charts[zone].chart.update();
-                    setTimeout(queryData, 30000, zone);
+            {% for bname in boilers %}
+                {
+                    let boiler = new Boiler('{{ bname }}',
+                        '{{ bname }}_gauge_in_div',
+                        '{{ bname }}_gauge_out_div',
+                        '{{ bname }}_gauge_burn_div',
+                        '{{ bname }}_chart_div',
+                        '{{ host }}/heating/api/boilers/{{ bname }}/data', 10000);
+                    boiler.setupBoiler();
                 }
-            );
-        }
+            {% endfor %}
 
-
-        function buildPage() {
-            {% for zone in zones %}
-                buildZone('{{ zone.name }}');
+            {% for vname in valves %}
+                {
+                    let valve = new MixingValve('{{ vname }}',
+                        '{{ vname }}_gauge_in_div',
+                        '{{ vname }}_gauge_out_div',
+                        '{{ vname }}_gauge_boiler_div',
+                        '{{ vname }}_chart_div',
+                        '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
+                    valve.setupValve();
+                }
             {% endfor %}
         }
     </script>
-
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Zone Comparison</a>
+      <a class="navbar-brand" href="#">Hot Water</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="{% url 'view_heating_dashboard' %}">Heating<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_hotwater_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Sensors<span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Zones
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    {% for zone in allzones %}
-                      <a class="dropdown-item" href="{% url 'view_heating_zone' zone.name %}">{{ zone.name }}</a>
-                    {% endfor %}
-                </div>
-            </li>
-        </ul>
+          <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'view_heating_dashboard' %}">Heating<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'view_hotwater_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Sensors<span class="sr-only">(current)</span></a>
+              </li>
+          </ul>
       </div>
     </nav>
-
     <div class="container-fluid mt-3">
-        {% for zone in zones %}
+        {% for zname in zones %}
         <div class="row">
             <div class="col">
-                <h6>{{ zone.name }}</h6>
+                <h6>{{ zname }}</h6>
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="{{ zname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for bname in boilers %}
         <div class="row">
             <div class="col">
-                <canvas id="{{ zone.name }}chart_div" style=" width: 100%; height: 400px"></canvas>
+                <h6>{{ bname }}</h6>
+            </div>
+        </div>
+        <div class="row mt-3">
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ bname }}_gauge_in_div" style="width: 100%;"></canvas>
+        </div>
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ bname }}_gauge_out_div" style="width: 100%;"></canvas>
+        </div>
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ bname }}_gauge_burn_div" style="width: 100%;"></canvas>
+        </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="{{ bname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for vname in valves %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ vname }}</h6>
+            </div>
+        </div>
+        <div class="row mt-3">
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ vname }}_gauge_in_div" style="width: 100%;"></canvas>
+        </div>
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ vname }}_gauge_out_div" style="width: 100%;"></canvas>
+        </div>
+        <div class="col-sm-4 col-lg-4 col-xl-2">
+            <canvas id="{{ vname }}_gauge_boiler_div" style="width: 100%;"></canvas>
+        </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="{{ vname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
         {% endfor %}
     </div>
-
 </body>
 </html>

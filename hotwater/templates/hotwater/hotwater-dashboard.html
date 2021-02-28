@@ -35,12 +35,13 @@ Display water heaters and circulation pump
 
             {% for pname in pumps %}
                 {
-                    {% comment %}let pump = new CircPump('{{ pname }}',
-                                            '{{ pname }}_gauge_in_div',
-                                            '{{ pname }}_gauge_pump_div',
-                                            '{{ pname }}_chart_in_div',
-                                            '{{ pname }}_chart_pump_div',
-                                            '{{ host }}', 10000);{% endcomment %}
+                    let pump = new CircPump('{{ pname }}',
+                        '{{ pname }}_gauge_in_div',
+                        '{{ pname }}_gauge_pump_div',
+                        '{{ pname }}_chart_in_div',
+                        '{{ pname }}_chart_pump_div',
+                        '{{ host }}/hotwater/api/circpumps/{{ pname }}/data', 10000);
+                    pump.setupPump();
                 }
             {% endfor %}
         }
@@ -67,56 +68,44 @@ Display water heaters and circulation pump
       </div>
     </nav>
     <div class="container-fluid mt-3">
-        <div class="row mt-3">
+        {% for hname in heaters %}
+         <div class="row mt-3">
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT1_gauge_in_div" style="width: 100%;"></canvas>
+                <canvas id="{{ hname }}_gauge_in_div" style="width: 100%;"></canvas>
             </div>
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT1_gauge_out_div" style="width: 100%;"></canvas>
+                <canvas id="{{ hname }}_gauge_out_div" style="width: 100%;"></canvas>
             </div>
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT1_gauge_burn_div" style="width: 100%;"></canvas>
+                <canvas id="{{ hname }}_gauge_burn_div" style="width: 100%;"></canvas>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="WHEAT1_chart_div" style=" width: 100%; height: 400px"></canvas>
+                <canvas id="{{ hname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
+        {% endfor %}
+        {% for pname in pumps %}
         <div class="row mt-3">
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT2_gauge_in_div" style="width: 100%;"></canvas>
+                <canvas id="{{ pname }}_gauge_in_div" style="width: 100%;"></canvas>
             </div>
             <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT2_gauge_out_div" style="width: 100%;"></canvas>
-            </div>
-            <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="WHEAT2_gauge_burn_div" style="width: 100%;"></canvas>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col">
-                <canvas id="WHEAT2_chart_div" style=" width: 100%; height: 400px"></canvas>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-sm-4 col-lg-4 col-xl-2">
-                <canvas id="HWCIRCPUMP_gauge_in_div" style="width: 100%;"></canvas>
-            </div>
-            <div class="col-sm-4 col-lg-4 col-xl-2">
-                <div id="HWCIRCPUMP_gauge_pump_div"></div>
+                <div id="{{ pname }}_gauge_pump_div"></div>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="HWCIRCPUMP_chart_in_div" style=" width: 100%; height: 400px"></canvas>
+                <canvas id="{{ pname }}_chart_in_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="HWCIRCPUMP_chart_pump_div" style=" width: 100%; height: 400px"></canvas>
+                <canvas id="{{ pname }}_chart_pump_div" style=" width: 100%; height: 400px"></canvas>
             </div>
         </div>
+        {% endfor %}
     </div>
 </body>
 </html>

@@ -1,14 +1,5 @@
 
 
-function __heaterDataCallback(adata, heater, func) {
-    func.call(heater, adata);
-}
-
-function __heaterCallback(heater, func) {
-    func.call(heater);
-}
-
-
 function WaterHeater(name, in_div, out_div, burn_div, chart_div, url, period) {
     this.name = name;
     this.url = url;
@@ -234,17 +225,23 @@ function WaterHeater(name, in_div, out_div, burn_div, chart_div, url, period) {
     this.updateHeater = function (adata) {
         this.updateData(adata);
         this.draw();
-        setTimeout(() => __heaterCallback(this, this.startUpdateHeater), this.period);
+        let heater = this;
+        setTimeout(function () {
+                        heater.startUpdateHeater();
+                    }, this.period);
     };
 
     this.startUpdateHeater = function () {
         let sts = new Date(this.lastLoaded);
         let ts = new Date();
         this.lastLoaded = ts;
+        let heater = this;
         $.getJSON(this.url,
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
-            data => __heaterDataCallback(data, this, this.updateHeater)
-        );
+            function (data) {
+                // can't use this here as it is set at runtime
+                heater.updateHeater(data);
+            });
     };
 
     this.setupHeater = function () {
@@ -252,10 +249,13 @@ function WaterHeater(name, in_div, out_div, burn_div, chart_div, url, period) {
         let ts = new Date(sts);
         sts.setHours(sts.getHours() - 24);
         this.lastLoaded = ts;
+        let heater = this;
         $.getJSON(this.url,
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
-            data => __heaterDataCallback(data, this, this.updateHeater)
-            );
+            function (data) {
+            // can't use this here as it is set at runtime
+                heater.updateHeater(data);
+            });
     };
 
     this.draw = function () {
