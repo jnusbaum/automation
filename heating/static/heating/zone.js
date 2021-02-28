@@ -114,7 +114,7 @@ function Zone(name, in_div, out_div, chart_div, url, period) {
         let sindata = adata['data']['sensor_in']['data']
         if (sincount > 0) {
             // data comes in latest first
-            if (this.guageIn) {
+            if (this.gaugeIn) {
                 this.gaugeIn.value = sindata[0]['attributes']['value'];
             }
             let sinLen = 0;
