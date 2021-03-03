@@ -53,7 +53,7 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
         this.gauge = new LinearGauge({
             renderTo: gauge_div,
             title: 'temp',
-            width: 200, height: 75,
+            width: 400, height: 150,
             units: 'F', minValue: 30, maxValue: 180,
             majorTicks: ['30', '60', '90', '120', '150', '180'],
             minorTicks: 6,
@@ -90,8 +90,8 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
         let sdata = adata['data']
         if (scount > 0) {
             // data comes in latest first
-            if (this.gaugeIn) {
-                this.gaugeIn.value = sdata[0]['attributes']['value'];
+            if (this.gauge) {
+                this.gauge.value = sdata[0]['attributes']['value'];
             }
             if (this.lineChart) {
                 let sLen = 0;
@@ -160,8 +160,8 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
     };
 
     this.draw = function () {
-        if (this.gaugeIn) {
-            this.gaugeIn.draw();
+        if (this.gauge) {
+            this.gauge.draw();
         }
         if (this.lineChart) {
             this.lineChart.update();

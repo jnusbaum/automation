@@ -48,10 +48,10 @@ def on_message(client, userdata, msg):
                  'num_interfaces': 0, 'interfaces': [],
                  'num_relays': 0, 'relays': []}
         for onew in d.onewireinterface_set.all():
-            ojson = {'pin_number': onew.pin_number, 'devices': [], 'num_devices': 0}
+            ojson = {'pin_number': onew.pin_number, 'tempsensors': [], 'num_tempsensors': 0}
             for s in onew.tempsensor_set.all():
-                ojson['devices'].append({'name': s.name, 'address': s.address})
-            ojson['num_devices'] = len(ojson['devices'])
+                ojson['tempsensors'].append({'name': s.name, 'address': s.address})
+            ojson['num_tempsensors'] = len(ojson['tempsensors'])
             djson['interfaces'].append(ojson)
         djson['num_interfaces'] = len(djson['interfaces'])
         # digital relays

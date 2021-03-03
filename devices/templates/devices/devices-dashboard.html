@@ -5,39 +5,63 @@
   <title>Sensors Dashboard</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <script src="{% static 'devices/tempsensor.js' %}"></script>
+  <script type="text/javascript">
+        $( document ).ready(dashSetup);
+
+        function dashSetup() {
+            {% for sname in sensors %}
+                {
+                    let sensor = new TempSensor('{{ sname }}',
+                                    '{{ sname }}_gauge_div',
+                                    null,
+                                    `{{ host }}/devices/api/tempsensors/{{ sname }}/data`, 10000);
+                    sensor.setupSensor();
+                }
+            {% endfor %}
+        }
+  </script>
 </head>
 
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Sensors</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'view_heating_dashboard' %}">Heating<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'view_hotwater_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Devices<span class="sr-only">(current)</span></a>
-      </li>
-    </ul>
-  </div>
-</nav>
-
-
-<div class="container-fluid mt-3">
-Sensors
-</div>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Hot Water</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'view_heating_dashboard' %}">Heating<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'view_hotwater_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Sensors<span class="sr-only">(current)</span></a>
+              </li>
+          </ul>
+      </div>
+    </nav>
+    <div class="container-fluid mt-3">
+        {% for sname in sensors %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ sname }}</h6>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <canvas id="{{ sname }}_gauge_div" style=" width: 100%;"></canvas>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </body>
 </html>
