@@ -350,8 +350,8 @@ def tempsensor_data(request, sensor_name):
         except KeyError:
             return JsonResponseBadRequest(reason="Missing value parameter")
         try:
-            s = Relay.objects.get(pk=sensor_name)
-        except Relay.DoesNotExist:
+            s = TempSensor.objects.get(pk=sensor_name)
+        except TempSensor.DoesNotExist:
             return JsonResponseNotFound("No Sensor with the specified id was found.")
         s = TempSensorData(sensor=s, timestamp=timestamp, value=value, original_value=value)
         s.save()
