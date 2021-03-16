@@ -2,7 +2,7 @@
 <html lang="en">
 {% load static %}
 <head>
-    <title>Heating Zone</title>
+    <title>Mixing Valve</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -11,51 +11,47 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.28/moment-timezone-with-data-2012-2022.min.js"></script>
-    <script src="{% static 'heating/zone.js' %}"></script>
+    <script src="{% static 'heating/mixingvalve.js' %}"></script>
     <script type="text/javascript">
-        $( document ).ready(setupCharts);
+        $( document ).ready(setupMixingvalve);
 
-        let offset = new Date().getTimezoneOffset() * 60 * 1000;
-        var zone;
+        var mixingvalve;
+        var offset = new Date().getTimezoneOffset() * 60 * 1000;
 
-        let ts;
-
-        function startData(adata) {
-            zone.updateData(adata, false);
-            zone.draw();
-            setTimeout(startUpdate, 10000);
+        function startMixingvalve(adata) {
+            mixingvalve.updateData(adata, false);
+            mixingvalve.draw();
+            setTimeout(startUpdateMixingvalve, 10000);
         }
 
-        function updateData(adata) {
-            zone.updateData(adata, true);
-            zone.draw();
-            setTimeout(startUpdate, 5000);
+        function updateMixingvalve(adata) {
+            mixingvalve.updateData(adata, true);
+            mixingvalve.draw();
+            setTimeout(startUpdateMixingvalve, 10000)
         }
 
-        function startUpdate() {
-		    let sts = new Date(ts);
+        function startUpdateMixingvalve() {
+            let sts = new Date(ts);
             ts = new Date();
-            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
-                { 'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                updateData);
+            $.getJSON('{{ host }}/heating/api/mixingvalves/{{ mixingvalve }}/data',
+                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
+                updateMixingvalve);
         }
 
-        function setupCharts() {
-            zone = new Zone('{{ zone }}', 'gauge_in_div', 'gauge_out_div', 'chart_div');
+        function setupMixingvalve() {
+            mixingvalve = new MixingValve('{{ mixingvalve }}', 'gauge_return_div', 'gauge_out_div', 'gauge_boiler_div', 'chart_div');
             let sts = new Date();
             ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
+            $.getJSON('{{ host }}/heating/api/mixingvalves/{{ mixingvalve }}/data',
                 {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startData);
+                startMixingvalve);
         }
     </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Zone {{ zone }}</a>
+      <a class="navbar-brand" href="#">Mixing Valve</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -69,33 +65,26 @@
             <a class="nav-link" href="{% url 'view_hotwater_dashboard' %}">Hot Water<span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Sensors<span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="{% url 'view_devices_dashboard' %}">Devices<span class="sr-only">(current)</span></a>
         </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Zones
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for zone in zones %}
-                  <a class="dropdown-item" href="{% url 'view_heating_zone' zone.name %}">{{ zone.name }}</a>
-                {% endfor %}
-            </div>
-          </li>
         </ul>
       </div>
     </nav>
     <div class="container-fluid mt-3">
         <div class="row mt-3">
-            <div class="col-sm-6 col-lg-4 col-xl-3">
-                <canvas id="gauge_in_div" style="width: 100%;"></canvas>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="gauge_return_div" style="width: 100%;"></canvas>
             </div>
-            <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="col-sm-4 col-lg-4 col-xl-2">
                 <canvas id="gauge_out_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="gauge_boiler_div" style="width: 100%;"></canvas>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col">
-                <canvas id="chart_div" style=" width: 100%; height: 400px"></canvas>
+                <canvas id="chart_div" style=" width: 100%; height: 300px"></canvas>
             </div>
         </div>
     </div>

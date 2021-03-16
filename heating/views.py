@@ -17,12 +17,20 @@ def dashboard(request):
 
 def zone(request, zone_name):
     zones = Zone.objects.all().order_by('name')
-    if zone_name in ('BOILER', 'WHEAT1', 'WHEAT2'):
-        return render(request, 'heating/heating-zone-wburn.html',
-                      {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
-    else:
-        return render(request, 'heating/heating-zone.html',
-                      {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
+    return render(request, 'heating/heating-zone.html',
+                    {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
+
+
+def boiler(request, boiler_name):
+    boilers = Boiler.objects.all().order_by('name')
+    return render(request, 'heating/heating-boiler.html',
+                    {'host': settings.DATASERVER_HOST, 'boiler': boiler_name, 'boilers': boilers})
+
+
+def mixingvalve(request, valve_name):
+    mixingvalves = MixingValve.objects.all().order_by('name')
+    return render(request, 'heating/heating-mixingvalve.html',
+                    {'host': settings.DATASERVER_HOST, 'mixingvalve': valve_name, 'mixingvalves': mixingvalves})
 
 
 def all_zones(request):

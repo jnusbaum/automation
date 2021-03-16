@@ -40,7 +40,7 @@
         }
 
         function setupPump() {
-            pump = new CircPump('PUMP', 'gauge_in_div', 'gauge_pump_div', 'temp_chart_div', 'pump_chart_div');
+            pump = new CircPump('{{ pump }}', 'gauge_in_div', 'gauge_pump_div', 'temp_chart_div', 'pump_chart_div');
             let sts = new Date();
             ts = new Date(sts);
             sts.setHours(sts.getHours() - 24);
