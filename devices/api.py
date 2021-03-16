@@ -169,8 +169,8 @@ def onewireinterface(request, ifc_id):
         return JsonResponse(data=rifc)
 
 
-def get_device_data(request, device):
-    sdata = device.devicestatus_set_set
+def get_device_data(request, device: Device):
+    sdata = device.devicestatus_set
     try:
         stime = request.GET['starttime']
         stime = isoparse(stime).replace(tzinfo=None)
@@ -226,6 +226,35 @@ def device_data(request, device_name):
         return JsonResponse(data=rdevicedata)
 
 
+# url options for GET
+def device_config(request, device_name):
+    if request.method == 'GET':
+        try:
+            d = Device.objects.get(pk=device_name)
+        except Device.DoesNotExist:
+            return JsonResponseNotFound()
+
+        # one wire temp busses
+        djson = {'client_id': d.client_id,
+                 'num_interfaces': 0, 'interfaces': [],
+                 'num_relays': 0, 'relays': []}
+        for onew in d.onewireinterface_set.all():
+            ojson = {'pin_number': onew.pin_number, 'tempsensors': [], 'num_tempsensors': 0}
+            for s in onew.tempsensor_set.all():
+                ojson['tempsensors'].append({'name': s.name, 'address': s.address})
+            ojson['num_tempsensors'] = len(ojson['tempsensors'])
+            djson['interfaces'].append(ojson)
+        djson['num_interfaces'] = len(djson['interfaces'])
+        # digital relays
+        for rnew in d.relay_set.all():
+            djson['relays'].append({'name': rnew.name, 'pin_number': rnew.pin_number})
+        djson['num_relays'] = len(djson['relays'])        # not implemented
+        return JsonResponse(data=djson)
+    else:
+        # not implemented
+        return JsonResponseBadRequest()
+
+
 # temperature sensors
 
 def tempsensors(request):
@@ -279,7 +308,7 @@ def tempsensor(request, sensor_name):
         return JsonResponse(data=rsensor)
 
 
-def get_tempsensor_data(request, sensor):
+def get_tempsensor_data(request, sensor: TempSensor):
     sdata = sensor.tempsensordata_set
     try:
         stime = request.GET['starttime']
@@ -321,8 +350,8 @@ def tempsensor_data(request, sensor_name):
         except KeyError:
             return JsonResponseBadRequest(reason="Missing value parameter")
         try:
-            s = Relay.objects.get(pk=sensor_name)
-        except Relay.DoesNotExist:
+            s = TempSensor.objects.get(pk=sensor_name)
+        except TempSensor.DoesNotExist:
             return JsonResponseNotFound("No Sensor with the specified id was found.")
         s = TempSensorData(sensor=s, timestamp=timestamp, value=value, original_value=value)
         s.save()
@@ -390,7 +419,7 @@ def relay(request, relay_name):
         return JsonResponse(data=rrelay)
 
 
-def get_relay_data(request, relay):
+def get_relay_data(request, relay: Relay):
     sdata = relay.relaydata_set
     try:
         stime = request.GET['starttime']

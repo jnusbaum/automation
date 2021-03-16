@@ -95,8 +95,9 @@ class TempSensor(models.Model):
                  'id': self.name,
                  'type': 'TempSensor',
                  'self': f"/devices/{self.name}",
-                 'relationships': {'data': f"/tempsensors/{self.name}/data",
-                                   'device': f"/onewireinterfaces/{self.one_wire_interface.device.name}"}
+                 'relationships': {'data': f"/tempsensors/{self.name}/data/",
+                                   'device': f"/onewireinterfaces/{self.one_wire_interface.device.name}/" if self.one_wire_interface else ''
+                                   },
                  }
         return dself
 
@@ -114,7 +115,7 @@ class TempSensorData(models.Model):
         verbose_name = "TempSensorData"
         verbose_name_plural = "TempSensorData"
         indexes = [
-            models.Index(fields=['sensor', '-timestamp'], name='heating_tsensordata_sid_ts'),
+            models.Index(fields=['sensor', '-timestamp'], name='devices_tsensordata_sid_ts'),
         ]
 
     def as_json(self):
@@ -123,8 +124,8 @@ class TempSensorData(models.Model):
                                 'original_value': self.original_value},
                  'id': self.id,
                  'type': 'TempSensorData',
-                 'self': f"/tempsensors/{self.sensor.name}/data/{self.id}",
-                 'relationships': {'sensor': f"/tempsensors/{self.sensor.name}"}
+                 'self': f"/tempsensors/{self.sensor.name}/data/{self.id}/",
+                 'relationships': {'sensor': f"/tempsensors/{self.sensor.name}/"}
                  }
         return dself
 
@@ -145,7 +146,7 @@ class Relay(models.Model):
                  'id': self.name,
                  'type': 'Relay',
                  'self': f"/relays/{self.name}",
-                 'relationships': {'device': f"/devices/{self.device.name}"}
+                 'relationships': {'device': f"/devices/{self.device.name}/"}
                  }
         return dself
 
@@ -171,7 +172,7 @@ class RelayData(models.Model):
                                 },
                  'id': self.id,
                  'type': 'RelayData',
-                 'self': f"/relays/{self.relay.name}/data/{self.id}",
-                 'relationships': {'relay': f"/relays/{self.relay.name}"}
+                 'self': f"/relays/{self.relay.name}/data/{self.id}/",
+                 'relationships': {'relay': f"/relays/{self.relay.name}/"}
                  }
         return dself
