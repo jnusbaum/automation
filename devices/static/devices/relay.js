@@ -109,7 +109,6 @@ function Relay(name, gauge_div, chart_div, url, period) {
                     }
                 } else {
                     // no data
-                    let sLen = 0;
                     for (let i = 0; i < scount; i++) {
                         sLen = this.lineChart.data.datasets[this.index].data.unshift({
                             t: sdata[i]['attributes']['timestamp'] - this.offset,

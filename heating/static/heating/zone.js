@@ -94,8 +94,11 @@ function Zone(name, in_div, out_div, chart_div, url, period) {
         });
     }
 
-    var ctx = document.getElementById(chart_div).getContext('2d');
-    this.lineChart = new Chart(ctx, this.chartConfig);
+    this.lineChart = null;
+    if (chart_div) {
+        var ctx = document.getElementById(chart_div).getContext('2d');
+        this.lineChart = new Chart(ctx, this.chartConfig);
+    }
 
     this.offset = new Date().getTimezoneOffset() * 60 * 1000;
 
@@ -118,29 +121,30 @@ function Zone(name, in_div, out_div, chart_div, url, period) {
                 this.gaugeIn.value = sindata[0]['attributes']['value'];
             }
             let sinLen = 0;
-            if (this.lineChart.data.datasets[this.inIndex].data.length > 0) {
-                // already have data
-                for (let i = sincount - 1; i >= 0; i--) {
-                    sinLen = this.lineChart.data.datasets[this.inIndex].data.push({
-                        t: sindata[i]['attributes']['timestamp'] - this.offset,
-                        y: sindata[i]['attributes']['value']
-                    });
-                    if (sinLen > this.maxPoints) {
-                        // remove extra
-                        this.lineChart.data.datasets[this.inIndex].data.shift();
+            if (this.lineChart) {
+                if (this.lineChart.data.datasets[this.inIndex].data.length > 0) {
+                    // already have data
+                    for (let i = sincount - 1; i >= 0; i--) {
+                        sinLen = this.lineChart.data.datasets[this.inIndex].data.push({
+                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            y: sindata[i]['attributes']['value']
+                        });
+                        if (sinLen > this.maxPoints) {
+                            // remove extra
+                            this.lineChart.data.datasets[this.inIndex].data.shift();
+                        }
                     }
+                } else {
+                    // no data
+                    for (let i = 0; i < sincount; i++) {
+                        sinLen = this.lineChart.data.datasets[this.inIndex].data.unshift({
+                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            y: sindata[i]['attributes']['value']
+                        });
+                    }
+                    // guaranteed not to have more than maxPoints in the incoming data\
+                    // so no need to remove extras
                 }
-            } else {
-                // no data
-                let sinLen = 0;
-                for (let i = 0; i < sincount; i++) {
-                    sinLen = this.lineChart.data.datasets[this.inIndex].data.unshift({
-                        t: sindata[i]['attributes']['timestamp'] - this.offset,
-                        y: sindata[i]['attributes']['value']
-                    });
-                }
-                // guaranteed not to have more than maxPoints in the incoming data\
-                // so no need to remove extras
             }
         }
 
@@ -152,29 +156,30 @@ function Zone(name, in_div, out_div, chart_div, url, period) {
                 this.gaugeOut.value = soutdata[0]['attributes']['value'];
             }
             let soutLen = 0;
-            if (this.lineChart.data.datasets[this.outIndex].data.length > 0) {
-                // already have data
-                for (let i = soutcount - 1; i >= 0; i--) {
-                    soutLen = this.lineChart.data.datasets[this.outIndex].data.push({
-                        t: soutdata[i]['attributes']['timestamp'] - this.offset,
-                        y: soutdata[i]['attributes']['value']
-                    });
-                    if (soutLen > this.maxPoints) {
-                        // remove extra
-                        this.lineChart.data.datasets[this.outIndex].data.shift();
+            if (this.lineChart) {
+                if (this.lineChart.data.datasets[this.outIndex].data.length > 0) {
+                    // already have data
+                    for (let i = soutcount - 1; i >= 0; i--) {
+                        soutLen = this.lineChart.data.datasets[this.outIndex].data.push({
+                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            y: soutdata[i]['attributes']['value']
+                        });
+                        if (soutLen > this.maxPoints) {
+                            // remove extra
+                            this.lineChart.data.datasets[this.outIndex].data.shift();
+                        }
                     }
+                } else {
+                    // no data
+                    for (let i = 0; i < soutcount; i++) {
+                        soutLen = this.lineChart.data.datasets[this.outIndex].data.unshift({
+                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            y: soutdata[i]['attributes']['value']
+                        });
+                    }
+                    // guaranteed not to have more than maxPoints in the incoming data\
+                    // so no need to remove extras
                 }
-            } else {
-                // no data
-                let soutLen = 0;
-                for (let i = 0; i < soutcount; i++) {
-                    soutLen = this.lineChart.data.datasets[this.outIndex].data.unshift({
-                        t: soutdata[i]['attributes']['timestamp'] - this.offset,
-                        y: soutdata[i]['attributes']['value']
-                    });
-                }
-                // guaranteed not to have more than maxPoints in the incoming data\
-                // so no need to remove extras
             }
         }
     };
@@ -222,6 +227,8 @@ function Zone(name, in_div, out_div, chart_div, url, period) {
         if (this.gaugeOut) {
             this.gaugeOut.draw();
         }
-        this.lineChart.update();
+        if (this.lineChart) {
+            this.lineChart.update();
+        }
     };
 }

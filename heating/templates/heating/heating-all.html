@@ -35,9 +35,9 @@ Display heating system
             {% for bname in boilers %}
                 {
                     let boiler = new Boiler('{{ bname }}',
-                        '{{ bname }}_gauge_in_div',
-                        '{{ bname }}_gauge_out_div',
-                        '{{ bname }}_gauge_burn_div',
+                        null,
+                        null,
+                        null,
                         '{{ bname }}_chart_div',
                         '{{ host }}/heating/api/boilers/{{ bname }}/data', 10000);
                     boiler.setupBoiler();
@@ -47,9 +47,9 @@ Display heating system
             {% for vname in valves %}
                 {
                     let valve = new MixingValve('{{ vname }}',
-                        '{{ vname }}_gauge_in_div',
-                        '{{ vname }}_gauge_out_div',
-                        '{{ vname }}_gauge_boiler_div',
+                        null,
+                        null,
+                        null,
                         '{{ vname }}_chart_div',
                         '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
                     valve.setupValve();
@@ -99,17 +99,6 @@ Display heating system
             </div>
         </div>
         <div class="row mt-3">
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ bname }}_gauge_in_div" style="width: 100%;"></canvas>
-        </div>
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ bname }}_gauge_out_div" style="width: 100%;"></canvas>
-        </div>
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ bname }}_gauge_burn_div" style="width: 100%;"></canvas>
-        </div>
-        </div>
-        <div class="row mt-3">
             <div class="col">
                 <canvas id="{{ bname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
             </div>
@@ -121,17 +110,6 @@ Display heating system
             <div class="col">
                 <h6>{{ vname }}</h6>
             </div>
-        </div>
-        <div class="row mt-3">
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ vname }}_gauge_in_div" style="width: 100%;"></canvas>
-        </div>
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ vname }}_gauge_out_div" style="width: 100%;"></canvas>
-        </div>
-        <div class="col-sm-4 col-lg-4 col-xl-2">
-            <canvas id="{{ vname }}_gauge_boiler_div" style="width: 100%;"></canvas>
-        </div>
         </div>
         <div class="row mt-3">
             <div class="col">
