@@ -30,8 +30,11 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'devices.apps.DevicesConfig',
+    'devices_views.apps.DevicesViewsConfig',
     'heating.apps.HeatingConfig',
+    'heating_views.apps.HeatingViewsConfig',
     'hotwater.apps.HotwaterConfig',
+    'hotwater_views.apps.HotwaterViewsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,9 +58,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'automation/templates'),
-                 os.path.join(BASE_DIR, 'heating/templates'),
-                 os.path.join(BASE_DIR, 'hotwater/templates'),
-                 os.path.join(BASE_DIR, 'devices/templates')]
+                 os.path.join(BASE_DIR, 'heating_views/templates'),
+                 os.path.join(BASE_DIR, 'hotwater_views/templates'),
+                 os.path.join(BASE_DIR, 'devices_views/templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -79,8 +82,8 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/mnt/db/sqlite/automation.sqlite',
-        # 'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
+        #'NAME': '/mnt/db/sqlite/automation.sqlite',
+        'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
     }
 }
 
@@ -155,13 +158,9 @@ LOGGING = {
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'America/Denver'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = False
 
 STATIC_URL = '/automation/static/'
@@ -169,18 +168,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # app specific settings - should they be here?
 
-DATASERVER_HOST = 'http://192.168.0.134/automation'
-MQTTHOST = '192.168.0.134'
-TEMPMQTTID = 'tempcapture'
-RELAYMQTTID = 'relaycapture'
-DEVCFGMQTTID = 'deviceconfig'
-DEVSTATUSMQTTID = 'devstatuscapture'
-BASETOPIC = 'sorrelhills'
-
-# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+# DATASERVER_HOST = 'http://192.168.0.134/automation'
 # MQTTHOST = '192.168.0.134'
-# TEMPMQTTID = 'testtempcapture'
-# RELAYMQTTID = 'testrelaycapture'
-# DEVCFGMQTTID = 'testdeviceconfig'
-# DEVSTATUSMQTTID = 'testdevstatuscapture'
+# TEMPMQTTID = 'tempcapture'
+# RELAYMQTTID = 'relaycapture'
+# DEVCFGMQTTID = 'deviceconfig'
+# DEVSTATUSMQTTID = 'devstatuscapture'
 # BASETOPIC = 'sorrelhills'
+
+DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+MQTTHOST = '192.168.0.134'
+TEMPMQTTID = 'testtempcapture'
+RELAYMQTTID = 'testrelaycapture'
+DEVCFGMQTTID = 'testdeviceconfig'
+DEVSTATUSMQTTID = 'testdevstatuscapture'
+BASETOPIC = 'sorrelhills'
