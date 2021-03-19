@@ -1,11 +1,6 @@
 
-
-function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, period) {
-    this.name = name;
-    this.url = url;
-    this.period = period;
-
-    this.chartConfig = {
+class MixingValve {
+    static chartConfig = {
         type: 'line',
         data: {
             datasets: [{
@@ -59,84 +54,91 @@ function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, peri
             },
         }
     };
-    this.gaugeReturn = null;
-    if (return_div) {
-        this.gaugeReturn = new RadialGauge({
-            renderTo: return_div,
-            title: 'RETURN',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 180,
-            majorTicks: ['30', '60', '90', '120', '150', '180'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 180, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
+
+    constructor(name, return_div, out_div, boiler_div, chart_div, url, period) {
+        this.name = name;
+        this.url = url;
+        this.period = period;
+
+        this.gaugeReturn = null;
+        if (return_div) {
+            this.gaugeReturn = new RadialGauge({
+                renderTo: return_div,
+                title: 'RETURN',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 180, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+        this.gaugeOut = null;
+        if (out_div) {
+            this.gaugeOut = new RadialGauge({
+                renderTo: out_div,
+                title: 'OUT',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 180, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+        this.gaugeBoiler = null;
+        if (boiler_div) {
+            this.gaugeBoiler = new RadialGauge({
+                renderTo: boiler_div,
+                title: 'BOILER',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 270,
+                majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 270, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+
+        this.lineChart = null;
+        if (chart_div) {
+            var ctx = document.getElementById(chart_div).getContext('2d');
+            this.lineChart = new Chart(ctx, this.chartConfig);
+        }
+
+        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+
+        // max data points to display in chart
+        this.maxPoints = 9000;
+
+        // dataset indices
+        this.inIndex = 0;
+        this.outIndex = 1;
+        this.boilerIndex = 2;
+
+        // last ts loaded
+        this.lastLoaded = null;
     }
-    this.gaugeOut = null;
-    if (out_div) {
-        this.gaugeOut = new RadialGauge({
-            renderTo: out_div,
-            title: 'OUT',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 180,
-            majorTicks: ['30', '60', '90', '120', '150', '180'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 180, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
-    }
-    this.gaugeBoiler = null;
-    if (boiler_div) {
-        this.gaugeBoiler = new RadialGauge({
-            renderTo: boiler_div,
-            title: 'BOILER',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 270,
-            majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 270, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
-    }
 
-    this.lineChart = null;
-    if (chart_div) {
-        var ctx = document.getElementById(chart_div).getContext('2d');
-        this.lineChart = new Chart(ctx, this.chartConfig);
-    }
-
-    this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-    // max data points to display in chart
-    this.maxPoints = 9000;
-
-    // dataset indices
-    this.inIndex = 0;
-    this.outIndex = 1;
-    this.boilerIndex = 2;
-
-    // last ts loaded
-    this.lastLoaded;
-
-    this.updateData = function(adata) {
+    updateData(adata) {
         let sincount = adata['data']['sensor_sys_in']['count'];
         let sindata = adata['data']['sensor_sys_in']['data']
         if (sincount > 0) {
@@ -235,19 +237,19 @@ function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, peri
                 }
             }
         }
-    };
+    }
 
 
-    this.updateValve = function (adata) {
+    update(adata) {
         this.updateData(adata);
         this.draw();
         let valve = this;
         setTimeout(function () {
-                        valve.startUpdateValve();
+                        valve.startUpdate();
                     }, this.period);
-    };
+    }
 
-    this.startUpdateValve = function () {
+    startUpdate() {
         let sts = new Date(this.lastLoaded);
         let ts = new Date();
         this.lastLoaded = ts;
@@ -256,11 +258,11 @@ function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, peri
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
             function (data) {
                 // can't use this here as it is set at runtime
-                valve.updateValve(data);
+                valve.update(data);
             });
-    };
+    }
 
-    this.setupValve = function () {
+    setup() {
         let sts = new Date();
         let ts = new Date(sts);
         sts.setHours(sts.getHours() - 24);
@@ -270,15 +272,14 @@ function MixingValve(name, return_div, out_div, boiler_div, chart_div, url, peri
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
             function (data) {
             // can't use this here as it is set at runtime
-                valve.updateValve(data);
+                valve.update(data);
             });
-    };
+    }
 
-
-    this.draw = function () {
+    draw() {
         if (this.gaugeReturn) this.gaugeReturn.draw();
         if (this.gaugeOut) this.gaugeOut.draw();
         if (this.gaugeBoiler) this.gaugeBoiler.draw();
         if (this.lineChart) this.lineChart.update();
-    };
+    }
 }

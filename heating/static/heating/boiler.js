@@ -1,11 +1,6 @@
 
-
-function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
-    this.name = name;
-    this.url = url;
-    this.period = period;
-
-    this.chartConfig = {
+class Boiler {
+    static chartConfig = {
         type: 'line',
         data: {
             datasets: [{
@@ -59,84 +54,92 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
             },
         }
     };
-    this.gaugeIn = null;
-    if (in_div) {
-        this.gaugeIn = new RadialGauge({
-            renderTo: in_div,
-            title: 'IN',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 180,
-            majorTicks: ['30', '60', '90', '120', '150', '180'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 180, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
+
+
+    constructor(name, in_div, out_div, burn_div, chart_div, url, period) {
+        this.name = name;
+        this.url = url;
+        this.period = period;
+        this.gaugeIn = null;
+        if (in_div) {
+            this.gaugeIn = new RadialGauge({
+                renderTo: in_div,
+                title: 'IN',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 180, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+        this.gaugeOut = null;
+        if (out_div) {
+            this.gaugeOut = new RadialGauge({
+                renderTo: out_div,
+                title: 'OUT',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 180, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+        this.gaugeBurn = null;
+        if (burn_div) {
+            this.gaugeBurn = new RadialGauge({
+                renderTo: burn_div,
+                title: 'BURN',
+                width: 200, height: 200,
+                units: 'F', minValue: 30, maxValue: 270,
+                majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 270, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+
+        this.lineChart = null;
+        if (chart_div) {
+            var ctx = document.getElementById(chart_div).getContext('2d');
+            this.lineChart = new Chart(ctx, Boiler.chartConfig);
+        }
+
+        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+
+        // max data points to display in chart
+        this.maxPoints = 9000;
+
+        // dataset indices
+        this.inIndex = 0;
+        this.outIndex = 1;
+        this.burnIndex = 2;
+
+        // last ts loaded
+        this.lastLoaded = null;
     }
-    this.gaugeOut = null;
-    if (out_div) {
-        this.gaugeOut = new RadialGauge({
-            renderTo: out_div,
-            title: 'OUT',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 180,
-            majorTicks: ['30', '60', '90', '120', '150', '180'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 180, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
-    }
-    this.gaugeBurn = null;
-    if (burn_div) {
-        this.gaugeBurn = new RadialGauge({
-            renderTo: burn_div,
-            title: 'BURN',
-            width: 200, height: 200,
-            units: 'F', minValue: 30, maxValue: 270,
-            majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 270, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
-    }
 
-    this.lineChart = null;
-    if (chart_div) {
-        var ctx = document.getElementById(chart_div).getContext('2d');
-        this.lineChart = new Chart(ctx, this.chartConfig);
-    }
 
-    this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-    // max data points to display in chart
-    this.maxPoints = 9000;
-
-    // dataset indices
-    this.inIndex = 0;
-    this.outIndex = 1;
-    this.burnIndex = 2;
-
-    // last ts loaded
-    this.lastLoaded;
-
-    this.updateData = function(adata) {
+    updateData(adata) {
         let sincount = adata['data']['sensor_in']['count'];
         let sindata = adata['data']['sensor_in']['data']
         if (sincount > 0) {
@@ -241,19 +244,19 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
                 }
             }
         }
-    };
+    }
 
 
-    this.updateBoiler = function (adata) {
+    update(adata) {
         this.updateData(adata);
         this.draw();
         let boiler = this;
         setTimeout(function () {
-                        boiler.startUpdateBoiler();
+                        boiler.startUpdate();
                     }, this.period);
-    };
+    }
 
-    this.startUpdateBoiler = function () {
+    startUpdate() {
         let sts = new Date(this.lastLoaded);
         let ts = new Date();
         this.lastLoaded = ts;
@@ -262,11 +265,11 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
             function (data) {
                 // can't use this here as it is set at runtime
-                boiler.updateBoiler(data);
+                boiler.update(data);
             });
-    };
+    }
 
-    this.setupBoiler = function () {
+    setup() {
         let sts = new Date();
         let ts = new Date(sts);
         sts.setHours(sts.getHours() - 24);
@@ -276,15 +279,14 @@ function Boiler(name, in_div, out_div, burn_div, chart_div, url, period) {
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
             function (data) {
             // can't use this here as it is set at runtime
-                boiler.updateBoiler(data);
+                boiler.update(data);
             });
-    };
+    }
 
-
-    this.draw = function () {
+    draw() {
         if (this.gaugeIn) this.gaugeIn.draw();
         if (this.gaugeOut) this.gaugeOut.draw();
         if (this.gaugeBurn) this.gaugeBurn.draw();
         if (this.lineChart) this.lineChart.update();
-    };
+    }
 }
