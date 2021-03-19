@@ -21,10 +21,10 @@ from automation import views
 urlpatterns = [
     path('automation/', views.dashboard, name='view_automation_dashboard'),
     path('automation/admin/', admin.site.urls),
-    path('automation/devices/dashboard/', include('devices.urls')),
-    path('automation/devices/api/', include('devices_api.urls')),
-    path('automation/heating/dashboard/', include('heating.urls')),
-    path('automation/heating/api/', include('heating_api.urls')),
-    path('automation/hotwater/dashboard/', include('hotwater.urls')),
-    path('automation/hotwater/api/', include('hotwater_apiurls')),
+    path('automation/devices/dashboard/', include('devices_views.urls')),
+    path('automation/devices/api/', include('devices.urls')),
+    path('automation/heating/dashboard/', include('heating_views.urls')),
+    path('automation/heating/api/', include('heating.urls')),
+    path('automation/hotwater/dashboard/', include('hotwater_views.urls')),
+    path('automation/hotwater/api/', include('hotwater.urls')),
 ]

@@ -19,8 +19,8 @@ class TestAPI(unittest.TestCase):
     def tearDown(self):
         print('teardown test')
         r = requests.delete(f'{host}/zones/{zone_name}')
-        r = requests.delete(f'{host}/devices/{out_sensor_name}')
-        r = requests.delete(f'{host}/devices/{in_sensor_name}')
+        r = requests.delete(f'{host}/devices_views/{out_sensor_name}')
+        r = requests.delete(f'{host}/devices_views/{in_sensor_name}')
 
 
     def test(self):
@@ -49,26 +49,26 @@ class TestAPI(unittest.TestCase):
 
         print(f'test {tcount} - add sensor')
         data = {'name': in_sensor_name, 'type': 'TEMP', 'address': '', 'description': 'test sensor', 'zone': zone_name}
-        r = requests.post(f'{host}/devices', data=data)
+        r = requests.post(f'{host}/devices_views', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
 
         print(f'test {tcount} - add sensor')
         data = {'name': out_sensor_name, 'type': 'TEMP', 'address': '', 'description': 'test sensor', 'zone': zone_name}
-        r = requests.post(f'{host}/devices', data=data)
+        r = requests.post(f'{host}/devices_views', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
-        print('test %d - get all devices' % tcount)
-        r = requests.get(f'{host}/devices')
+        print('test %d - get all devices_views' % tcount)
+        r = requests.get(f'{host}/devices_views')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
         tcount += 1
 
         print(f'test {tcount} - get sensor')
-        r = requests.get(f'{host}/devices/{in_sensor_name}')
+        r = requests.get(f'{host}/devices_views/{in_sensor_name}')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
@@ -76,12 +76,12 @@ class TestAPI(unittest.TestCase):
 
         print(f'test {tcount} - change sensor')
         data = {'address': '0x423e4a'}
-        r = requests.patch(f'{host}/devices/{in_sensor_name}', data=data)
+        r = requests.patch(f'{host}/devices_views/{in_sensor_name}', data=data)
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - get sensor')
-        r = requests.get(f'{host}/devices/{in_sensor_name}')
+        r = requests.get(f'{host}/devices_views/{in_sensor_name}')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
@@ -91,33 +91,33 @@ class TestAPI(unittest.TestCase):
         tdt = datetime.utcnow()
         tstr = tdt.isoformat()
         data = {'value': '138.2', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{in_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{in_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         data = {'value': '120.2', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{out_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{out_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         sleep(10)
         tdt = datetime.utcnow()
         savstr = tstr = tdt.isoformat()
         data = {'value': '136', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{in_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{in_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         data = {'value': '130', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{out_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{out_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         sleep(10)
         tdt = datetime.utcnow()
         tstr = tdt.isoformat()
         data = {'value': '143.25', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{in_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{in_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         data = {'value': '141.25', 'timestamp': tstr}
-        r = requests.post(f'{host}/devices/{out_sensor_name}/data', data=data)
+        r = requests.post(f'{host}/devices_views/{out_sensor_name}/data', data=data)
         self.assertEqual(requests.codes.created, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - get data')
-        r = requests.get(f'{host}/devices/{in_sensor_name}/data')
+        r = requests.get(f'{host}/devices_views/{in_sensor_name}/data')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
@@ -125,14 +125,14 @@ class TestAPI(unittest.TestCase):
 
         print(f'test {tcount} - get data')
         targettime = savstr
-        r = requests.get(f'{host}/devices/{in_sensor_name}/data?targettime={targettime}')
+        r = requests.get(f'{host}/devices_views/{in_sensor_name}/data?targettime={targettime}')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
         tcount += 1
 
         print(f'test {tcount} - get data')
-        r = requests.get(f'{host}/devices/{in_sensor_name}/data?targettime={targettime}&datapts=2')
+        r = requests.get(f'{host}/devices_views/{in_sensor_name}/data?targettime={targettime}&datapts=2')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)
@@ -161,12 +161,12 @@ class TestAPI(unittest.TestCase):
         tcount += 1
 
         print(f'test {tcount} - delete sensor')
-        r = requests.delete(f'{host}/devices/{out_sensor_name}')
+        r = requests.delete(f'{host}/devices_views/{out_sensor_name}')
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
         print(f'test {tcount} - delete sensor')
-        r = requests.delete(f'{host}/devices/{in_sensor_name}')
+        r = requests.delete(f'{host}/devices_views/{in_sensor_name}')
         self.assertEqual(requests.codes.no_content, r.status_code, "bad response = %d" % r.status_code)
         tcount += 1
 
@@ -176,7 +176,7 @@ class TestAPI(unittest.TestCase):
         tcount += 1
 
         print(f'test {tcount} - device config')
-        r = requests.get(f'{host}/devices/MECHROOM/config')
+        r = requests.get(f'{host}/devices_views/MECHROOM/config')
         self.assertEqual(requests.codes.ok, r.status_code, "bad response = %d" % r.status_code)
         data = r.json()
         pprint.pprint(data)

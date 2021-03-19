@@ -83,7 +83,7 @@ def sensors_for_zone(zone_name):
         z = Zone.objects.get(pk=zone_name)
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
-    # devices for zone
+    # devices_views for zone
     rsensors = {'count': len(z.sensors), 'data': [s.as_json for s in z.sensors]}
     return JsonResponse(data=rsensors)
 

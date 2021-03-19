@@ -1,6 +1,6 @@
 /*
-* implement tree view to browse devices
-* devices
+* implement tree view to browse devices_views
+* devices_views
 *   device-1
 *       one wire ifcs
 *           ifc-1

@@ -63,7 +63,7 @@ def overlay(request):
                                                             'datapts': datapts,
                                                             'allzones': zones,
                                                             'zones': dzones,
-                                                            'devices': osensors})
+                                                            'devices_views': osensors})
 
 
 def test(request, zone_name):
