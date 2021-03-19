@@ -16,15 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from . import views
+from automation import views
 
 urlpatterns = [
     path('automation/', views.dashboard, name='view_automation_dashboard'),
     path('automation/admin/', admin.site.urls),
     path('automation/devices/dashboard/', include('devices.urls')),
-    path('automation/devices/api/', include('devices.api-urls')),
+    path('automation/devices/api/', include('devices_api.urls')),
     path('automation/heating/dashboard/', include('heating.urls')),
-    path('automation/heating/api/', include('heating.api-urls')),
+    path('automation/heating/api/', include('heating_api.urls')),
     path('automation/hotwater/dashboard/', include('hotwater.urls')),
-    path('automation/hotwater/api/', include('hotwater.api-urls')),
+    path('automation/hotwater/api/', include('hotwater_apiurls')),
 ]
