@@ -8,7 +8,7 @@ def dashboard(request):
     zones = Zone.objects.all().order_by('name')
     boilers = Boiler.objects.all().order_by('name')
     valves = MixingValve.objects.all().order_by('name')
-    return render(request, 'heating/heating-dashboard.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating_views/heating-dashboard.html', {'host': settings.DATASERVER_HOST,
                                                               'zones': [z.name for z in zones],
                                                               'boilers': [b.name for b in boilers],
                                                               'valves': [v.name for v in valves],
@@ -17,19 +17,19 @@ def dashboard(request):
 
 def zone(request, zone_name):
     zones = Zone.objects.all().order_by('name')
-    return render(request, 'heating/heating-zone.html',
+    return render(request, 'heating_views/heating-zone.html',
                     {'host': settings.DATASERVER_HOST, 'zone': zone_name, 'zones': zones})
 
 
 def boiler(request, boiler_name):
     boilers = Boiler.objects.all().order_by('name')
-    return render(request, 'heating/heating-boiler.html',
+    return render(request, 'heating_views/heating-boiler.html',
                     {'host': settings.DATASERVER_HOST, 'boiler': boiler_name, 'boilers': boilers})
 
 
 def mixingvalve(request, valve_name):
     mixingvalves = MixingValve.objects.all().order_by('name')
-    return render(request, 'heating/heating-mixingvalve.html',
+    return render(request, 'heating_views/heating-mixingvalve.html',
                     {'host': settings.DATASERVER_HOST, 'mixingvalve': valve_name, 'mixingvalves': mixingvalves})
 
 
@@ -37,7 +37,7 @@ def all_zones(request):
     zones = Zone.objects.all().order_by('name')
     boilers = Boiler.objects.all().order_by('name')
     valves = MixingValve.objects.all().order_by('name')
-    return render(request, 'heating/heating-all.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating_views/heating-all.html', {'host': settings.DATASERVER_HOST,
                                                               'zones': [z.name for z in zones],
                                                               'boilers': [b.name for b in boilers],
                                                               'valves': [v.name for v in valves],
@@ -59,7 +59,7 @@ def overlay(request):
     for z in dzones:
         for sensor in z.sensors.all():
             osensors.append(sensor)
-    return render(request, 'heating/heating-overlay.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating_views/heating-overlay.html', {'host': settings.DATASERVER_HOST,
                                                             'datapts': datapts,
                                                             'allzones': zones,
                                                             'zones': dzones,
@@ -67,7 +67,7 @@ def overlay(request):
 
 
 def test(request, zone_name):
-    return render(request, 'heating/heating-test.html', {'host': settings.DATASERVER_HOST,
+    return render(request, 'heating_views/heating-test.html', {'host': settings.DATASERVER_HOST,
                                                          'zone': zone_name})
 
 
