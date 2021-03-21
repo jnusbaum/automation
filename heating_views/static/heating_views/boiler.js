@@ -125,15 +125,12 @@ class Boiler {
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-
         // max data points to display in chart
         this.maxPoints = 9000;
-
         // dataset indices
         this.inIndex = 0;
         this.outIndex = 1;
         this.burnIndex = 2;
-
         // last ts loaded
         this.lastLoaded = null;
     }
@@ -179,9 +176,7 @@ class Boiler {
         let soutdata = adata['data']['sensor_out']['data']
         if (soutcount > 0) {
             // data comes in latest first
-            if (this.gaugeOut) {
-                this.gaugeOut.value = soutdata[0]['attributes']['value'];
-            }
+            if (this.gaugeOut) this.gaugeOut.value = soutdata[0]['attributes']['value'];
             let soutLen = 0;
             if (this.lineChart) {
                 if (this.lineChart.data.datasets[this.outIndex].data.length > 0) {
@@ -214,9 +209,7 @@ class Boiler {
         let sburndata = adata['data']['sensor_burn']['data']
         if (sburncount > 0) {
             // data comes in latest first
-            if (this.gaugeBurn) {
-                this.gaugeBurn.value = sburndata[0]['attributes']['value'];
-            }
+            if (this.gaugeBurn) this.gaugeBurn.value = sburndata[0]['attributes']['value'];
             let sburnLen = 0;
             if (this.lineChart) {
                 if (this.lineChart.data.datasets[this.burnIndex].data.length > 0) {

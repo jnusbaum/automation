@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from devices.models import TempSensorData
+from django.db.utils import OperationalError
 
 import logging
 
@@ -59,7 +60,10 @@ def on_message(client, userdata, msg):
             cache[fsname] = value
 
     s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
-    s.save()
+    try:
+        s.save()
+    except OperationalError:
+        pass
     logger.debug(f"saved data for sensor = {fsname}")
 
 

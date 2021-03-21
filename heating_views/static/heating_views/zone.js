@@ -116,9 +116,7 @@ class Zone {
         let sindata = adata['data']['sensor_in']['data']
         if (sincount > 0) {
             // data comes in latest first
-            if (this.gaugeIn) {
-                this.gaugeIn.value = sindata[0]['attributes']['value'];
-            }
+            if (this.gaugeIn) this.gaugeIn.value = sindata[0]['attributes']['value'];
             let sinLen = 0;
             if (this.lineChart) {
                 if (this.lineChart.data.datasets[this.inIndex].data.length > 0) {
@@ -151,9 +149,7 @@ class Zone {
         let soutdata = adata['data']['sensor_out']['data']
         if (soutcount > 0) {
             // data comes in latest first
-            if (this.gaugeOut) {
-                this.gaugeOut.value = soutdata[0]['attributes']['value'];
-            }
+            if (this.gaugeOut) this.gaugeOut.value = soutdata[0]['attributes']['value'];
             let soutLen = 0;
             if (this.lineChart) {
                 if (this.lineChart.data.datasets[this.outIndex].data.length > 0) {
