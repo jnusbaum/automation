@@ -15,38 +15,16 @@
     <script type="text/javascript">
         $( document ).ready(setupHeater);
 
-        var heater;
-        var offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-        function startHeater(adata) {
-            heater.updateData(adata, false);
-            heater.draw();
-            setTimeout(startUpdateHeater, 10000);
-        }
-
-        function updateHeater(adata) {
-            heater.updateData(adata, true);
-            heater.draw();
-            setTimeout(startUpdateHeater, 10000)
-        }
-
-        function startUpdateHeater() {
-            let sts = new Date(ts);
-            ts = new Date();
-            $.getJSON('{{ host }}/hotwater/api/waterheaters/{{ heater }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                updateHeater);
-        }
-
         function setupHeater() {
-            heater = new WaterHeater('WHEAT1', 'gauge_in_div', 'gauge_out_div', 'gauge_burn_div', 'chart_div');
-            let sts = new Date();
-            ts = new Date(sts);
-            sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/hotwater/api/waterheaters/{{ heater }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startHeater);
+            let heater = new WaterHeater('{{ heater }}',
+                        'gauge_in_div',
+                        'gauge_out_div',
+                        'gauge_burn_div',
+                        'chart_div',
+                        `{{ host }}/hotwater/api/waterheaters/{{ heater }}/data`, 10000);
+                    heater.setup();
         }
+
     </script>
 </head>
 <body>

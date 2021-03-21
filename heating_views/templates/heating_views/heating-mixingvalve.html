@@ -15,38 +15,16 @@
     <script type="text/javascript">
         $( document ).ready(setupMixingvalve);
 
-        var mixingvalve;
-        var offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-        function startMixingvalve(adata) {
-            mixingvalve.updateData(adata, false);
-            mixingvalve.draw();
-            setTimeout(startUpdateMixingvalve, 10000);
-        }
-
-        function updateMixingvalve(adata) {
-            mixingvalve.updateData(adata, true);
-            mixingvalve.draw();
-            setTimeout(startUpdateMixingvalve, 10000)
-        }
-
-        function startUpdateMixingvalve() {
-            let sts = new Date(ts);
-            ts = new Date();
-            $.getJSON('{{ host }}/heating/api/mixingvalves/{{ mixingvalve }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                updateMixingvalve);
-        }
-
         function setupMixingvalve() {
-            mixingvalve = new MixingValve('{{ mixingvalve }}', 'gauge_return_div', 'gauge_out_div', 'gauge_boiler_div', 'chart_div');
-            let sts = new Date();
-            ts = new Date(sts);
-            sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/heating/api/mixingvalves/{{ mixingvalve }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startMixingvalve);
+            let valve = new MixingValve('{{ mixingvalve }}',
+                'gauge_return_div',
+                'gauge_out_div',
+                'gauge_boiler_div',
+                'chart_div',
+                '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
+            valve.setup();
         }
+
     </script>
 </head>
 <body>

@@ -29,7 +29,7 @@ Display water heaters and circulation pump
                         '{{ hname }}_gauge_burn_div',
                         '{{ hname }}_chart_div',
                         `{{ host }}/hotwater/api/waterheaters/{{ hname }}/data`, 10000);
-                    heater.setupHeater();
+                    heater.setup();
                 }
             {% endfor %}
 
@@ -41,7 +41,7 @@ Display water heaters and circulation pump
                         '{{ pname }}_chart_in_div',
                         '{{ pname }}_chart_pump_div',
                         '{{ host }}/hotwater/api/circpumps/{{ pname }}/data', 10000);
-                    pump.setupPump();
+                    pump.setup();
                 }
             {% endfor %}
         }

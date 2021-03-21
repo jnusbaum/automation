@@ -15,38 +15,16 @@
     <script type="text/javascript">
         $( document ).ready(setupBoiler);
 
-        var boiler;
-        var offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-        function startBoiler(adata) {
-            boiler.updateData(adata, false);
-            boiler.draw();
-            setTimeout(startUpdateBoiler, 10000);
-        }
-
-        function updateBoiler(adata) {
-            boiler.updateData(adata, true);
-            boiler.draw();
-            setTimeout(startUpdateBoiler, 10000)
-        }
-
-        function startUpdateBoiler() {
-            let sts = new Date(ts);
-            ts = new Date();
-            $.getJSON('{{ host }}/heating/api/boilers/{{ boiler }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                updateBoiler);
-        }
-
         function setupBoiler() {
-            boiler = new Boiler('{{ boiler }}', 'gauge_in_div', 'gauge_out_div', 'gauge_burn_div', 'chart_div');
-            let sts = new Date();
-            ts = new Date(sts);
-            sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/heating/api/boilers/{{ boiler }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startBoiler);
+            let boiler = new Boiler('{{ boiler }}',
+                'gauge_in_div',
+                'gauge_out_div',
+                'gauge_burn_div',
+                'chart_div',
+                '{{ host }}/heating/api/boilers/{{ boiler }}/data', 10000);
+            boiler.setup();
         }
+
     </script>
 </head>
 <body>

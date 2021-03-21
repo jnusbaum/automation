@@ -16,38 +16,16 @@
     <script type="text/javascript">
         $( document ).ready(setupPump);
 
-        var pump;
-        var offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-        function startPump(adata) {
-            pump.updateData(adata, false);
-            pump.draw();
-            setTimeout(startUpdatePump, 10000);
-        }
-
-        function updatePump(adata) {
-            pump.updateData(adata, true);
-            pump.draw();
-            setTimeout(startUpdatePump, 10000)
-        }
-
-        function startUpdatePump() {
-            let sts = new Date(ts);
-            ts = new Date();
-            $.getJSON('{{ host }}/hotwater/api/circpumps/{{ pump }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000},
-                updatePump);
-        }
-
         function setupPump() {
-            pump = new CircPump('{{ pump }}', 'gauge_in_div', 'gauge_pump_div', 'temp_chart_div', 'pump_chart_div');
-            let sts = new Date();
-            ts = new Date(sts);
-            sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/hotwater/api/circpumps/{{ pump }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startPump);
+            let pump = new CircPump('{{ pump }}',
+                            'gauge_in_div',
+                            'gauge_pump_div',
+                            'temp_chart_div',
+                            'pump_chart_div'
+                            '{{ host }}/hotwater/api/circpumps/{{ pump }}/data', 10000);
+            pump.setup();
         }
+
     </script>
 </head>
 <body>

@@ -28,7 +28,7 @@ Display heating system
                         '{{ zname }}_gauge_out_div',
                         '{{ zname }}_chart_div',
                         `{{ host }}/heating/api/zones/{{ zname }}/data`, 10000);
-                    zone.setupZone();
+                    zone.setup();
                 }
             {% endfor %}
 
@@ -40,7 +40,7 @@ Display heating system
                         '{{ bname }}_gauge_burn_div',
                         '{{ bname }}_chart_div',
                         '{{ host }}/heating/api/boilers/{{ bname }}/data', 10000);
-                    boiler.setupBoiler();
+                    boiler.setup();
                 }
             {% endfor %}
 
@@ -52,7 +52,7 @@ Display heating system
                         '{{ vname }}_gauge_boiler_div',
                         '{{ vname }}_chart_div',
                         '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
-                    valve.setupValve();
+                    valve.setup();
                 }
             {% endfor %}
         }

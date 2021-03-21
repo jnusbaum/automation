@@ -22,7 +22,7 @@
                                     '{{ sname }}_gauge_div',
                                     null,
                                     `{{ host }}/devices/api/tempsensors/{{ sname }}/data`, 10000);
-                    sensor.setupSensor();
+                    sensor.setup();
                 }
             {% endfor %}
         }

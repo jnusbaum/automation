@@ -121,19 +121,16 @@ class MixingValve {
         this.lineChart = null;
         if (chart_div) {
             var ctx = document.getElementById(chart_div).getContext('2d');
-            this.lineChart = new Chart(ctx, this.chartConfig);
+            this.lineChart = new Chart(ctx, MixingValve.chartConfig);
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-
         // max data points to display in chart
         this.maxPoints = 9000;
-
         // dataset indices
         this.inIndex = 0;
         this.outIndex = 1;
         this.boilerIndex = 2;
-
         // last ts loaded
         this.lastLoaded = null;
     }

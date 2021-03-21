@@ -17,39 +17,13 @@
     <script type="text/javascript">
         $( document ).ready(setupCharts);
 
-        let offset = new Date().getTimezoneOffset() * 60 * 1000;
-        var zone;
-
-        let ts;
-
-        function startData(adata) {
-            zone.updateData(adata, false);
-            zone.draw();
-            setTimeout(startUpdate, 10000);
-        }
-
-        function updateData(adata) {
-            zone.updateData(adata, true);
-            zone.draw();
-            setTimeout(startUpdate, 5000);
-        }
-
-        function startUpdate() {
-		    let sts = new Date(ts);
-            ts = new Date();
-            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
-                { 'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                updateData);
-        }
-
         function setupCharts() {
-            zone = new Zone('{{ zone }}', 'gauge_in_div', 'gauge_out_div', 'chart_div');
-            let sts = new Date();
-            ts = new Date(sts);
-            sts.setHours(sts.getHours() - 24);
-            $.getJSON('{{ host }}/heating/api/zones/{{ zone }}/data',
-                {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': 9000 },
-                startData);
+            let zone = new Zone('{{ zone }}',
+                        'gauge_in_div',
+                        'gauge_out_div',
+                        'chart_div',
+                        `{{ host }}/heating/api/zones/{{ zone }}/data`, 10000);
+            zone.setup();
         }
     </script>
 </head>

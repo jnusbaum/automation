@@ -28,7 +28,7 @@ Display heating system
                         null,
                         '{{ zname }}_chart_div',
                         `{{ host }}/heating/api/zones/{{ zname }}/data`, 10000);
-                    zone.setupZone();
+                    zone.setup();
                 }
             {% endfor %}
 
@@ -40,7 +40,7 @@ Display heating system
                         null,
                         '{{ bname }}_chart_div',
                         '{{ host }}/heating/api/boilers/{{ bname }}/data', 10000);
-                    boiler.setupBoiler();
+                    boiler.setup();
                 }
             {% endfor %}
 
@@ -52,7 +52,7 @@ Display heating system
                         null,
                         '{{ vname }}_chart_div',
                         '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
-                    valve.setupValve();
+                    valve.setup();
                 }
             {% endfor %}
         }

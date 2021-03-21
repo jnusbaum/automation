@@ -1,11 +1,6 @@
-
-
-function TempSensor(name, gauge_div, chart_div, url, period) {
-    this.name = name;
-    this.url = url;
-    this.period = period;
-
-    this.chartConfig = {
+// TempSensor class
+class TempSensor {
+    static chartConfig = {
         type: 'line',
         data: {
             datasets: [{
@@ -48,44 +43,47 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
         }
     };
 
-    this.gauge = null;
-    if (gauge_div) {
-        this.gauge = new LinearGauge({
-            renderTo: gauge_div,
-            title: 'temp',
-            width: 400, height: 150,
-            units: 'F', minValue: 30, maxValue: 180,
-            majorTicks: ['30', '60', '90', '120', '150', '180'],
-            minorTicks: 6,
-            highlights: [{from: 30, to: 60, color: 'skyblue'},
-                {from: 60, to: 90, color: 'aliceblue'},
-                {from: 90, to: 120, color: 'yellow'},
-                {from: 120, to: 150, color: 'orange'},
-                {from: 150, to: 180, color: 'red'}
-            ],
-            valueBox: true,
-            value: 30
-        });
+    constructor(name, gauge_div, chart_div, url, period) {
+        this.name = name;
+        this.url = url;
+        this.period = period;
+        this.gauge = null;
+
+        if (gauge_div) {
+            this.gauge = new LinearGauge({
+                renderTo: gauge_div,
+                title: 'temp',
+                width: 400, height: 150,
+                units: 'F', minValue: 30, maxValue: 180,
+                majorTicks: ['30', '60', '90', '120', '150', '180'],
+                minorTicks: 6,
+                highlights: [{from: 30, to: 60, color: 'skyblue'},
+                    {from: 60, to: 90, color: 'aliceblue'},
+                    {from: 90, to: 120, color: 'yellow'},
+                    {from: 120, to: 150, color: 'orange'},
+                    {from: 150, to: 180, color: 'red'}
+                ],
+                valueBox: true,
+                value: 30
+            });
+        }
+
+        this.lineChart = null;
+        if (chart_div) {
+            var ctx = document.getElementById(chart_div).getContext('2d');
+            this.lineChart = new Chart(ctx, TempSensor.chartConfig);
+        }
+
+        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+        // max data points to display in chart
+        this.maxPoints = 9000;
+        // dataset indices
+        this.index = 0;
+        // last ts loaded
+        this.lastLoaded = null;
     }
 
-    this.lineChart = null;
-    if (chart_div) {
-        var ctx = document.getElementById(chart_div).getContext('2d');
-        this.lineChart = new Chart(ctx, this.chartConfig);
-    }
-
-    this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-
-    // max data points to display in chart
-    this.maxPoints = 9000;
-
-    // dataset indices
-    this.index = 0;
-
-    // last ts loaded
-    this.lastLoaded;
-
-    this.updateData = function(adata) {
+    updateData(adata) {
         let scount = adata['count'];
         let sdata = adata['data']
         if (scount > 0) {
@@ -120,18 +118,18 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
                 }
             }
         }
-    };
+    }
 
-    this.updateSensor = function (adata) {
+    update(adata) {
         this.updateData(adata);
         this.draw();
         let sensor = this;
         setTimeout(function () {
-                        sensor.startUpdateSensor();
+                        sensor.startUpdate();
                     }, this.period);
-    };
+    }
 
-    this.startUpdateSensor = function () {
+    startUpdate() {
         let sts = new Date(this.lastLoaded);
         let ts = new Date();
         this.lastLoaded = ts;
@@ -140,11 +138,11 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
             function (data) {
                 // can't use this here as it is set at runtime
-                sensor.updateSensor(data);
+                sensor.update(data);
             });
     };
 
-    this.setupSensor = function () {
+    setup () {
         let sts = new Date();
         let ts = new Date(sts);
         sts.setHours(sts.getHours() - 24);
@@ -154,16 +152,16 @@ function TempSensor(name, gauge_div, chart_div, url, period) {
             {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
             function (data) {
             // can't use this here as it is set at runtime
-                sensor.updateSensor(data);
+                sensor.update(data);
             });
-    };
+    }
 
-    this.draw = function () {
+    draw() {
         if (this.gauge) {
             this.gauge.draw();
         }
         if (this.lineChart) {
             this.lineChart.update();
         }
-    };
+    }
 }
