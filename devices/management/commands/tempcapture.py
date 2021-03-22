@@ -63,7 +63,7 @@ def on_message(client, userdata, msg):
     try:
         s.save()
     except OperationalError:
-        pass
+        logger.error(f"error - db locked")
     logger.debug(f"saved data for sensor = {fsname}")
 
 
