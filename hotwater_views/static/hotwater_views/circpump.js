@@ -1,91 +1,5 @@
 // Circulator Pump
 class CircPump {
-    static tempChartConfig = {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'IN',
-                borderColor: 'orange',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            },]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    ticks: {
-                        stepSize: 10
-                    },
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {minute: 'MM-DD HH:mm'}
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 30,
-                        suggestedMax: 180,
-                        stepSize: 30
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'temp'
-                    }
-                }]
-            },
-        }
-    };
-
-    static pumpChartConfig = {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'RUN',
-                borderColor: 'orange',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            },]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    ticks: {
-                        stepSize: 10
-                    },
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {minute: 'MM-DD HH:mm'}
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 0,
-                        suggestedMax: 1,
-                        stepSize: 1
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'on/off'
-                    }
-                }]
-            },
-        }
-    };
-
 
     constructor(name, in_div, pump_div, temp_chart_div, pump_chart_div, url, period) {
         this.name = name;
@@ -120,13 +34,98 @@ class CircPump {
 
         this.tempChart = null;
         if (temp_chart_div) {
+            this.tempChartConfig = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'IN',
+                        borderColor: 'orange',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    },]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            ticks: {
+                                stepSize: 10
+                            },
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {minute: 'MM-DD HH:mm'}
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 30,
+                                suggestedMax: 180,
+                                stepSize: 30
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'temp'
+                            }
+                        }]
+                    },
+                }
+            };
+
             var ctx = document.getElementById(temp_chart_div).getContext('2d');
-            this.tempChart = new Chart(ctx, CircPump.tempChartConfig);
+            this.tempChart = new Chart(ctx, this.tempChartConfig);
         }
         this.pumpChart = null;
         if (pump_chart_div) {
+            this.pumpChartConfig = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'RUN',
+                        borderColor: 'orange',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    },]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            ticks: {
+                                stepSize: 10
+                            },
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {minute: 'MM-DD HH:mm'}
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 0,
+                                suggestedMax: 1,
+                                stepSize: 1
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'on/off'
+                            }
+                        }]
+                    },
+                }
+            };
             ctx = document.getElementById(pump_chart_div).getContext('2d');
-            this.pumpChart = new Chart(ctx, CircPump.pumpChartConfig);
+            this.pumpChart = new Chart(ctx, this.pumpChartConfig);
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;

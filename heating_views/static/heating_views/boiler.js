@@ -1,60 +1,5 @@
 
 class Boiler {
-    static chartConfig = {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'IN',
-                borderColor: 'orange',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'OUT',
-                borderColor: 'skyblue',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'BURN',
-                borderColor: 'red',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    ticks: {
-                        stepSize: 10
-                    },
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {minute: 'MM-DD HH:mm'}
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 30,
-                        suggestedMax: 180,
-                        stepSize: 30
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'temp'
-                    }
-                }]
-            },
-        }
-    };
-
 
     constructor(name, in_div, out_div, burn_div, chart_div, url, period) {
         this.name = name;
@@ -120,8 +65,62 @@ class Boiler {
 
         this.lineChart = null;
         if (chart_div) {
+            this.chartConfig = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'IN',
+                        borderColor: 'orange',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }, {
+                        label: 'OUT',
+                        borderColor: 'skyblue',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }, {
+                        label: 'BURN',
+                        borderColor: 'red',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            ticks: {
+                                stepSize: 10
+                            },
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {minute: 'MM-DD HH:mm'}
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 30,
+                                suggestedMax: 180,
+                                stepSize: 30
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'temp'
+                            }
+                        }]
+                    },
+                }
+            };
             var ctx = document.getElementById(chart_div).getContext('2d');
-            this.lineChart = new Chart(ctx, Boiler.chartConfig);
+            this.lineChart = new Chart(ctx, this.chartConfig);
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;

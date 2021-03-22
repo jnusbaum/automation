@@ -1,49 +1,6 @@
 // TempSensor class
 class TempSensor {
-    static chartConfig = {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'TEMP',
-                borderColor: 'orange',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            },]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    ticks: {
-                        stepSize: 10
-                    },
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {minute: 'MM-DD HH:mm'}
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 30,
-                        suggestedMax: 180,
-                        stepSize: 30
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'temp'
-                    }
-                }]
-            },
-        }
-    };
-
-    constructor(name, gauge_div, chart_div, url, period) {
+        constructor(name, gauge_div, chart_div, url, period) {
         this.name = name;
         this.url = url;
         this.period = period;
@@ -70,8 +27,50 @@ class TempSensor {
 
         this.lineChart = null;
         if (chart_div) {
+            this.chartConfig = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'TEMP',
+                        borderColor: 'orange',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    },]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            ticks: {
+                                stepSize: 10
+                            },
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {minute: 'MM-DD HH:mm'}
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 30,
+                                suggestedMax: 180,
+                                stepSize: 30
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'temp'
+                            }
+                        }]
+                    },
+                }
+            };
             var ctx = document.getElementById(chart_div).getContext('2d');
-            this.lineChart = new Chart(ctx, TempSensor.chartConfig);
+            this.lineChart = new Chart(ctx, this.chartConfig);
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;

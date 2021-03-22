@@ -1,59 +1,5 @@
 
 class MixingValve {
-    static chartConfig = {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'RETURN',
-                borderColor: 'orange',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'OUT',
-                borderColor: 'skyblue',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }, {
-                label: 'BOILER',
-                borderColor: 'red',
-                fill: false,
-                pointRadius: 0,
-                data: [],
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    ticks: {
-                        stepSize: 10
-                    },
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {minute: 'MM-DD HH:mm'}
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        suggestedMin: 30,
-                        suggestedMax: 180,
-                        stepSize: 30
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'temp'
-                    }
-                }]
-            },
-        }
-    };
 
     constructor(name, return_div, out_div, boiler_div, chart_div, url, period) {
         this.name = name;
@@ -120,8 +66,63 @@ class MixingValve {
 
         this.lineChart = null;
         if (chart_div) {
+            this.chartConfig = {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'RETURN',
+                        borderColor: 'orange',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }, {
+                        label: 'OUT',
+                        borderColor: 'skyblue',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }, {
+                        label: 'BOILER',
+                        borderColor: 'red',
+                        fill: false,
+                        pointRadius: 0,
+                        data: [],
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            ticks: {
+                                stepSize: 10
+                            },
+                            time: {
+                                unit: 'minute',
+                                displayFormats: {minute: 'MM-DD HH:mm'}
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                suggestedMin: 30,
+                                suggestedMax: 180,
+                                stepSize: 30
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'temp'
+                            }
+                        }]
+                    },
+                }
+            };
+
             var ctx = document.getElementById(chart_div).getContext('2d');
-            this.lineChart = new Chart(ctx, MixingValve.chartConfig);
+            this.lineChart = new Chart(ctx, this.chartConfig);
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
