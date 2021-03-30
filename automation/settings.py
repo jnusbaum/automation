@@ -81,9 +81,13 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/mnt/db/sqlite/automation.sqlite',
-        #'NAME': '/home/rjn/Projects/automation/sqlite/automation.sqlite',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'automation',
+        'USER': 'automation',
+        'PASSWORD': 'zaxxon',
+        # 'HOST': '192.168.0.134',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
