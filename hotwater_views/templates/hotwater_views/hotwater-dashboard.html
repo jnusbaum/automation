@@ -49,7 +49,7 @@ Display water heaters and circulation pump
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Hot Water</a>
+      <a class="navbar-brand" href="{% url 'view_automation_dashboard' %}">Automation</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -69,6 +69,11 @@ Display water heaters and circulation pump
     </nav>
     <div class="container-fluid mt-3">
         {% for hname in heaters %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ hname }}</h6>
+            </div>
+        </div>
          <div class="row mt-3">
             <div class="col-sm-4 col-lg-4 col-xl-2">
                 <canvas id="{{ hname }}_gauge_in_div" style="width: 100%;"></canvas>
@@ -87,6 +92,11 @@ Display water heaters and circulation pump
         </div>
         {% endfor %}
         {% for pname in pumps %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ pname }}</h6>
+            </div>
+        </div>
         <div class="row mt-3">
             <div class="col-sm-4 col-lg-4 col-xl-2">
                 <canvas id="{{ pname }}_gauge_in_div" style="width: 100%;"></canvas>
