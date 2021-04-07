@@ -77,7 +77,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'automation.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+# postgres
 
 DATABASES = {
     'default': {
