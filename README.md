@@ -1,2 +1,2 @@
-# automation-frontend
-django home automation front end
+# automation
+django home automation system
