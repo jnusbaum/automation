@@ -77,7 +77,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'automation.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+# postgres
 
 DATABASES = {
     'default': {
@@ -172,18 +172,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # app specific settings - should they be here?
 
-DATASERVER_HOST = 'http://192.168.0.134/automation'
-MQTTHOST = '192.168.0.134'
-TEMPMQTTID = 'tempcapture'
-RELAYMQTTID = 'relaycapture'
-DEVCFGMQTTID = 'deviceconfig'
-DEVSTATUSMQTTID = 'devstatuscapture'
-BASETOPIC = 'sorrelhills'
-
-# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+# DATASERVER_HOST = 'http://192.168.0.134/automation'
 # MQTTHOST = '192.168.0.134'
-# TEMPMQTTID = 'testtempcapture'
-# RELAYMQTTID = 'testrelaycapture'
-# DEVCFGMQTTID = 'testdeviceconfig'
-# DEVSTATUSMQTTID = 'testdevstatuscapture'
+# TEMPMQTTID = 'tempcapture'
+# RELAYMQTTID = 'relaycapture'
+# DEVCFGMQTTID = 'deviceconfig'
+# DEVSTATUSMQTTID = 'devstatuscapture'
 # BASETOPIC = 'sorrelhills'
+
+DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+MQTTHOST = '192.168.0.134'
+TEMPMQTTID = 'testtempcapture'
+RELAYMQTTID = 'testrelaycapture'
+DEVCFGMQTTID = 'testdeviceconfig'
+DEVSTATUSMQTTID = 'testdevstatuscapture'
+BASETOPIC = 'sorrelhills'
