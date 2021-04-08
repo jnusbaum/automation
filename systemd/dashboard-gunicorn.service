@@ -14,7 +14,7 @@ ExecStart=/home/rjn/Projects/automation/venv/bin/gunicorn \
 	  --access-logfile /home/rjn/Projects/automation/log/gunicorn.access.log \
           --error-logfile /home/rjn/Projects/automation/log/gunicorn.error.log \
           --pid /run/dashboard-gunicorn/pid   \
-          --bind unix:/run/dashboard-salite-gunicorn/socket automation.wsgi
+          --bind unix:/run/dashboard-gunicorn/socket automation.wsgi
 PIDFile=/run/dashboard-gunicorn/pid
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
