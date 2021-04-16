@@ -9,14 +9,3 @@ def dashboard(request):
                                                                     'sensors': [s.name for s in sensors],
                                                                     })
 
-
-def all_sensors(request):
-    pass
-
-
-def test(request):
-    pass
-
-
-def sensor(request):
-    pass
