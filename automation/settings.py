@@ -77,7 +77,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'automation.wsgi.application'
 
 # Database
-# postgres
+# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -86,7 +86,7 @@ DATABASES = {
         'USER': 'automation',
         'PASSWORD': 'zaxxon',
         # 'HOST': '192.168.0.134',
-        'HOST': 'localhost',
+        'HOST': 'automation.c0bnlhkxko2m.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
@@ -116,22 +116,22 @@ LOGGING = {
         'tempcapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
+            'filename': '/home/ubuntu/automation/log/tempcapture.log',
         },
         'relaycapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/relaycapture.log',
+            'filename': '/home/ubuntu/automation/log/relaycapture.log',
         },
         'devstatuscapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/devstatuscapture.log',
+            'filename': '/home/ubuntu/automation/log/devstatuscapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/deviceconfig.log',
+            'filename': '/home/ubuntu/automation/log/deviceconfig.log',
         },
     },
     'loggers': {
@@ -172,18 +172,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # app specific settings - should they be here?
 
-# DATASERVER_HOST = 'http://192.168.0.134/automation'
-# MQTTHOST = '192.168.0.134'
-# TEMPMQTTID = 'tempcapture'
-# RELAYMQTTID = 'relaycapture'
-# DEVCFGMQTTID = 'deviceconfig'
-# DEVSTATUSMQTTID = 'devstatuscapture'
-# BASETOPIC = 'sorrelhills'
-
-DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
-MQTTHOST = '192.168.0.134'
-TEMPMQTTID = 'testtempcapture'
-RELAYMQTTID = 'testrelaycapture'
-DEVCFGMQTTID = 'testdeviceconfig'
-DEVSTATUSMQTTID = 'testdevstatuscapture'
+DATASERVER_HOST = 'http://ec2-18-191-56-78.us-east-2.compute.amazonaws.com/automation'
+MQTTHOST = 'localhost'
+TEMPMQTTID = 'tempcapture'
+RELAYMQTTID = 'relaycapture'
+DEVCFGMQTTID = 'deviceconfig'
+DEVSTATUSMQTTID = 'devstatuscapture'
 BASETOPIC = 'sorrelhills'
+
+# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+# MQTTHOST = '192.168.0.134'
+# TEMPMQTTID = 'testtempcapture'
+# RELAYMQTTID = 'testrelaycapture'
+# DEVCFGMQTTID = 'testdeviceconfig'
+# DEVSTATUSMQTTID = 'testdevstatuscapture'
+# BASETOPIC = 'sorrelhills'
