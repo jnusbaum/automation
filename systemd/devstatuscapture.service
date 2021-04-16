@@ -1,5 +1,5 @@
 [Unit]
-Description=device config server
+Description=devstatuscapture daemon
 Requires=mosquitto.service
 After=network.target multi-user.target mosquitto.service
 
@@ -7,7 +7,7 @@ After=network.target multi-user.target mosquitto.service
 User=rjn
 Group=www-data
 WorkingDirectory=/home/rjn/Projects/automation
-ExecStart=/home/rjn/Projects/automation/venv/bin/python /home/rjn/Projects/automation/manage.py deviceconfig
+ExecStart=/home/rjn/Projects/automation/venv/bin/python /home/rjn/Projects/automation/manage.py devstatuscapture
 
 [Install]
 WantedBy=multi-user.target
