@@ -85,8 +85,8 @@ DATABASES = {
         'NAME': 'automation',
         'USER': 'automation',
         'PASSWORD': 'zaxxon',
-        # 'HOST': '192.168.0.134',
-        'HOST': 'localhost',
+        'HOST': '192.168.0.134',
+        # 'HOST': 'localhost',
         'PORT': '5432',
     }
 }
