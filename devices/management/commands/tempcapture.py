@@ -12,8 +12,8 @@ import logging
 logger = logging.getLogger('tempcapture')
 logger.setLevel('INFO')
 
-MAX_TEMP_MOVE = 35
-MIN_TEMP = 25
+MAX_TEMP_MOVE = 45
+MIN_TEMP = 35
 
 
 # The callback for when the client receives a CONNACK response from the server.
