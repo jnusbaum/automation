@@ -20,6 +20,7 @@ from automation import views
 
 urlpatterns = [
     path('automation/', views.dashboard, name='view_automation_dashboard'),
+    path('automation/plot/', views.plot, name='view_automation_plot'),
     path('automation/admin/', admin.site.urls),
     path('automation/devices/dashboard/', include('devices_views.urls')),
     path('automation/devices/api/', include('devices.urls')),
