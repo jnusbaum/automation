@@ -21,8 +21,9 @@
                             'gauge_in_div',
                             'gauge_pump_div',
                             'temp_chart_div',
-                            'pump_chart_div'
-                            '{{ host }}/hotwater/api/circpumps/{{ pump }}/data', 10000);
+                            'pump_chart_div',
+                            {{ hours }},
+                            '{{ host }}/hotwater/api/circpumps/{{ pump }}/data/', 10000);
             pump.setup();
         }
 

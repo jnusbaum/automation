@@ -22,7 +22,8 @@
                         'gauge_in_div',
                         'gauge_out_div',
                         'chart_div',
-                        `{{ host }}/heating/api/zones/{{ zone }}/data`, 10000);
+                        {{ hours }},
+                        `{{ host }}/heating/api/zones/{{ zone }}/data/`, 10000);
             zone.setup();
         }
     </script>

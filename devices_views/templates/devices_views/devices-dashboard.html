@@ -21,7 +21,8 @@
                     let sensor = new TempSensor('{{ sname }}',
                                     '{{ sname }}_gauge_div',
                                     null,
-                                    `{{ host }}/devices/api/tempsensors/{{ sname }}/data`, 10000);
+                                    1,
+                                    `{{ host }}/devices/api/tempsensors/{{ sname }}/data/`, 10000);
                     sensor.setup();
                 }
             {% endfor %}

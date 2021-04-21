@@ -29,7 +29,8 @@ Display heating system
                         null,
                         null,
                         '{{ zname }}_chart_div',
-                        `{{ host }}/heating/api/zones/{{ zname }}/data`, 10000);
+                        {{ hours }},
+                        `{{ host }}/heating/api/zones/{{ zname }}/data/`, 10000);
                     zone.setup();
                 }
             {% endfor %}
@@ -41,7 +42,8 @@ Display heating system
                         null,
                         null,
                         '{{ bname }}_chart_div',
-                        '{{ host }}/heating/api/boilers/{{ bname }}/data', 10000);
+                        {{ hours }},
+                        '{{ host }}/heating/api/boilers/{{ bname }}/data/', 10000);
                     boiler.setup();
                 }
             {% endfor %}
@@ -53,7 +55,8 @@ Display heating system
                         null,
                         null,
                         '{{ vname }}_chart_div',
-                        '{{ host }}/heating/api/mixingvalves/{{ vname }}/data', 10000);
+                        {{ hours }},
+                        '{{ host }}/heating/api/mixingvalves/{{ vname }}/data/', 10000);
                     valve.setup();
                 }
             {% endfor %}
@@ -65,7 +68,8 @@ Display heating system
                         null,
                         null,
                         '{{ hname }}_chart_div',
-                        '{{ host }}/hotwater/api/waterheaters/{{ hname }}/data', 10000);
+                        {{ hours }},
+                        '{{ host }}/hotwater/api/waterheaters/{{ hname }}/data/', 10000);
                     heater.setup();
                 }
             {% endfor %}
@@ -77,7 +81,8 @@ Display heating system
                         null,
                         '{{ pname }}_temp_chart_div',
                         '{{ pname }}_pump_chart_div',
-                        '{{ host }}/hotwater/api/circpumps/{{ pname }}/data', 10000);
+                        {{ hours }},
+                        '{{ host }}/hotwater/api/circpumps/{{ pname }}/data/', 10000);
                     pump.setup();
                 }
             {% endfor %}

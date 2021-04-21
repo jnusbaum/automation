@@ -20,6 +20,9 @@ def plot(request):
     valves = MixingValve.objects.all().order_by('name')
     pumps = CircPump.objects.all().order_by('name')
     heaters = WaterHeater.objects.all().order_by('name')
+    hours = 24
+    if 'datapts' in request.GET:
+        hours = request.GET['datapts']
     if 'ALL' in request.GET:
         for z in zones:
             dzones.append(z.name)
@@ -48,6 +51,7 @@ def plot(request):
             if h.name in request.GET:
                 dheaters.append(h.name)
     return render(request, 'automation/automation-plot.html', {'host': settings.DATASERVER_HOST,
+                                                               'hours': hours,
                                                                 'zones': dzones,
                                                                 'boilers': dboilers,
                                                                 'valves': dvalves,

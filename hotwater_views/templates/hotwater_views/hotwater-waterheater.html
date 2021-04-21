@@ -21,7 +21,8 @@
                         'gauge_out_div',
                         'gauge_burn_div',
                         'chart_div',
-                        `{{ host }}/hotwater/api/waterheaters/{{ heater }}/data`, 10000);
+                        {{ hours }},
+                        `{{ host }}/hotwater/api/waterheaters/{{ heater }}/data/`, 10000);
                     heater.setup();
         }
 

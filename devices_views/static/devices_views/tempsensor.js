@@ -1,11 +1,12 @@
 // TempSensor class
 class TempSensor {
-        constructor(name, gauge_div, chart_div, url, period) {
+        constructor(name, gauge_div, chart_div, hours, url, period) {
         this.name = name;
         this.url = url;
         this.period = period;
-        this.gauge = null;
+        this.hours = hours;
 
+        this.gauge = null;
         if (gauge_div) {
             this.gauge = new LinearGauge({
                 renderTo: gauge_div,
@@ -71,11 +72,12 @@ class TempSensor {
             };
             var ctx = document.getElementById(chart_div).getContext('2d');
             this.lineChart = new Chart(ctx, this.chartConfig);
+
+            // max data points to display in chart
+            this.maxPoints = 0;
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-        // max data points to display in chart
-        this.maxPoints = 9000;
         // dataset indices
         this.index = 0;
         // last ts loaded
@@ -84,6 +86,7 @@ class TempSensor {
 
     updateData(adata) {
         let scount = adata['count'];
+        if (scount > this.maxPoints) this.maxPoints = scount;
         let sdata = adata['data']
         if (scount > 0) {
             // data comes in latest first
@@ -134,7 +137,7 @@ class TempSensor {
         this.lastLoaded = ts;
         let sensor = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString() },
             function (data) {
                 // can't use this here as it is set at runtime
                 sensor.update(data);
@@ -144,11 +147,11 @@ class TempSensor {
     setup () {
         let sts = new Date();
         let ts = new Date(sts);
-        sts.setHours(sts.getHours() - 24);
+        sts.setHours(sts.getHours() - this.hours);
         this.lastLoaded = ts;
         let sensor = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString()},
             function (data) {
             // can't use this here as it is set at runtime
                 sensor.update(data);

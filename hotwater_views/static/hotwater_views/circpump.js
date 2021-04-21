@@ -1,10 +1,11 @@
 // Circulator Pump
 class CircPump {
 
-    constructor(name, in_div, pump_div, temp_chart_div, pump_chart_div, url, period) {
+    constructor(name, in_div, pump_div, temp_chart_div, pump_chart_div, hours, url, period) {
         this.name = name;
         this.url = url;
         this.period = period;
+        this.hours = hours;
 
         this.gaugeIn = null;
         if (in_div) {
@@ -79,6 +80,8 @@ class CircPump {
 
             var ctx = document.getElementById(temp_chart_div).getContext('2d');
             this.tempChart = new Chart(ctx, this.tempChartConfig);
+
+            this.tempMaxPoints = 0;
         }
         this.pumpChart = null;
         if (pump_chart_div) {
@@ -126,11 +129,12 @@ class CircPump {
             };
             ctx = document.getElementById(pump_chart_div).getContext('2d');
             this.pumpChart = new Chart(ctx, this.pumpChartConfig);
+
+            // max data points to display in chart
+            this.pumpMaxPoints = 0;
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-        // max data points to display in chart
-        this.maxPoints = 9000;
         // dataset indices
         this.inIndex = 0;
         this.pumpIndex = 0;
@@ -139,7 +143,43 @@ class CircPump {
     }
 
     updateData(adata) {
+        let pumpcount = adata['data']['relay']['count']
+        if (pumpcount > this.pumpMaxPoints) this.pumpMaxPoints = pumpcount;
+        let pumpdata = adata['data']['relay']['data']
+        if (pumpcount > 0) {
+            // data comes in latest first
+            this.pumpVal = pumpdata[0]['attributes']['value'];
+            let pumpLen = 0;
+            if (this.pumpChart) {
+                if (this.pumpChart.data.datasets[this.pumpIndex].data.length > 0) {
+                    // already have data
+                    let pumpLen = 0;
+                    for (let i = pumpcount - 1; i >= 0; i--) {
+                        pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.push({
+                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
+                            y: pumpdata[i]['attributes']['value']
+                        });
+                        if (pumpLen > this.pumpMaxPoints) {
+                            // remove extra
+                            this.pumpChart.data.datasets[this.pumpIndex].data.shift();
+                        }
+                    }
+                } else {
+                    // no data
+                    for (let i = 0; i < pumpcount; i++) {
+                        pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.unshift({
+                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
+                            y: pumpdata[i]['attributes']['value']
+                        });
+                    }
+                    // guaranteed not to have more than maxPoints in the incoming data\
+                    // so no need to remove extras
+                }
+            }
+        }
+
         let sincount = adata['data']['sensor']['count'];
+        if (sincount > this.tempMaxPoints) this.tempMaxPoints = sincount;
         let sindata = adata['data']['sensor']['data']
         if (sincount > 0) {
             // data comes in latest first
@@ -155,7 +195,7 @@ class CircPump {
                             t: sindata[i]['attributes']['timestamp'] - this.offset,
                             y: sindata[i]['attributes']['value']
                         });
-                        if (sinLen > this.maxPoints) {
+                        if (sinLen > this.tempMaxPoints) {
                             // remove extra
                             this.tempChart.data.datasets[this.inIndex].data.shift();
                         }
@@ -166,40 +206,6 @@ class CircPump {
                         sinLen = this.tempChart.data.datasets[this.inIndex].data.unshift({
                             t: sindata[i]['attributes']['timestamp'] - this.offset,
                             y: sindata[i]['attributes']['value']
-                        });
-                    }
-                    // guaranteed not to have more than maxPoints in the incoming data\
-                    // so no need to remove extras
-                }
-            }
-        }
-
-        let pumpcount = adata['data']['relay']['count']
-        let pumpdata = adata['data']['relay']['data']
-        if (pumpcount > 0) {
-            // data comes in latest first
-            this.pumpVal = pumpdata[0]['attributes']['value'];
-            let pumpLen = 0;
-            if (this.pumpChart) {
-                if (this.pumpChart.data.datasets[this.pumpIndex].data.length > 0) {
-                    // already have data
-                    let pumpLen = 0;
-                    for (let i = pumpcount - 1; i >= 0; i--) {
-                        pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.push({
-                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
-                            y: pumpdata[i]['attributes']['value']
-                        });
-                        if (pumpLen > this.maxPoints) {
-                            // remove extra
-                            this.pumpChart.data.datasets[this.pumpIndex].data.shift();
-                        }
-                    }
-                } else {
-                    // no data
-                    for (let i = 0; i < pumpcount; i++) {
-                        pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.unshift({
-                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
-                            y: pumpdata[i]['attributes']['value']
                         });
                     }
                     // guaranteed not to have more than maxPoints in the incoming data\
@@ -225,7 +231,7 @@ class CircPump {
         this.lastLoaded = ts;
         let pump = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString()},
             function (data) {
                 // can't use this here as it is set at runtime
                 pump.update(data);
@@ -236,11 +242,11 @@ class CircPump {
     setup() {
         let sts = new Date();
         let ts = new Date(sts);
-        sts.setHours(sts.getHours() - 24);
+        sts.setHours(sts.getHours() - this.hours);
         this.lastLoaded = ts;
         let pump = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString()},
             function (data) {
                 // can't use this here as it is set at runtime
                 pump.update(data);

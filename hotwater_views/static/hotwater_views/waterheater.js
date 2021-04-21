@@ -1,10 +1,11 @@
 // Water Heater class
 class WaterHeater {
 
-    constructor(name, in_div, out_div, burn_div, chart_div, url, period) {
+    constructor(name, in_div, out_div, burn_div, chart_div, hours, url, period) {
         this.name = name;
         this.url = url;
         this.period = period;
+        this.hours = hours;
 
         this.gaugeIn = null;
         if (in_div) {
@@ -122,11 +123,14 @@ class WaterHeater {
             };
             var ctx = document.getElementById(chart_div).getContext('2d');
             this.lineChart = new Chart(ctx, this.chartConfig);
+
+            // max data points to display in chart
+            this.inMaxPoints = 0;
+            this.outMaxPoints = 0;
+            this.burnMaxPoints = 0;
         }
 
         this.offset = new Date().getTimezoneOffset() * 60 * 1000;
-        // max data points to display in chart
-        this.maxPoints = 9000;
         // dataset indices
         this.inIndex = 0;
         this.outIndex = 1;
@@ -137,6 +141,7 @@ class WaterHeater {
 
     updateData(adata) {
         let sincount = adata['data']['sensor_in']['count'];
+        if (sincount > this.inMaxPoints) this.inMaxPoints = sincount;
         let sindata = adata['data']['sensor_in']['data']
         if (sincount > 0) {
             // data comes in latest first
@@ -150,7 +155,7 @@ class WaterHeater {
                             t: sindata[i]['attributes']['timestamp'] - this.offset,
                             y: sindata[i]['attributes']['value']
                         });
-                        if (sinLen > this.maxPoints) {
+                        if (sinLen > this.inMaxPoints) {
                             // remove extra
                             this.lineChart.data.datasets[this.inIndex].data.shift();
                         }
@@ -170,6 +175,7 @@ class WaterHeater {
         }
 
         let soutcount = adata['data']['sensor_out']['count']
+        if (soutcount > this.outMaxPoints) this.outMaxPoints = soutcount;
         let soutdata = adata['data']['sensor_out']['data']
         if (soutcount > 0) {
             // data comes in latest first
@@ -183,7 +189,7 @@ class WaterHeater {
                             t: soutdata[i]['attributes']['timestamp'] - this.offset,
                             y: soutdata[i]['attributes']['value']
                         });
-                        if (soutLen > this.maxPoints) {
+                        if (soutLen > this.outMaxPoints) {
                             // remove extra
                             this.lineChart.data.datasets[this.outIndex].data.shift();
                         }
@@ -203,6 +209,7 @@ class WaterHeater {
         }
 
         let sburncount = adata['data']['sensor_burn']['count']
+        if (sburncount > this.burnMaxPoints) this.burnMaxPoints = sburncount;
         let sburndata = adata['data']['sensor_burn']['data']
         if (sburncount > 0) {
             // data comes in latest first
@@ -216,7 +223,7 @@ class WaterHeater {
                             t: sburndata[i]['attributes']['timestamp'] - this.offset,
                             y: sburndata[i]['attributes']['value']
                         });
-                        if (sburnLen > this.maxPoints) {
+                        if (sburnLen > this.burnMaxPoints) {
                             // remove extra
                             this.lineChart.data.datasets[this.burnIndex].data.shift();
                         }
@@ -252,7 +259,7 @@ class WaterHeater {
         this.lastLoaded = ts;
         let heater = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints},
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString() },
             function (data) {
                 // can't use this here as it is set at runtime
                 heater.update(data);
@@ -262,11 +269,11 @@ class WaterHeater {
     setup() {
         let sts = new Date();
         let ts = new Date(sts);
-        sts.setHours(sts.getHours() - 24);
+        sts.setHours(sts.getHours() - this.hours);
         this.lastLoaded = ts;
         let heater = this;
         $.getJSON(this.url,
-            {'starttime': sts.toISOString(), 'endtime': ts.toISOString(), 'datapts': this.maxPoints },
+            {'starttime': sts.toISOString(), 'endtime': ts.toISOString() },
             function (data) {
             // can't use this here as it is set at runtime
                 heater.update(data);

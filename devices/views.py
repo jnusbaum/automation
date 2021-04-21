@@ -189,8 +189,9 @@ def get_device_data(request, device: Device):
         datapts = request.GET['datapts']
         datapts = int(datapts)
     except KeyError:
-        datapts = 1
-    sdata = sdata.order_by('-timestamp')[:datapts]
+        sdata = sdata.order_by('-timestamp')
+    else:
+        sdata = sdata.order_by('-timestamp')[:datapts]
     data = [s.as_json() for s in sdata]
     return {'count': len(data), 'data': data}
 
@@ -331,8 +332,9 @@ def get_tempsensor_data(request, sensor: TempSensor):
         datapts = request.GET['datapts']
         datapts = int(datapts)
     except KeyError:
-        datapts = 1
-    sdata = sdata.order_by('-timestamp')[:datapts]
+        sdata = sdata.order_by('-timestamp')
+    else:
+        sdata = sdata.order_by('-timestamp')[:datapts]
     data = [s.as_json() for s in sdata]
     return {'count': len(data), 'data': data}
 
@@ -444,8 +446,9 @@ def get_relay_data(request, relay: Relay):
         datapts = request.GET['datapts']
         datapts = int(datapts)
     except KeyError:
-        datapts = 1
-    sdata = sdata.order_by('-timestamp')[:datapts]
+        sdata = sdata.order_by('-timestamp')
+    else:
+        sdata = sdata.order_by('-timestamp')[:datapts]
     data = [s.as_json() for s in sdata]
     return {'count': len(data), 'data': data}
 
