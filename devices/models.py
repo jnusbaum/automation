@@ -17,7 +17,6 @@ class Device(models.Model):
                  'id': self.name,
                  'type': 'Device',
                  'self': f"/devices/{self.name}",
-                 'relationships': {'devices': f"/devices/{self.name}"}
                  }
         return dself
 
