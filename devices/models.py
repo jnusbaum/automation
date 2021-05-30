@@ -44,7 +44,7 @@ class DeviceStatus(models.Model):
                  'id': self.id,
                  'type': 'DeviceStatus',
                  'self': f"/devices/{self.device.name}/data/{self.id}",
-                 'relationships': {'relay': f"/devices/{self.device.name}"}
+                 'relationships': {'device': f"/devices/{self.device.name}"}
                  }
         return dself
 
@@ -96,7 +96,7 @@ class TempSensor(models.Model):
                  'type': 'TempSensor',
                  'self': f"/devices/{self.name}",
                  'relationships': {'data': f"/tempsensors/{self.name}/data/",
-                                   'device': f"/onewireinterfaces/{self.one_wire_interface.device.name}/" if self.one_wire_interface else ''
+                                   'interface': f"/onewireinterfaces/{self.one_wire_interface.id}/" if self.one_wire_interface else '',
                                    },
                  }
         return dself
