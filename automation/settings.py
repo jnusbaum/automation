@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import django.db.models
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -85,11 +87,13 @@ DATABASES = {
         'NAME': 'automation',
         'USER': 'automation',
         'PASSWORD': 'zaxxon',
-        'HOST': '192.168.0.134',
+        'HOST': '192.168.4.36',
         # 'HOST': 'automation.c0bnlhkxko2m.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
     }
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -177,17 +181,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # app specific settings - should they be here?
 
 # DATASERVER_HOST = 'http://ec2-18-191-56-78.us-east-2.compute.amazonaws.com/automation'
+DATASERVER_HOST = 'http://192.168.4.36/automation'
 MQTTHOST = 'localhost'
-# TEMPMQTTID = 'tempcapture'
+TEMPMQTTID = 'tempcapture'
 RELAYMQTTID = 'relaycapture'
-DEVCFGMQTTID = 'deviceconfig'
 DEVSTATUSMQTTID = 'devstatuscapture'
 BASETOPIC = 'sorrelhills'
 
-DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
-MQTTHOST = '192.168.0.134'
+
+# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
+# MQTTHOST = '192.168.0.134'
 # TEMPMQTTID = 'testtempcapture'
 # RELAYMQTTID = 'testrelaycapture'
-# DEVCFGMQTTID = 'testdeviceconfig'
 # DEVSTATUSMQTTID = 'testdevstatuscapture'
 # BASETOPIC = 'sorrelhills'
