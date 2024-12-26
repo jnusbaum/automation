@@ -1,11 +1,14 @@
 from django.db import models
 from django.utils import timezone
 
+from accounts.models import Location
+
 
 class Device(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    name = models.CharField(max_length=64)
     description = models.CharField(max_length=512, null=True)
-    client_id = models.CharField(max_length=64, null=True)
+    config = models.JSONField()
 
     class Meta:
         verbose_name = "Device"
@@ -46,6 +49,10 @@ class DeviceStatus(models.Model):
                  'relationships': {'device': f"/devices/{self.device.name}"}
                  }
         return dself
+
+
+
+
 
 
 class OneWireInterface(models.Model):
