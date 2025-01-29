@@ -1,10 +1,12 @@
 from django.db import models
-from devices.models import TempSensor, Relay
+
+from accounts.models import Location
+from devices.models import Device
+from sensors.models import TempSensor
+from controls.models import Relay
 
 
-class WaterHeater(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
-    description = models.CharField(max_length=512, null=True)
+class WaterHeater(Device):
     sensor_in = models.ForeignKey(TempSensor, related_name='sensor_in', on_delete=models.RESTRICT)
     sensor_out = models.ForeignKey(TempSensor, related_name='sensor_out', on_delete=models.RESTRICT)
     sensor_burn = models.ForeignKey(TempSensor, related_name='sensor_burn', on_delete=models.RESTRICT)
@@ -14,20 +16,18 @@ class WaterHeater(models.Model):
         verbose_name_plural = "WaterHeaters"
 
     def as_json(self):
-        dself = {'attributes': {'description': self.description},
-                 'id': self.name,
-                 'type': 'WaterHeater',
-                 'self': f"/zones/{self.name}",
-                 'relationships': {'sensor_in': f"automation/devices/api/tempsensors/{self.sensor_in.name}",
-                                   'sensor_out': f"automation/devices/api/tempsensors/{self.sensor_out.name}",
-                                   'sensor_burn': f"automation/devices/api/tempsensors/{self.sensor_burn.name}"},
-                 }
+        dself: dict[str, str | dict[str, str | Location] | int] = super().as_json()
+        dself['type'] = 'WaterHeater'
+        dself['self'] = f"/waterheaters/{self.sensor.name}"
+        dself['relationships'] = {
+            'sensor_in': f"automation/sensors/api/tempsensors/{self.sensor_in.name}",
+            'sensor_out': f"automation/sensors/api/tempsensors/{self.sensor_out.name}",
+            'sensor_burn': f"automation/sensors/api/tempsensors/{self.sensor_burn.name}"
+        }
         return dself
 
 
-class CircPump(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
-    description = models.CharField(max_length=512, null=True)
+class CircPump(Device):
     sensor = models.ForeignKey(TempSensor, related_name='sensor', on_delete=models.RESTRICT)
     relay = models.OneToOneField(Relay, related_name='+', on_delete=models.RESTRICT)
 
@@ -36,11 +36,11 @@ class CircPump(models.Model):
         verbose_name_plural = "CircPumps"
 
     def as_json(self):
-        dself = {'attributes': {'description': self.description},
-                 'id': self.name,
-                 'type': 'CircPump',
-                 'self': f"/circpumps/{self.name}",
-                 'relationships': {'sensor': f"automation/devices/api/tempsensors/{self.sensor.name}",
-                                   'relay': f"automation/devices/api/relays/{self.relay.name}"},
-                 }
+        dself: dict[str, str | dict[str, str | Location] | int] = super().as_json()
+        dself['type'] = 'CircPump'
+        dself['self'] = f"/circpumps/{self.sensor.name}"
+        dself['relationships'] = {
+            'sensor': f"automation/sensors/api/tempsensors/{self.sensor.name}",
+            'relay': f"automation/controls/api/relays/{self.relay.name}"
+        }
         return dself

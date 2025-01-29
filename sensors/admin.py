@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import OneWireInterface, Sensor, TempSensor, TempSensorData
+from sensors.models import OneWireInterface, Sensor, TempSensor, TempSensorData
 from django.urls import reverse
 
 

@@ -87,8 +87,12 @@ WSGI_APPLICATION = 'automation.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'automation',
+        'ENGINE': 'django.db.backends.postgresql',
+        "OPTIONS": {
+            "service": "dev_service",
+            "passfile": ".dev_pgpass",
+        },
+        'NAME': 'automation-dev',
         'USER': 'automation',
         'PASSWORD': 'zaxxon',
         'HOST': '192.168.4.36',

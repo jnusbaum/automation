@@ -1,10 +1,8 @@
 from django.db import models
-from devices.models import TempSensor
+from sensors.models import TempSensor
+from devices.models import Device
 
-
-class Boiler(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
-    description = models.CharField(max_length=512, null=True)
+class Boiler(Device):
     sensor_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_burn = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
@@ -25,9 +23,7 @@ class Boiler(models.Model):
         return dself
 
 
-class MixingValve(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
-    description = models.CharField(max_length=512, null=True)
+class MixingValve(Device):
     sensor_sys_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_boiler_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
@@ -49,8 +45,6 @@ class MixingValve(models.Model):
 
 
 class Zone(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
-    description = models.CharField(max_length=512, null=True)
     sensor_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
 

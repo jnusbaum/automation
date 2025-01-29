@@ -1,5 +1,5 @@
 from django.contrib import admin
-from models import Relay, RelayData
+from controls.models import Relay, RelayData
 # from django.urls import reverse
 
 
@@ -25,8 +25,6 @@ class RelayAdmin(admin.ModelAdmin):
     #
     # device_link.short_description = 'Device'
     pass
-
-admin.site.register(Relay, RelayAdmin)
 
 
 @admin.register(RelayData)
@@ -59,5 +57,3 @@ class RelayDataAdmin(admin.ModelAdmin):
     #
     # relay_link.short_description = 'Relay'
     pass
-
-admin.site.register(RelayData, RelayDataAdmin)

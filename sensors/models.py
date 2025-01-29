@@ -7,13 +7,13 @@ from django.utils import timezone
 class Sensor(models.Model):
     collector = models.ForeignKey(Collector, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    config = models.JSONField()
+    config = models.JSONField(null=True)
 
 
 class OneWireInterface(models.Model):
     description = models.CharField(max_length=512, null=True)
-    pin_number = models.IntegerField()
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    pin_number = models.IntegerField(null=True)
+    collector = models.ForeignKey(Collector, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.description
@@ -72,7 +72,7 @@ class TempSensorData(models.Model):
         verbose_name = "TempSensorData"
         verbose_name_plural = "TempSensorData"
         indexes = [
-            models.Index(fields=['sensor', '-timestamp'], name='devices_tsensordata_sid_ts'),
+            models.Index(fields=['sensor', '-timestamp'], name='sensors_tsensordata_sid_ts'),
         ]
 
     def as_json(self):

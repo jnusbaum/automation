@@ -23,9 +23,6 @@ class DeviceAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Device, DeviceAdmin)
-
-
 @admin.register(DeviceStatus)
 class DeviceStatusAdmin(admin.ModelAdmin):
     # list_display = (
@@ -59,9 +56,6 @@ class DeviceStatusAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(DeviceStatus, DeviceStatusAdmin)
-
-
 @admin.register(OneWireInterface)
 class OneWireInterfaceAdmin(admin.ModelAdmin):
     # list_display = (
@@ -86,9 +80,6 @@ class OneWireInterfaceAdmin(admin.ModelAdmin):
     #
     # device_link.short_description = 'Device'
     pass
-
-
-admin.site.register(OneWireInterface, OneWireInterfaceAdmin)
 
 
 @admin.register(TempSensor)
@@ -125,9 +116,6 @@ class TempSensorAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(TempSensor, TempSensorAdmin)
-
-
 @admin.register(TempSensorData)
 class TempSensorDataAdmin(admin.ModelAdmin):
     # list_display = (
@@ -160,6 +148,3 @@ class TempSensorDataAdmin(admin.ModelAdmin):
     #
     # sensor_link.short_description = 'Sensor'
     pass
-
-
-admin.site.register(TempSensorData, TempSensorDataAdmin)

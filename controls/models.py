@@ -4,13 +4,12 @@ from devices.models import Device
 
 
 class Control(models.Model):
-    name = models.CharField(max_length=64, primary_key=True)
+    name = models.CharField(max_length=64)
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
-    pass
 
 
 class Relay(Control):
-    pin_number = models.IntegerField()
+    pin_number = models.IntegerField(null=True)
     description = models.CharField(max_length=512, null=True)
 
     class Meta:
@@ -40,7 +39,7 @@ class RelayData(models.Model):
         verbose_name = "RelayData"
         verbose_name_plural = "RelayData"
         indexes = [
-            models.Index(fields=['relay', '-timestamp'], name='sensors_relay_sid_ts'),
+            models.Index(fields=['relay', '-timestamp'], name='controls_relay_sid_ts'),
         ]
 
     def as_json(self):
