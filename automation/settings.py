@@ -181,17 +181,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # app specific settings - should they be here?
 
 # DATASERVER_HOST = 'http://ec2-18-191-56-78.us-east-2.compute.amazonaws.com/automation'
-DATASERVER_HOST = 'http://192.168.4.36/automation'
+DATASERVER_HOST = 'http://192.168.0.3/automation'
 MQTTHOST = 'localhost'
 TEMPMQTTID = 'tempcapture'
 RELAYMQTTID = 'relaycapture'
 DEVSTATUSMQTTID = 'devstatuscapture'
 BASETOPIC = 'sorrelhills'
 
-
-# DATASERVER_HOST = 'http://127.0.0.1:8000/automation'
-# MQTTHOST = '192.168.0.134'
-# TEMPMQTTID = 'testtempcapture'
-# RELAYMQTTID = 'testrelaycapture'
-# DEVSTATUSMQTTID = 'testdevstatuscapture'
-# BASETOPIC = 'sorrelhills'
