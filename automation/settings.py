@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'automation',
         'USER': 'automation',
         'PASSWORD': 'zaxxon',
-        'HOST': '192.168.4.36',
+        'HOST': '192.168.0.3',
         # 'HOST': 'automation.c0bnlhkxko2m.us-east-2.rds.amazonaws.com',
         'PORT': '5432',
     }
