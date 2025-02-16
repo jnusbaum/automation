@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'heating_views.apps.HeatingViewsConfig',
     'hotwater.apps.HotwaterConfig',
     'hotwater_views.apps.HotwaterViewsConfig',
+    'exterior.apps.ExteriorConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
