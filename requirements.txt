@@ -1,13 +1,15 @@
+ambient_api==1.5.7
 asgiref==3.8.1
 certifi==2024.12.14
 chardet==5.2.0
 charset-normalizer==3.4.0
-Django==5.1.4
+Django==5.1.5
 gunicorn==23.0.0
 idna==3.10
 packaging==24.2
 paho-mqtt==2.1.0
 psycopg-binary==3.2.3
+psycopg2-binary==2.9.10
 python-dateutil==2.9.0.post0
 pytz==2024.2
 requests==2.32.3

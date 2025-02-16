@@ -5,7 +5,11 @@ from devices.models import Device
 
 class Control(models.Model):
     name = models.CharField(max_length=64)
-    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Control"
+        verbose_name_plural = "Control"
+        abstract = True
 
 
 class Relay(Control):

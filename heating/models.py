@@ -44,7 +44,7 @@ class MixingValve(Device):
         return dself
 
 
-class Zone(models.Model):
+class Zone(Device):
     sensor_in = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
     sensor_out = models.OneToOneField(TempSensor, related_name='+', on_delete=models.RESTRICT)
 

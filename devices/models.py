@@ -24,3 +24,26 @@ class Device(models.Model):
                  'self': f"/devices/{self.name}",
                  }
         return dself
+
+
+class DeviceStatus(models.Model):
+    timestamp = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=512)
+
+    def __str__(self):
+        return f"{self.device_id}:{self.timestamp}"
+
+    class Meta:
+        verbose_name = "DeviceStatus"
+        verbose_name_plural = "DeviceStatus"
+
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'status': self.status,
+                                },
+                 'id': self.id,
+                 'type': 'DeviceStatus',
+                 'self': f"/devices/{self.device.name}/data/{self.id}",
+                 'relationships': {'device': f"/devices/{self.device.name}"}
+                 }
+        return dself
