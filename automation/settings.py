@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'collectors.apps.CollectorsConfig',
     'sensors.apps.SensorsConfig',
     'controls.apps.ControlsConfig',
-    'environment.apps.EnvironmentConfig'
+    'exterior.apps.EnvironmentConfig'
 ]
 
 MIDDLEWARE = [

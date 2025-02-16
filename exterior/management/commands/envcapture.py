@@ -1,8 +1,5 @@
 from ambient_api.ambientapi import AmbientAPI
-from django.conf import settings
 from django.core.management.base import BaseCommand
-from environment.models import EnvSensorData
-from django.db.utils import OperationalError
 import time
 import logging
 
