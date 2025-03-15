@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import *
 from http import HTTPStatus
 from dateutil.parser import *
@@ -82,17 +82,6 @@ def device(request, device_name):
         return JsonResponse(data=rdevice)
 
 
-def onewireinterfaces_for_device(device_name):
-    # if GET get device meta data
-    try:
-        z = Device.objects.get(pk=device_name)
-    except Device.DoesNotExist:
-        return JsonResponseNotFound(reason="No Device with the specified id was found.")
-    # devices_views for device
-    rifcs = {'count': len(z.onewireinterface_set), 'data': [s.as_json for s in z.onewireinterfaces]}
-    return JsonResponse(data=rifcs)
-
-
 def tempsensors_for_device(device_name):
     # if GET get device meta data
     try:
@@ -171,8 +160,8 @@ def onewireinterface(request, ifc_id):
         return JsonResponse(data=rifc)
 
 
-def get_device_data(request, device: Device):
-    sdata = device.devicestatus_set
+def get_device_data(request, idevice: Device):
+    sdata = idevice.devicestatus_set
     try:
         stime = request.GET['starttime']
         stime = isoparse(stime).replace(tzinfo=None)
@@ -183,7 +172,7 @@ def get_device_data(request, device: Device):
         etime = request.GET['endtime']
         etime = isoparse(etime).replace(tzinfo=None)
     except KeyError:
-        etime = datetime.utcnow()
+        etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -326,7 +315,7 @@ def get_tempsensor_data(request, sensor: TempSensor):
         etime = request.GET['endtime']
         etime = isoparse(etime).replace(tzinfo=None)
     except KeyError:
-        etime = datetime.utcnow()
+        etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -371,6 +360,224 @@ def tempsensor_data(request, sensor_name):
         except TempSensor.DoesNotExist:
             return JsonResponseNotFound("No TempSensor with the specified id was found.")
         rsensordata = get_tempsensor_data(request, s)
+        return JsonResponse(data=rsensordata)
+
+
+# wind sensors
+
+def windsensors(request):
+    if request.method == 'POST':
+        # if POST add new sensor
+        try:
+            sensor_name = request.POST['name']
+        except KeyError:
+            return JsonResponseBadRequest(reason="No name parameter supplied.")
+        description = request.POST.get('description', default=None)
+        try:
+            WindSensor.objects.get(pk=sensor_name)
+            return JsonResponseBadRequest(reason="WindSensor with supplied name already exists.")
+        except WindSensor.DoesNotExist:
+            s = WindSensor(name=sensor_name, description=description)
+            s.save()
+            rdevices = {'count': 1, 'data': [s.as_json()]}
+            return JsonResponseCreated(data=rdevices)
+    else:
+        # if GET return list of devices_views
+        snsrs = WindSensor.objects.all().order_by('name')
+        rsensors = {'count': len(snsrs), 'data': [s.as_json() for s in snsrs]}
+        return JsonResponse(data=rsensors)
+
+
+def windsensor(request, sensor_name):
+    try:
+        s = WindSensor.objects.get(pk=sensor_name)
+    except WindSensor.DoesNotExist:
+        return JsonResponseNotFound(reason="No WindSensor with the specified id was found.")
+    if request.method == 'PATCH':
+        # if PATCH add data for sensor
+        # can't change pk (name)
+        try:
+            s.description = request.POST['description']
+        except KeyError:
+            pass
+        s.save()
+        return JsonResponseNoContent()
+    elif request.method == 'DELETE':
+        # if DELETE delete sensor
+        s.delete()
+        return JsonResponseNoContent()
+    else:
+        # if GET get sensor meta data
+        rsensor = {'count': 1, 'data': [s.as_json()]}
+        return JsonResponse(data=rsensor)
+
+
+def get_windsensor_data(request, sensor: WindSensor):
+    sdata = sensor.windsensordata_set
+    try:
+        stime = request.GET['starttime']
+        stime = isoparse(stime).replace(tzinfo=None)
+        sdata = sdata.filter(timestamp__gt=stime)
+    except KeyError:
+        pass
+    try:
+        etime = request.GET['endtime']
+        etime = isoparse(etime).replace(tzinfo=None)
+    except KeyError:
+        etime = datetime.now(timezone.utc)
+    sdata = sdata.filter(timestamp__lte=etime)
+    try:
+        datapts = request.GET['datapts']
+        datapts = int(datapts)
+    except KeyError:
+        sdata = sdata.order_by('-timestamp')
+    else:
+        sdata = sdata.order_by('-timestamp')[:datapts]
+    data = [s.as_json() for s in sdata]
+    return {'count': len(data), 'data': data}
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def windsensor_data(request, sensor_name):
+    if request.method == 'POST':
+        # if POST add data for sensor
+        try:
+            timestamp = request.POST['timestamp']
+            timestamp = datetime.fromisoformat(timestamp)
+        except KeyError:
+            timestamp = datetime.today()
+        try:
+            value = request.POST['value']
+            value = Decimal(value)
+        except KeyError:
+            return JsonResponseBadRequest(reason="Missing value parameter")
+        try:
+            s = WindSensor.objects.get(pk=sensor_name)
+        except WindSensor.DoesNotExist:
+            return JsonResponseNotFound("No Sensor with the specified id was found.")
+        s = WindSensorData(sensor=s, timestamp=timestamp, value=value)
+        s.save()
+        rdevices = {'count': 1, 'data': [s.as_json()]}
+        return JsonResponseCreated(data=rdevices)
+    else:
+        # if GET get data for sensor
+        try:
+            s = WindSensor.objects.get(pk=sensor_name)
+        except WindSensor.DoesNotExist:
+            return JsonResponseNotFound("No WindSensor with the specified id was found.")
+        rsensordata = get_windsensor_data(request, s)
+        return JsonResponse(data=rsensordata)
+
+
+# sun sensors
+
+def sunsensors(request):
+    if request.method == 'POST':
+        # if POST add new sensor
+        try:
+            sensor_name = request.POST['name']
+        except KeyError:
+            return JsonResponseBadRequest(reason="No name parameter supplied.")
+        description = request.POST.get('description', default=None)
+        try:
+            SunSensor.objects.get(pk=sensor_name)
+            return JsonResponseBadRequest(reason="SunSensor with supplied name already exists.")
+        except SunSensor.DoesNotExist:
+            s = SunSensor(name=sensor_name, description=description)
+            s.save()
+            rdevices = {'count': 1, 'data': [s.as_json()]}
+            return JsonResponseCreated(data=rdevices)
+    else:
+        # if GET return list of devices_views
+        snsrs = SunSensor.objects.all().order_by('name')
+        rsensors = {'count': len(snsrs), 'data': [s.as_json() for s in snsrs]}
+        return JsonResponse(data=rsensors)
+
+
+def sunsensor(request, sensor_name):
+    try:
+        s = SunSensor.objects.get(pk=sensor_name)
+    except SunSensor.DoesNotExist:
+        return JsonResponseNotFound(reason="No SunSensor with the specified id was found.")
+    if request.method == 'PATCH':
+        # if PATCH add data for sensor
+        # can't change pk (name)
+        try:
+            s.description = request.POST['description']
+        except KeyError:
+            pass
+        s.save()
+        return JsonResponseNoContent()
+    elif request.method == 'DELETE':
+        # if DELETE delete sensor
+        s.delete()
+        return JsonResponseNoContent()
+    else:
+        # if GET get sensor meta data
+        rsensor = {'count': 1, 'data': [s.as_json()]}
+        return JsonResponse(data=rsensor)
+
+
+def get_sunsensor_data(request, sensor: SunSensor):
+    sdata = sensor.sunsensordata_set
+    try:
+        stime = request.GET['starttime']
+        stime = isoparse(stime).replace(tzinfo=None)
+        sdata = sdata.filter(timestamp__gt=stime)
+    except KeyError:
+        pass
+    try:
+        etime = request.GET['endtime']
+        etime = isoparse(etime).replace(tzinfo=None)
+    except KeyError:
+        etime = datetime.now(timezone.utc)
+    sdata = sdata.filter(timestamp__lte=etime)
+    try:
+        datapts = request.GET['datapts']
+        datapts = int(datapts)
+    except KeyError:
+        sdata = sdata.order_by('-timestamp')
+    else:
+        sdata = sdata.order_by('-timestamp')[:datapts]
+    data = [s.as_json() for s in sdata]
+    return {'count': len(data), 'data': data}
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def sunsensor_data(request, sensor_name):
+    if request.method == 'POST':
+        # if POST add data for sensor
+        try:
+            timestamp = request.POST['timestamp']
+            timestamp = datetime.fromisoformat(timestamp)
+        except KeyError:
+            timestamp = datetime.today()
+        try:
+            value = request.POST['value']
+            value = Decimal(value)
+        except KeyError:
+            return JsonResponseBadRequest(reason="Missing value parameter")
+        try:
+            s = SunSensor.objects.get(pk=sensor_name)
+        except SunSensor.DoesNotExist:
+            return JsonResponseNotFound("No Sensor with the specified id was found.")
+        s = SunSensorData(sensor=s, timestamp=timestamp, value=value)
+        s.save()
+        rdevices = {'count': 1, 'data': [s.as_json()]}
+        return JsonResponseCreated(data=rdevices)
+    else:
+        # if GET get data for sensor
+        try:
+            s = SunSensor.objects.get(pk=sensor_name)
+        except SunSensor.DoesNotExist:
+            return JsonResponseNotFound("No SunSensor with the specified id was found.")
+        rsensordata = get_sunsensor_data(request, s)
         return JsonResponse(data=rsensordata)
 
 
@@ -440,7 +647,7 @@ def get_relay_data(request, relay: Relay):
         etime = request.GET['endtime']
         etime = isoparse(etime).replace(tzinfo=None)
     except KeyError:
-        etime = datetime.utcnow()
+        etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']

@@ -1,5 +1,5 @@
 from django.db import models
-from devices.models import TempSensor
+from devices.models import TempSensor, WindSensor, SunSensor
 
 
 class Boiler(models.Model):
@@ -67,3 +67,4 @@ class Zone(models.Model):
                                    'sensor_out': f"/devices/{self.sensor_out.name}",}
                  }
         return dself
+

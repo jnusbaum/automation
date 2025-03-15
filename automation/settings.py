@@ -37,13 +37,14 @@ INSTALLED_APPS = [
     'heating_views.apps.HeatingViewsConfig',
     'hotwater.apps.HotwaterConfig',
     'hotwater_views.apps.HotwaterViewsConfig',
-    'exterior.apps.ExteriorConfig',
+    'weather.apps.WeatherConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'weather_views.apps.WeatherViewsConfig'
 ]
 
 MIDDLEWARE = [
@@ -124,6 +125,11 @@ LOGGING = {
             'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
             # 'filename': '/home/ubuntu/automation/log/tempcapture.log',
         },
+        'exteriorcapture': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/home/rjn/Projects/automation/log/exteriorcapture.log',
+        },
         'relaycapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
@@ -146,6 +152,11 @@ LOGGING = {
     'loggers': {
         'tempcapture': {
             'handlers': ['tempcapture'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'exteriorcapture': {
+            'handlers': ['exteriorcapture'],
             'level': 'DEBUG',
             'propagate': True,
         },

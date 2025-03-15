@@ -7,7 +7,6 @@ urlpatterns = [
     path('devices/', views.devices, name='api_devices'),
     path('devices/<device_name>/', views.device, name='api_device'),
     path('devices/<device_name>/config/', views.device_config, name='api_device'),
-    path('devices/<device_name>/onewireinterfaces/', views.onewireinterfaces_for_device, name='api_onewireinterfaces_for_device'),
     path('devices/<device_name>/tempsensors/', views.tempsensors_for_device, name='api_tempsensors_for_device'),
     path('devices/<device_name>/relays/', views.relays_for_device, name='api_relays_for_device'),
     path('devices/<device_name>/data/', views.device_data, name='api_device_data'),

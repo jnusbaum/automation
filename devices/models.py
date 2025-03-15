@@ -60,7 +60,7 @@ class OneWireInterface(models.Model):
         verbose_name = "OneWireInterface"
         verbose_name_plural = "OneWireInterfaces"
 
-    def as_json(self, altvalue=None):
+    def as_json(self):
         dself = {'attributes': {'description': self.description,
                                 'pin_number': self.pin_number},
                  'id': self.id,
@@ -113,6 +113,9 @@ class TempSensorData(models.Model):
     class Meta:
         verbose_name = "TempSensorData"
         verbose_name_plural = "TempSensorData"
+        constraints = [
+            models.UniqueConstraint(fields=['sensor', 'timestamp'], name='devices_tsensordata_unique'),
+        ]
         indexes = [
             models.Index(fields=['sensor', '-timestamp'], name='devices_tsensordata_sid_ts'),
         ]
@@ -125,6 +128,101 @@ class TempSensorData(models.Model):
                  'type': 'TempSensorData',
                  'self': f"/tempsensors/{self.sensor.name}/data/{self.id}/",
                  'relationships': {'sensor': f"/tempsensors/{self.sensor.name}/"}
+                 }
+        return dself
+
+
+class WindSensor(models.Model):
+    name = models.CharField(max_length=64, primary_key=True)
+    description = models.CharField(max_length=512, null=True)
+
+    class Meta:
+        verbose_name = "WindSensor"
+        verbose_name_plural = "WindSensors"
+
+    def as_json(self):
+        dself = {'attributes': {'description': self.description},
+                 'id': self.name,
+                 'type': 'WindSensor',
+                 'self': f"/devices/{self.name}",
+                 'relationships': {'data': f"/windsensors/{self.name}/data/"},
+                 }
+        return dself
+
+
+class WindSensorData(models.Model):
+    sensor = models.ForeignKey(WindSensor, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    value = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.sensor_id}:{self.timestamp}"
+
+    class Meta:
+        verbose_name = "WindSensorData"
+        verbose_name_plural = "WindSensorData"
+        constraints = [
+            models.UniqueConstraint(fields=['sensor', 'timestamp'], name='devices_wsensordata_unique'),
+        ]
+        indexes = [
+            models.Index(fields=['sensor', '-timestamp'], name='devices_wsensordata_sid_ts'),
+        ]
+
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'value': self.value},
+                 'id': self.id,
+                 'type': 'WindSensorData',
+                 'self': f"/windsensors/{self.sensor.name}/data/{self.id}/",
+                 'relationships': {'sensor': f"/windsensors/{self.sensor.name}/"}
+                 }
+        return dself
+
+
+class SunSensor(models.Model):
+    name = models.CharField(max_length=64, primary_key=True)
+    description = models.CharField(max_length=512, null=True)
+
+    class Meta:
+        verbose_name = "SunSensor"
+        verbose_name_plural = "SunSensors"
+
+    def as_json(self):
+        dself = {'attributes': {'description': self.description},
+                 'id': self.name,
+                 'type': 'SunSensor',
+                 'self': f"/devices/{self.name}",
+                 'relationships': {'data': f"/sunsensors/{self.name}/data/"},
+                 }
+        return dself
+
+
+class SunSensorData(models.Model):
+    sensor = models.ForeignKey(SunSensor, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(default=timezone.now)
+    value = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.sensor_id}:{self.timestamp}"
+
+    class Meta:
+        verbose_name = "SunSensorData"
+        verbose_name_plural = "SunSensorData"
+        constraints = [
+            models.UniqueConstraint(fields=['sensor', 'timestamp'], name='devices_ssensordata_unique'),
+        ]
+        indexes = [
+            models.Index(fields=['sensor', '-timestamp'], name='devices_ssensordata_sid_ts'),
+        ]
+
+    def as_json(self):
+        dself = {'attributes': {'timestamp': round(self.timestamp.timestamp() * 1000),
+                                'value': self.value,
+                                },
+                 'id': self.id,
+                 'type': 'SunSensorData',
+                 'self': f"/sunsensors/{self.sensor.name}/data/{self.id}/",
+                 'relationships': {'sensor': f"/sunsensors/{self.sensor.name}/"}
                  }
         return dself
 

@@ -13,7 +13,7 @@ class TestAPI(unittest.TestCase):
     device_name = 'TEST'
     relay_name = 'TEST'
     ow_pin = 2
-    ow_id = 0;
+    ow_id = 0
 
     def setUp(self):
         print('setup test')

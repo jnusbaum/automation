@@ -59,7 +59,7 @@ def sensors_for_zone(zone_name):
     except Zone.DoesNotExist:
         return JsonResponseNotFound(reason="No Zone with the specified id was found.")
     # devices_views for zone
-    rsensors = {'count': len(z.sensors), 'data': [s.as_json for s in z.sensors]}
+    rsensors = {'count': 2, 'data': [s.as_json for s in (z.sensor_in, z.sensor_out)]}
     return JsonResponse(data=rsensors)
 
 

@@ -28,4 +28,6 @@ urlpatterns = [
     path('automation/heating/api/', include('heating.urls')),
     path('automation/hotwater/dashboard/', include('hotwater_views.urls')),
     path('automation/hotwater/api/', include('hotwater.urls')),
+    path('automation/weather/dashboard/', include('weather_views.urls')),
+    path('automation/weather/api/', include('weather.urls')),
 ]
