@@ -1,11 +1,10 @@
 from ambient_api.ambientapi import AmbientAPI
 from django.core.management.base import BaseCommand
-import datetime, time
 import logging
-
+from datetime import datetime, timezone
 from devices.models import TempSensorData, WindSensorData, SunSensorData
 from weather.models import Weather
-from django.db import OperationalError
+from django.db import OperationalError, IntegrityError
 import os
 
 
@@ -20,62 +19,62 @@ class Command(BaseCommand):
     help = 'capture weather sensor data'
 
     def handle(self, *args, **options):
+        # run in cron on a 5 minute cycle
         api = AmbientAPI()
         devices = api.get_devices()
         device = devices[0]
-        time.sleep(1)  # pause for a second to avoid API limits
-        ddata = device.get_data()
-        timestamp = datetime.datetime.fromtimestamp(ddata[0]['dateutc']/1000)
-        data = ddata[0]
+        data = device.last_data
+        timestamp = datetime.fromtimestamp(timestamp=data['dateutc']/1000, tz=timezone.utc)
+        received_timestamp = datetime.now(tz=timezone.utc)
 
         weather = Weather.objects.get(pk='OUTSIDE')
         tdata = TempSensorData(sensor=weather.sensor_temp,
                                timestamp=timestamp,
                                value=data['tempf'],
-                               original_value=data['tempf']
+                               original_value=data['tempf'],
+                               received_timestamp=received_timestamp
                                )
         try:
             tdata.save()
         except OperationalError:
-            # db locked
+            # log error but continue
             logger.error(f"error - db locked")
-        except KeyError:
-            # duplicate
-            pass
-        except ValueError:
-            # bad value
-            logger.error(f"error - bad value for temperature")
+        except IntegrityError:
+            # duplicate timestamp, ignore
+            logger.warning(f"warning - duplicate sensor, timestamp")
+        else:
+            logger.debug(f"saved data for sensor = {weather.sensor_temp.name}")
 
         wdata = WindSensorData(sensor=weather.sensor_wind,
                                timestamp=timestamp,
-                               value=data['windspeedmph']
+                               value=data['windspeedmph'],
+                               received_timestamp=received_timestamp
                                )
         try:
             wdata.save()
         except OperationalError:
-            # db locked
+            # log error but continue
             logger.error(f"error - db locked")
-        except KeyError:
-            # duplicate
-            pass
-        except ValueError:
-            # bad value
-            logger.error(f"error - bad value for wind")
+        except IntegrityError:
+            # duplicate timestamp, ignore
+            logger.warning(f"warning - duplicate sensor, timestamp")
+        else:
+            logger.debug(f"saved data for sensor = {weather.sensor_wind.name}")
 
         sdata = SunSensorData(sensor=weather.sensor_sun,
                               timestamp=timestamp,
-                              value=data['solarradiation']
+                              value=data['solarradiation'],
+                              received_timestamp=received_timestamp
                               )
         try:
             sdata.save()
         except OperationalError:
-            # db locked
+            # log error but continue
             logger.error(f"error - db locked")
-        except KeyError:
-            # duplicate
-            pass
-        except ValueError:
-            # bad value
-            logger.error(f"error - bad value for sunshine")
+        except IntegrityError:
+            # duplicate timestamp, ignore
+            logger.warning(f"warning - duplicate sensor, timestamp")
+        else:
+            logger.debug(f"saved data for sensor = {weather.sensor_sun.name}")
 
 

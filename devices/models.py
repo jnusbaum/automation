@@ -106,6 +106,7 @@ class TempSensorData(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
     value = models.DecimalField(max_digits=10, decimal_places=2)
     original_value = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    received_timestamp = models.DateTimeField(null=True)
 
     def __str__(self):
         return f"{self.sensor_id}:{self.timestamp}"
@@ -154,6 +155,7 @@ class WindSensorData(models.Model):
     sensor = models.ForeignKey(WindSensor, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
     value = models.DecimalField(max_digits=10, decimal_places=2)
+    received_timestamp = models.DateTimeField(null=True)
 
     def __str__(self):
         return f"{self.sensor_id}:{self.timestamp}"
@@ -201,6 +203,7 @@ class SunSensorData(models.Model):
     sensor = models.ForeignKey(SunSensor, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
     value = models.DecimalField(max_digits=10, decimal_places=2)
+    received_timestamp = models.DateTimeField(null=True)
 
     def __str__(self):
         return f"{self.sensor_id}:{self.timestamp}"
@@ -252,6 +255,7 @@ class RelayData(models.Model):
     relay = models.ForeignKey(Relay, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
     value = models.BooleanField()
+    received_timestamp = models.DateTimeField(null=True)
 
     def __str__(self):
         return f"{self.relay_id}:{self.timestamp}"

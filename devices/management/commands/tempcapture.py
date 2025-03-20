@@ -1,9 +1,11 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import IntegrityError
+
 from devices.models import TempSensorData
 from django.db.utils import OperationalError
 
@@ -41,8 +43,7 @@ def on_message(client, userdata, msg):
     payload = json.loads(msg.payload)
     logger.debug(f"got mesg, payload = {payload}")
     fsname = payload['sensor']
-    timestamp = datetime.fromtimestamp(payload['timestamp'], tz=pytz.timezone("UTC"))
-    timestamp = timestamp.replace(tzinfo=None)
+    timestamp = datetime.fromtimestamp(payload['timestamp'], tz=timezone.utc)
     value = payload['value']
     ovalue = value
     try:
@@ -59,12 +60,23 @@ def on_message(client, userdata, msg):
         else:
             cache[fsname] = value
 
-    s = TempSensorData(sensor_id=fsname, timestamp=timestamp, value=value, original_value=ovalue)
+    s = TempSensorData(
+        sensor_id=fsname,
+        timestamp=timestamp,
+        value=value,
+        original_value=ovalue,
+        received_timestamp=datetime.now(timezone.utc)
+    )
     try:
         s.save()
     except OperationalError:
+        # log error but continue
         logger.error(f"error - db locked")
-    logger.debug(f"saved data for sensor = {fsname}")
+    except IntegrityError:
+        # duplicate timestamp, ignore
+        logger.warning(f"warning - duplicate sensor, timestamp")
+    else:
+        logger.debug(f"saved data for sensor = {fsname}")
 
 
 class Command(BaseCommand):

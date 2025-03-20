@@ -125,10 +125,10 @@ LOGGING = {
             'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
             # 'filename': '/home/ubuntu/automation/log/tempcapture.log',
         },
-        'exteriorcapture': {
+        'weathercapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/exteriorcapture.log',
+            'filename': '/home/rjn/Projects/automation/log/weathercapture.log',
         },
         'relaycapture': {
             'level': 'DEBUG',
@@ -155,8 +155,8 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        'exteriorcapture': {
-            'handlers': ['exteriorcapture'],
+        'weathercapture': {
+            'handlers': ['weathercapture'],
             'level': 'DEBUG',
             'propagate': True,
         },
