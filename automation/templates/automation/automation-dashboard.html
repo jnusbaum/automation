@@ -13,7 +13,7 @@
 
       $(document).ready(setupData);
 
-      let offset = new Date().getTimezoneOffset() * 60 * 1000;
+      // let offset = new Date().getTimezoneOffset() * 60 * 1000;
       let sensorNames = [];
 
       function selectColor(temp) {
@@ -44,8 +44,8 @@
                   function (adata) {
                       // process data
                       adata.data.forEach(function(sensordata) {
-                          let timestamp = new Date(sensordata.attributes.timestamp - offset);
-                          $('#'+sname+'-TS').text(timestamp.toLocaleString('en-US', {timeZone: 'America/Denver'}).replace(',', ''));
+                          let timestamp = new Date(sensordata.attributes.timestamp);
+                          $('#'+sname+'-TS').text(timestamp.toLocaleString('en-US').replace(',', ''));
                           let val = sensordata.attributes.value;
                           // update data in DOM
                           let newcls = selectColor(val);
