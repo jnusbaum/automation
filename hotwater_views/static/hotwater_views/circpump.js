@@ -134,7 +134,7 @@ class CircPump {
             this.pumpMaxPoints = 0;
         }
 
-        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+        // this.offset = new Date().getTimezoneOffset() * 60 * 1000;
         // dataset indices
         this.inIndex = 0;
         this.pumpIndex = 0;
@@ -156,7 +156,7 @@ class CircPump {
                     let pumpLen = 0;
                     for (let i = pumpcount - 1; i >= 0; i--) {
                         pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.push({
-                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
+                            t: pumpdata[i]['attributes']['timestamp'],
                             y: pumpdata[i]['attributes']['value']
                         });
                         if (pumpLen > this.pumpMaxPoints) {
@@ -168,7 +168,7 @@ class CircPump {
                     // no data
                     for (let i = 0; i < pumpcount; i++) {
                         pumpLen = this.pumpChart.data.datasets[this.pumpIndex].data.unshift({
-                            t: pumpdata[i]['attributes']['timestamp'] - this.offset,
+                            t: pumpdata[i]['attributes']['timestamp'],
                             y: pumpdata[i]['attributes']['value']
                         });
                     }
@@ -192,7 +192,7 @@ class CircPump {
                     // already have data
                     for (let i = sincount - 1; i >= 0; i--) {
                         sinLen = this.tempChart.data.datasets[this.inIndex].data.push({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                         if (sinLen > this.tempMaxPoints) {
@@ -204,7 +204,7 @@ class CircPump {
                     // no data
                     for (let i = 0; i < sincount; i++) {
                         sinLen = this.tempChart.data.datasets[this.inIndex].data.unshift({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                     }

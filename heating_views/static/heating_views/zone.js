@@ -104,7 +104,7 @@ class Zone {
             this.outMaxPoints = 0;
         }
 
-        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+        // this.offset = new Date().getTimezoneOffset() * 60 * 1000;
         // dataset indices
         this.inIndex = 0;
         this.outIndex = 1;
@@ -125,7 +125,7 @@ class Zone {
                     // already have data
                     for (let i = sincount - 1; i >= 0; i--) {
                         sinLen = this.lineChart.data.datasets[this.inIndex].data.push({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                         if (sinLen > this.inMaxPoints) {
@@ -137,7 +137,7 @@ class Zone {
                     // no data
                     for (let i = 0; i < sincount; i++) {
                         sinLen = this.lineChart.data.datasets[this.inIndex].data.unshift({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                     }
@@ -159,7 +159,7 @@ class Zone {
                     // already have data
                     for (let i = soutcount - 1; i >= 0; i--) {
                         soutLen = this.lineChart.data.datasets[this.outIndex].data.push({
-                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            t: soutdata[i]['attributes']['timestamp'],
                             y: soutdata[i]['attributes']['value']
                         });
                         if (soutLen > this.outMaxPoints) {
@@ -171,7 +171,7 @@ class Zone {
                     // no data
                     for (let i = 0; i < soutcount; i++) {
                         soutLen = this.lineChart.data.datasets[this.outIndex].data.unshift({
-                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            t: soutdata[i]['attributes']['timestamp'],
                             y: soutdata[i]['attributes']['value']
                         });
                     }

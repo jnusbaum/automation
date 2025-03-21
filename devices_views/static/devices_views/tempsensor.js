@@ -77,7 +77,7 @@ class TempSensor {
             this.maxPoints = 0;
         }
 
-        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+        // this.offset = new Date().getTimezoneOffset() * 60 * 1000;
         // dataset indices
         this.index = 0;
         // last ts loaded
@@ -99,7 +99,7 @@ class TempSensor {
                     // already have data
                     for (let i = scount - 1; i >= 0; i--) {
                         sLen = this.lineChart.data.datasets[this.index].data.push({
-                            t: sdata[i]['attributes']['timestamp'] - this.offset,
+                            t: sdata[i]['attributes']['timestamp'],
                             y: sdata[i]['attributes']['value']
                         });
                         if (sLen > this.maxPoints) {
@@ -111,7 +111,7 @@ class TempSensor {
                     // no data
                     for (let i = 0; i < scount; i++) {
                         sLen = this.lineChart.data.datasets[this.index].data.unshift({
-                            t: sdata[i]['attributes']['timestamp'] - this.offset,
+                            t: sdata[i]['attributes']['timestamp'],
                             y: sdata[i]['attributes']['value']
                         });
                     }

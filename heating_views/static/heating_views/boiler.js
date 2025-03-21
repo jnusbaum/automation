@@ -128,7 +128,7 @@ class Boiler {
             this.burnMaxPoints = 0;
         }
 
-        this.offset = new Date().getTimezoneOffset() * 60 * 1000;
+        // this.offset = new Date().getTimezoneOffset() * 60 * 1000;
         // dataset indices
         this.inIndex = 0;
         this.outIndex = 1;
@@ -153,7 +153,7 @@ class Boiler {
                     // already have data
                     for (let i = sincount - 1; i >= 0; i--) {
                         sinLen = this.lineChart.data.datasets[this.inIndex].data.push({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                         if (sinLen > this.inMaxPoints) {
@@ -165,7 +165,7 @@ class Boiler {
                     // no data
                     for (let i = 0; i < sincount; i++) {
                         sinLen = this.lineChart.data.datasets[this.inIndex].data.unshift({
-                            t: sindata[i]['attributes']['timestamp'] - this.offset,
+                            t: sindata[i]['attributes']['timestamp'],
                             y: sindata[i]['attributes']['value']
                         });
                     }
@@ -187,7 +187,7 @@ class Boiler {
                     // already have data
                     for (let i = soutcount - 1; i >= 0; i--) {
                         soutLen = this.lineChart.data.datasets[this.outIndex].data.push({
-                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            t: soutdata[i]['attributes']['timestamp'],
                             y: soutdata[i]['attributes']['value']
                         });
                         if (soutLen > this.outMaxPoints) {
@@ -199,7 +199,7 @@ class Boiler {
                     // no data
                     for (let i = 0; i < soutcount; i++) {
                         soutLen = this.lineChart.data.datasets[this.outIndex].data.unshift({
-                            t: soutdata[i]['attributes']['timestamp'] - this.offset,
+                            t: soutdata[i]['attributes']['timestamp'],
                             y: soutdata[i]['attributes']['value']
                         });
                     }
@@ -221,7 +221,7 @@ class Boiler {
                     // already have data
                     for (let i = sburncount - 1; i >= 0; i--) {
                         sburnLen = this.lineChart.data.datasets[this.burnIndex].data.push({
-                            t: sburndata[i]['attributes']['timestamp'] - this.offset,
+                            t: sburndata[i]['attributes']['timestamp'],
                             y: sburndata[i]['attributes']['value']
                         });
                         if (sburnLen > this.burnMaxPoints) {
@@ -233,7 +233,7 @@ class Boiler {
                     // no data
                     for (let i = 0; i < sburncount; i++) {
                         sburnLen = this.lineChart.data.datasets[this.burnIndex].data.unshift({
-                            t: sburndata[i]['attributes']['timestamp'] - this.offset,
+                            t: sburndata[i]['attributes']['timestamp'],
                             y: sburndata[i]['attributes']['value']
                         });
                     }
