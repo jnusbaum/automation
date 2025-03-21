@@ -1,6 +1,5 @@
 import json
 from datetime import datetime, timezone
-import pytz
 import paho.mqtt.client as mqtt
 from django.conf import settings
 from django.core.management.base import BaseCommand

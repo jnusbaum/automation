@@ -122,31 +122,31 @@ LOGGING = {
         'tempcapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/tempcapture.log',
+            'filename': '/home/rjn/Deployments/automation/log/tempcapture.log',
             # 'filename': '/home/ubuntu/automation/log/tempcapture.log',
         },
         'weathercapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/home/rjn/Projects/automation/log/weathercapture.log',
+            'filename': '/home/rjn/Deployments/automation/log/weathercapture.log',
         },
         'relaycapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             # 'filename': '/home/ubuntu/automation/log/relaycapture.log',
-            'filename': '/home/rjn/Projects/automation/log/relaycapture.log',
+            'filename': '/home/rjn/Deployments/automation/log/relaycapture.log',
         },
         'devstatuscapture': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             # 'filename': '/home/ubuntu/automation/log/devstatuscapture.log',
-            'filename': '/home/rjn/Projects/automation/log/devstatuscapture.log',
+            'filename': '/home/rjn/Deployments/automation/log/devstatuscapture.log',
         },
         'deviceconfig': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             # 'filename': '/home/ubuntu/automation/log/deviceconfig.log',
-            'filename': '/home/rjn/Projects/automation/log/deviceconfig.log',
+            'filename': '/home/rjn/Deployments/automation/log/deviceconfig.log',
         },
     },
     'loggers': {
