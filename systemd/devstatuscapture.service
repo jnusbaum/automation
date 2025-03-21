@@ -6,8 +6,8 @@ After=network.target multi-user.target mosquitto.service
 [Service]
 User=rjn
 Group=www-data
-WorkingDirectory=/home/rjn/Projects/automation
-ExecStart=/home/rjn/Projects/automation/venv/bin/python /home/rjn/Projects/automation/manage.py devstatuscapture
+WorkingDirectory=/home/rjn/Deployments/automation
+ExecStart=/home/rjn/Deployments/automation/venv/bin/python /home/rjn/Deployments/automation/manage.py devstatuscapture
 
 [Install]
 WantedBy=multi-user.target

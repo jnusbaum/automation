@@ -8,11 +8,11 @@ User=rjn
 Group=www-data
 RuntimeDirectory=dashboard-gunicorn
 RuntimeDirectoryMode=0775
-WorkingDirectory=/home/rjn/Projects/automation
-ExecStart=/home/rjn/Projects/automation/venv/bin/gunicorn \
+WorkingDirectory=/home/rjn/Deployments/automation
+ExecStart=/home/rjn/Deployments/automation/venv/bin/gunicorn \
           --timeout 90 --workers 4 \
-	  --access-logfile /home/rjn/Projects/automation/log/gunicorn.access.log \
-          --error-logfile /home/rjn/Projects/automation/log/gunicorn.error.log \
+	  --access-logfile /home/rjn/Deployments/automation/log/gunicorn.access.log \
+          --error-logfile /home/rjn/Deployments/automation/log/gunicorn.error.log \
           --pid /run/dashboard-gunicorn/pid   \
           --bind unix:/run/dashboard-gunicorn/socket automation.wsgi
 PIDFile=/run/dashboard-gunicorn/pid
