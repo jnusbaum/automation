@@ -2,9 +2,7 @@ from datetime import datetime, timezone
 from decimal import *
 from http import HTTPStatus
 from dateutil.parser import *
-
 from django.http import JsonResponse, HttpResponse
-
 from devices.models import *
 
 
@@ -164,13 +162,13 @@ def get_device_data(request, idevice: Device):
     sdata = idevice.devicestatus_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=None)
+        stime = isoparse(stime).replace(tzinfo=timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=None)
+        etime = isoparse(etime).replace(tzinfo=timezone.utc)
     except KeyError:
         etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
@@ -307,13 +305,13 @@ def get_tempsensor_data(request, sensor: TempSensor):
     sdata = sensor.tempsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=None)
+        stime = isoparse(stime).replace(tzinfo=timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=None)
+        etime = isoparse(etime).replace(tzinfo=timezone.utc)
     except KeyError:
         etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
@@ -416,13 +414,13 @@ def get_windsensor_data(request, sensor: WindSensor):
     sdata = sensor.windsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=None)
+        stime = isoparse(stime).replace(tzinfo=timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=None)
+        etime = isoparse(etime).replace(tzinfo=timezone.utc)
     except KeyError:
         etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
@@ -525,13 +523,13 @@ def get_sunsensor_data(request, sensor: SunSensor):
     sdata = sensor.sunsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=None)
+        stime = isoparse(stime).replace(tzinfo=timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=None)
+        etime = isoparse(etime).replace(tzinfo=timezone.utc)
     except KeyError:
         etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
@@ -639,13 +637,13 @@ def get_relay_data(request, relay: Relay):
     sdata = relay.relaydata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=None)
+        stime = isoparse(stime).replace(tzinfo=timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=None)
+        etime = isoparse(etime).replace(tzinfo=timezone.utc)
     except KeyError:
         etime = datetime.now(timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
