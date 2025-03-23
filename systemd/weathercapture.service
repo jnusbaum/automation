@@ -1,0 +1,15 @@
+[Unit]
+Description=weathercapture daemon
+After=network.target multi-user.target
+
+[Service]
+User=rjn
+Group=www-data
+WorkingDirectory=/home/rjn/Deployments/automation
+Environment="AMBIENT_ENDPOINT=https://rt.ambientweather.net/v1"
+Environment="AMBIENT_API_KEY=2ec9e80358ec4b5b80bbeb6d009071d3c3cb3f856d604c4cb94227277cada3f6"
+Environment="AMBIENT_APPLICATION_KEY=ba1d0b43b3644aa884d2769fdf7d0a8ac9828765b0ec4d6aa16e547b706dac08"
+ExecStart=/home/rjn/Deployments/automation/.venv/bin/python /home/rjn/Deployments/automation/manage.py weathercapture
+
+[Install]
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+import datetime
 from decimal import *
 from http import HTTPStatus
 from dateutil.parser import *
@@ -162,15 +162,15 @@ def get_device_data(request, idevice: Device):
     sdata = idevice.devicestatus_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=timezone.utc)
+        stime = isoparse(stime).replace(tzinfo=datetime.timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=timezone.utc)
+        etime = isoparse(etime).replace(tzinfo=datetime.timezone.utc)
     except KeyError:
-        etime = datetime.now(timezone.utc)
+        etime = datetime.datetime.now(datetime.timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -192,9 +192,9 @@ def device_data(request, device_name):
         # if POST add data for relay
         try:
             timestamp = request.POST['timestamp']
-            timestamp = datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp)
         except KeyError:
-            timestamp = datetime.today()
+            timestamp = datetime.datetime.today()
         try:
             value = request.POST['value']
         except KeyError:
@@ -305,15 +305,15 @@ def get_tempsensor_data(request, sensor: TempSensor):
     sdata = sensor.tempsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=timezone.utc)
+        stime = isoparse(stime).replace(tzinfo=datetime.timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=timezone.utc)
+        etime = isoparse(etime).replace(tzinfo=datetime.timezone.utc)
     except KeyError:
-        etime = datetime.now(timezone.utc)
+        etime = datetime.datetime.now(tz=datetime.timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -335,9 +335,9 @@ def tempsensor_data(request, sensor_name):
         # if POST add data for sensor
         try:
             timestamp = request.POST['timestamp']
-            timestamp = datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp)
         except KeyError:
-            timestamp = datetime.today()
+            timestamp = datetime.datetime.today()
         try:
             value = request.POST['value']
             value = Decimal(value)
@@ -414,15 +414,15 @@ def get_windsensor_data(request, sensor: WindSensor):
     sdata = sensor.windsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=timezone.utc)
+        stime = isoparse(stime).replace(tzinfo=datetime.timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=timezone.utc)
+        etime = isoparse(etime).replace(tzinfo=datetime.timezone.utc)
     except KeyError:
-        etime = datetime.now(timezone.utc)
+        etime = datetime.datetime.now(datetime.timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -436,7 +436,7 @@ def get_windsensor_data(request, sensor: WindSensor):
 
 
 # url options for GET
-# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# targettime=<datetime.datetime: targettime> get data <= <targettime>, default is now
 # datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
 # default is to get latest sensor reading for sensor
 def windsensor_data(request, sensor_name):
@@ -444,9 +444,9 @@ def windsensor_data(request, sensor_name):
         # if POST add data for sensor
         try:
             timestamp = request.POST['timestamp']
-            timestamp = datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp)
         except KeyError:
-            timestamp = datetime.today()
+            timestamp = datetime.datetime.today()
         try:
             value = request.POST['value']
             value = Decimal(value)
@@ -523,15 +523,15 @@ def get_sunsensor_data(request, sensor: SunSensor):
     sdata = sensor.sunsensordata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=timezone.utc)
+        stime = isoparse(stime).replace(tzinfo=datetime.timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=timezone.utc)
+        etime = isoparse(etime).replace(tzinfo=datetime.timezone.utc)
     except KeyError:
-        etime = datetime.now(timezone.utc)
+        etime = datetime.datetime.now(datetime.timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -545,7 +545,7 @@ def get_sunsensor_data(request, sensor: SunSensor):
 
 
 # url options for GET
-# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# targettime=<datetime.datetime: targettime> get data <= <targettime>, default is now
 # datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
 # default is to get latest sensor reading for sensor
 def sunsensor_data(request, sensor_name):
@@ -553,9 +553,9 @@ def sunsensor_data(request, sensor_name):
         # if POST add data for sensor
         try:
             timestamp = request.POST['timestamp']
-            timestamp = datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp)
         except KeyError:
-            timestamp = datetime.today()
+            timestamp = datetime.datetime.today()
         try:
             value = request.POST['value']
             value = Decimal(value)
@@ -637,15 +637,15 @@ def get_relay_data(request, relay: Relay):
     sdata = relay.relaydata_set
     try:
         stime = request.GET['starttime']
-        stime = isoparse(stime).replace(tzinfo=timezone.utc)
+        stime = isoparse(stime).replace(tzinfo=datetime.timezone.utc)
         sdata = sdata.filter(timestamp__gt=stime)
     except KeyError:
         pass
     try:
         etime = request.GET['endtime']
-        etime = isoparse(etime).replace(tzinfo=timezone.utc)
+        etime = isoparse(etime).replace(tzinfo=datetime.timezone.utc)
     except KeyError:
-        etime = datetime.now(timezone.utc)
+        etime = datetime.datetime.now(datetime.timezone.utc)
     sdata = sdata.filter(timestamp__lte=etime)
     try:
         datapts = request.GET['datapts']
@@ -671,7 +671,7 @@ bool_values = {
 
 
 # url options for GET
-# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# targettime=<datetime.datetime: targettime> get data <= <targettime>, default is now
 # datapts=<int: datapts> get <datapts> relay reading back from target time, default is 1
 # default is to get latest relay reading for relay
 def relay_data(request, relay_name):
@@ -679,9 +679,9 @@ def relay_data(request, relay_name):
         # if POST add data for relay
         try:
             timestamp = request.POST['timestamp']
-            timestamp = datetime.fromisoformat(timestamp)
+            timestamp = datetime.datetime.fromisoformat(timestamp)
         except KeyError:
-            timestamp = datetime.today()
+            timestamp = datetime.datetime.today()
         try:
             value = request.POST['value']
             value = bool_values[value]
