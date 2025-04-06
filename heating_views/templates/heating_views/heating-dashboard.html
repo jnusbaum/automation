@@ -14,6 +14,7 @@ Display heating system
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.5/all/gauge.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <script src="{% static 'heating_views/weather.js' %}"></script>
     <script src="{% static 'heating_views/zone.js' %}"></script>
     <script src="{% static 'heating_views/boiler.js' %}"></script>
     <script src="{% static 'heating_views/mixingvalve.js' %}"></script>
@@ -21,6 +22,19 @@ Display heating system
         $( document ).ready(dashSetup);
 
         function dashSetup() {
+            {% for wname in weathers %}
+                {
+                    let weather = new Weather('{{ wname }}',
+                        '{{ wname }}_gauge_temp_div',
+                        '{{ wname }}_gauge_wind_div',
+                        '{{ wname }}_gauge_sun_div',
+                        '{{ wname }}_chart_div',
+                        {{ hours }},
+                        `{{ host }}/heating/api/weathers/{{ wname }}/data/`, 10000);
+                    zone.setup();
+                }
+            {% endfor %}
+
             {% for zname in zones %}
                 {
                     let zone = new Zone('{{ zname }}',
@@ -81,7 +95,32 @@ Display heating system
           </ul>
       </div>
     </nav>
+
     <div class="container-fluid mt-3">
+        {% for wname in weathers %}
+        <div class="row">
+            <div class="col">
+                <h6>{{ wname }}</h6>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="{{ wname }}_gauge_temp_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="{{ wname }}_gauge_wind_div" style="width: 100%;"></canvas>
+            </div>
+            <div class="col-sm-4 col-lg-4 col-xl-2">
+                <canvas id="{{ wname }}_gauge_sun_div" style="width: 100%;"></canvas>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <canvas id="{{ wname }}_chart_div" style=" width: 100%; height: 400px"></canvas>
+            </div>
+        </div>
+        {% endfor %}
+
         {% for zname in zones %}
         <div class="row">
             <div class="col">

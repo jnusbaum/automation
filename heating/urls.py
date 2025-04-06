@@ -16,4 +16,8 @@ urlpatterns = [
     path('mixingvalves/', views.mixingvalves, name='api_mixingvalves'),
     path('mixingvalves/<valve_name>/', views.mixingvalve, name='api_mixingvalve'),
     path('mixingvalves/<valve_name>/data/', views.mixingvalve_data, name='api_mixingvalve_data'),
+
+    path('weathers/', views.weathers, name='api_weathers'),
+    path('weathers/<weather_name>/', views.weather, name='api_weather'),
+    path('weathers/<weather_name>/data/', views.weather_data, name='api_weather_data'),
 ]
