@@ -11,16 +11,16 @@ class Weather {
         if (temp_div) {
             this.gaugeTemp = new RadialGauge({
                 renderTo: temp_div,
-                title: 'IN',
+                title: 'TEMP',
                 width: 200, height: 200,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '60', '90', '120', '150', '180'],
-                minorTicks: 6,
-                highlights: [{from: 30, to: 60, color: 'skyblue'},
-                    {from: 60, to: 90, color: 'aliceblue'},
-                    {from: 90, to: 120, color: 'yellow'},
-                    {from: 120, to: 150, color: 'orange'},
-                    {from: 150, to: 180, color: 'red'}
+                units: 'F', minValue: -20, maxValue: 100,
+                majorTicks: ['-20', '-10', '0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+                minorTicks: 5,
+                highlights: [{from: -20, to: 0, color: 'skyblue'},
+                    {from: 0, to: 40, color: 'aliceblue'},
+                    {from: 40, to: 60, color: 'yellow'},
+                    {from: 60, to: 80, color: 'orange'},
+                    {from: 80, to: 100, color: 'red'}
                 ],
                 valueBox: true,
                 value: 30
@@ -30,38 +30,38 @@ class Weather {
         if (wind_div) {
             this.gaugeWind = new RadialGauge({
                 renderTo: wind_div,
-                title: 'OUT',
+                title: 'WIND',
                 width: 200, height: 200,
-                units: 'F', minValue: 30, maxValue: 180,
-                majorTicks: ['30', '60', '90', '120', '150', '180'],
-                minorTicks: 6,
-                highlights: [{from: 30, to: 60, color: 'skyblue'},
-                    {from: 60, to: 90, color: 'aliceblue'},
-                    {from: 90, to: 120, color: 'yellow'},
-                    {from: 120, to: 150, color: 'orange'},
-                    {from: 150, to: 180, color: 'red'}
+                units: 'MPH', minValue: 0, maxValue: 60,
+                majorTicks: ['0', '5', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60'],
+                minorTicks: 5,
+                highlights: [{from: 0, to: 5, color: 'skyblue'},
+                    {from: 5, to: 15, color: 'aliceblue'},
+                    {from: 15, to: 30, color: 'yellow'},
+                    {from: 30, to: 45, color: 'orange'},
+                    {from: 45, to: 60, color: 'red'}
                 ],
                 valueBox: true,
-                value: 30
+                value: 0
             });
         }
-        this.gaugeBurn = null;
+        this.gaugeSun = null;
         if (sun_div) {
-            this.gaugeBurn = new RadialGauge({
+            this.gaugeSun = new RadialGauge({
                 renderTo: sun_div,
-                title: 'BURN',
+                title: 'SUN',
                 width: 200, height: 200,
-                units: 'F', minValue: 30, maxValue: 270,
-                majorTicks: ['30', '60', '90', '120', '150', '180', '210', '240', '270'],
-                minorTicks: 6,
-                highlights: [{from: 30, to: 60, color: 'skyblue'},
-                    {from: 60, to: 90, color: 'aliceblue'},
-                    {from: 90, to: 120, color: 'yellow'},
-                    {from: 120, to: 150, color: 'orange'},
-                    {from: 150, to: 270, color: 'red'}
+                units: 'L', minValue: 0, maxValue: 600,
+                majorTicks: ['0', '200', '400', '600', '800', '1000', '1200', '1400', '1600'],
+                minorTicks: 10,
+                highlights: [{from: 0, to: 200, color: 'skyblue'},
+                    {from: 200, to: 500, color: 'aliceblue'},
+                    {from: 500, to: 800, color: 'yellow'},
+                    {from: 800, to: 1200, color: 'orange'},
+                    {from: 1200, to: 1600, color: 'red'}
                 ],
                 valueBox: true,
-                value: 30
+                value: 100
             });
         }
 

@@ -31,7 +31,7 @@ Display heating system
                         '{{ wname }}_chart_div',
                         {{ hours }},
                         `{{ host }}/heating/api/weathers/{{ wname }}/data/`, 10000);
-                    zone.setup();
+                    weather.setup();
                 }
             {% endfor %}
 

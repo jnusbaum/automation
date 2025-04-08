@@ -1,4 +1,5 @@
 from heating.models import *
+from weather.models import *
 from devices.views import *
 
 
@@ -230,3 +231,82 @@ def mixingvalve_data(request, valve_name):
                'sensor_boiler_in': get_tempsensor_data(request, z.sensor_boiler_in)}
     rsensordata = {'count': 1, 'data': dseries}
     return JsonResponse(data=rsensordata)
+
+
+# Weathers
+
+def weathers(request):
+    if request.method == 'POST':
+        try:
+            weather_name = request.POST['name']
+        except KeyError:
+            return JsonResponseBadRequest(reason="No name parameter supplied.")
+        # if POST add new weather
+        try:
+            Weather.objects.get(pk=weather_name)
+            return JsonResponseBadRequest(reason="Weather with supplied name already exists.")
+        except Weather.DoesNotExist:
+            description = request.POST.get('description', default=None)
+            sensor_in = request.POST.get('sensor_in', default=None)
+            sensor_out = request.POST.get('sensor_out', default=None)
+            sensor_burn = request.POST.get('sensor_burn', default=None)
+            z = Weather(name=weather_name, description=description,
+                       sensor_in_id=sensor_in,
+                       sensor_out_id=sensor_out,
+                       sensor_burn_id=sensor_burn)
+            z.save()
+            rdevices = {'count': 1, 'data': [z.as_json()]}
+            return JsonResponseCreated(data=rdevices)
+    else:
+        # if GET return list of weathers
+        zns = Weather.objects.all().order_by('name')
+        rweathers = {'count': len(zns), 'data': [z.as_json() for z in zns]}
+        return JsonResponse(data=rweathers)
+
+
+def weather(request, weather_name):
+    try:
+        z = Weather.objects.get(pk=weather_name)
+    except Weather.DoesNotExist:
+        return JsonResponseNotFound(reason="No Weather with the specified id was found.")
+    if request.method == 'PATCH':
+        # if PATCH add data for weather
+        # can't change pk (name)
+        try:
+            z.description = request.POST.get('description', default=z.description)
+            z.sensor_in_id = request.POST.get('sensor_in', default=z.sensor_in_id)
+            z.sensor_out_id = request.POST.get('sensor_out', default=z.sensor_out_id)
+            z.sensor_burn_id = request.POST.get('sensor_burn', default=z.sensor_burn_id)
+            z.save()
+        except KeyError:
+            pass
+        z.save()
+        return JsonResponseNoContent()
+    elif request.method == 'DELETE':
+        # if DELETE delete sensor
+        z.delete()
+        return JsonResponseNoContent()
+    else:
+        # if GET get weather meta data
+        rweather = {'count': 1, 'data': [z.as_json()]}
+        return JsonResponse(data=rweather)
+
+
+# url options for GET
+# targettime=<datetime: targettime> get data <= <targettime>, default is now
+# datapts=<int: datapts> get <datapts> sensor reading back from target time, default is 1
+# default is to get latest sensor reading for sensor
+def weather_data(request, weather_name):
+    # if GET get weather meta data
+    try:
+        z = Weather.objects.get(pk=weather_name)
+    except Weather.DoesNotExist:
+        return JsonResponseNotFound(reason="No Weather with the specified id was found.")
+    dseries = {'sensor_temp': get_tempsensor_data(request, z.sensor_temp),
+               'sensor_wind': get_windsensor_data(request, z.sensor_wind),
+               'sensor_sun': get_sunsensor_data(request, z.sensor_sun)}
+    rsensordata = {'count': 1, 'data': dseries}
+    return JsonResponse(data=rsensordata)
+
+
+
